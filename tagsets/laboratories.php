@@ -8,16 +8,16 @@ function laboratories__strip_lab_name($lab_text="") {
 }
 
 function laboratories__strip_lab_address($lab_text="") {
-        $textarray=explode("\n",$lab_text);
-        unset($textarray[0]);
+    $textarray=explode("\n",$lab_text);
+    unset($textarray[0]);
     $address=implode("\n",$textarray);
     return $address;
 }
 
 function laboratories__select_field($postvarname,$selected) {
     global $lang;
-    echo '<SELECT name="'.$postvarname.'">';
-     $query="SELECT *
+    echo '<span class="select is-primary"><select name="'.$postvarname.'" id="'.$postvarname.'">';
+    $query="SELECT *
             FROM ".table('lang')."
             WHERE content_type='laboratory'
             AND enabled='y'
@@ -26,18 +26,20 @@ function laboratories__select_field($postvarname,$selected) {
     while ($line = pdo_fetch_assoc($result)) {
         $labname=laboratories__strip_lab_name(stripslashes($line[lang('lang')]));
         echo '<OPTION value="'.$line['content_name'].'"';
-        if ($line['content_name']==$selected) echo " SELECTED";
-        echo '>'.$labname.'</OPTION>';
+        if ($line['content_name']==$selected) {
+            echo " SELECTED";
         }
-    echo '</SELECT>';
+        echo '>'.$labname.'</OPTION>';
+    }
+    echo '</select></span>';
 }
 
 function laboratories__get_laboratory_name($laboratory_id) {
-     global $lang;
-     $pars=array(':laboratory_id'=>$laboratory_id);
-     $query="SELECT * FROM ".table('lang')." WHERE content_type='laboratory' AND content_name=:laboratory_id";
-     $lab=orsee_query($query,$pars);
-     return laboratories__strip_lab_name(stripslashes($lab[lang('lang')]));
+    global $lang;
+    $pars=array(':laboratory_id'=>$laboratory_id);
+    $query="SELECT * FROM ".table('lang')." WHERE content_type='laboratory' AND content_name=:laboratory_id";
+    $lab=orsee_query($query,$pars);
+    return laboratories__strip_lab_name(stripslashes($lab[lang('lang')]));
 }
 
 

@@ -1,22 +1,7 @@
 <?php
 // part of orsee. see orsee.org
-ob_start();
-$menu__area="impressum";
-$title="impressum";
-include ("header.php");
-if ($proceed) {
-    if ($settings['show_public_legal_notice']!='y') redirect("public/");
-}
-if ($proceed) {
-
-    echo '<center>
-            <TABLE class="or_formtable" style="width: 80%"><TR><TD>';
-        echo content__get_content("impressum");
-        echo '
-            </TD></TR></TABLE>
-
-            </center>';
-
-}
-include ("footer.php");
+include("../config/settings.php");
+include("../config/system.php");
+include("../config/requires.php");
+redirect('public/index.php?page=impressum');
 ?>

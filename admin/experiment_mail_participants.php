@@ -2,11 +2,14 @@
 // part of orsee. see orsee.org
 ob_start();
 $title="send_invitations";
+include("header.php");
 
-include ("header.php");
 if ($proceed) {
-    if ($_REQUEST['experiment_id']) $experiment_id=$_REQUEST['experiment_id'];
-            else redirect ("admin/");
+    if ($_REQUEST['experiment_id']) {
+        $experiment_id=$_REQUEST['experiment_id'];
+    } else {
+        redirect("admin/");
+    }
 }
 
 if ($proceed) {
@@ -14,19 +17,44 @@ if ($proceed) {
 }
 
 if ($proceed) {
-    if (isset($_REQUEST['id'])) $id=$_REQUEST['id']; else $id="";
+    if (isset($_REQUEST['id'])) {
+        $id=$_REQUEST['id'];
+    } else {
+        $id="";
+    }
 
-    if (isset($_REQUEST['preview']) && $_REQUEST['preview']) $preview=true; else $preview=false;
-    if (isset($_REQUEST['save']) && $_REQUEST['save']) $save=true; else $save=false;
-    if (isset($_REQUEST['send']) && $_REQUEST['send']) $send=true; else $send=false;
-    if (isset($_REQUEST['sendall']) && $_REQUEST['sendall']) $sendall=true; else $sendall=false;
+    if (isset($_REQUEST['preview']) && $_REQUEST['preview']) {
+        $preview=true;
+    } else {
+        $preview=false;
+    }
+    if (isset($_REQUEST['save']) && $_REQUEST['save']) {
+        $save=true;
+    } else {
+        $save=false;
+    }
+    if (isset($_REQUEST['send']) && $_REQUEST['send']) {
+        $send=true;
+    } else {
+        $send=false;
+    }
+    if (isset($_REQUEST['sendall']) && $_REQUEST['sendall']) {
+        $sendall=true;
+    } else {
+        $sendall=false;
+    }
 
-    if ($preview || $save || $send || $sendall) $action=true; else $action=false;
+    if ($preview || $save || $send || $sendall) {
+        $action=true;
+    } else {
+        $action=false;
+    }
 
 
     $experiment=orsee_db_load_array("experiments",$experiment_id,"experiment_id");
-    if (!check_allow('experiment_restriction_override'))
+    if (!check_allow('experiment_restriction_override')) {
         check_experiment_allowed($experiment,"admin/experiment_show.php?experiment_id=".$experiment_id);
+    }
 }
 
 if ($proceed) {
@@ -35,17 +63,9 @@ if ($proceed) {
     $installed_langs=get_languages();
 
 
-    echo '<center>';
-    echo '<TABLE class="or_page_subtitle" style="background: '.$color['page_subtitle_background'].'; color: '.$color['page_subtitle_textcolor'].'; width: 80%;">
-            <TR><TD align="center">
-            '.$experiment['experiment_name'].'
-            </TD>';
-    echo '</TR></TABLE>';
-
-
     if ($action) {
         if (!csrf__validate_request_message()) {
-            redirect ('admin/experiment_mail_participants.php?experiment_id='.$experiment_id);
+            redirect('admin/experiment_mail_participants.php?experiment_id='.$experiment_id);
         }
 
         $sitem=$_REQUEST;
@@ -59,18 +79,32 @@ if ($proceed) {
 
         // well: just to be sure: for all other languages, copy the public default lang
         foreach ($installed_langs as $inst_lang) {
-            if (!in_array($inst_lang,$inv_langs)) $sitem[$inst_lang]=$sitem[$settings['public_standard_language']];
+            if (!in_array($inst_lang,$inv_langs)) {
+                $sitem[$inst_lang]=$sitem[$settings['public_standard_language']];
+            }
         }
 
         // is unknown or known?
-        if (!$id) $done=lang__insert_to_lang($sitem);
-        else $done=orsee_db_save_array($sitem,"lang",$id,"lang_id");
+        $allowed_fields=array('content_type','content_name');
+        foreach ($installed_langs as $inst_lang) {
+            $allowed_fields[]=$inst_lang;
+        }
+        $form_fields=array_filter_allowed($sitem,$allowed_fields);
 
-        if ($done) message (lang('changes_saved'));
-        else message (lang('database_error'));
+        if (!$id) {
+            $done=lang__insert_to_lang($form_fields);
+        } else {
+            $done=orsee_db_save_array($form_fields,"lang",$id,"lang_id");
+        }
+
+        if ($done) {
+            message(lang('changes_saved'));
+        } else {
+            message(lang('database_error'),'error');
+        }
 
         if ($preview) {
-            redirect ('admin/experiment_mail_preview.php?experiment_id='.$experiment_id);
+            redirect('admin/experiment_mail_preview.php?experiment_id='.$experiment_id);
         } elseif ($send || $sendall) {
             // send mails!
 
@@ -80,17 +114,16 @@ if ($proceed) {
                 $whom= ($sendall) ? "all" : "not-invited";
                 $measure_start=getmicrotime();
                 $sent=experimentmail__send_invitations_to_queue($experiment_id,$whom);
-                message ($sent.' '.lang('xxx_inv_mails_added_to_mail_queue'));
+                message($sent.' '.lang('xxx_inv_mails_added_to_mail_queue'));
                 $measure_end=getmicrotime();
                 message(lang('time_needed_in_seconds').': '.round(($measure_end-$measure_start),5));
-                log__admin("experiment_send_invitations","experiment:".$experiment['experiment_name']);
-                redirect ("admin/experiment_mail_participants.php?experiment_id=".$experiment_id);
+                log__admin("experiment_send_invitations","experiment:".$experiment['experiment_name'].", experiment_id:".$experiment['experiment_id']);
+                redirect("admin/experiment_mail_participants.php?experiment_id=".$experiment_id);
             }
-
         } else {
             message(lang('mail_text_saved'));
-            log__admin("experiment_edit_invitation_mail","experiment:".$experiment['experiment_name']);
-            redirect ('admin/'.thisdoc().'?experiment_id='.$experiment_id);
+            log__admin("experiment_edit_invitation_mail","experiment:".$experiment['experiment_name'].", experiment_id:".$experiment['experiment_id']);
+            redirect('admin/'.thisdoc().'?experiment_id='.$experiment_id);
         }
     }
 }
@@ -104,19 +137,27 @@ if ($proceed) {
 
     if (!isset($experiment_mail['lang_id'])) {
         $experiment_mail=array('lang_id'=>'');
-        foreach ($inv_langs as $inv_lang) $experiment_mail[$inv_lang]='';
+        foreach ($inv_langs as $inv_lang) {
+            $experiment_mail[$inv_lang]='';
+        }
     }
 
+    $lang_dirs=lang__is_rtl_all_langs();
     // form
+    show_message();
 
-     echo '<FORM action="'.thisdoc().'" method="post">
+    echo '<div class="orsee-panel">
+            <div class="orsee-panel-title">
+                <div>'.lang('send_invitations').': '.$experiment['experiment_name'].'</div>
+            </div>
+            <div class="orsee-form-shell" style="width: min(100%, 62rem);">
+            <FORM action="'.thisdoc().'" method="post">
             <INPUT type=hidden name="experiment_id" value="'.$experiment_id.'">
             <INPUT type=hidden name="id" value="'.$experiment_mail['lang_id'].'">
-            '.csrf__field().'
-
-            <TABLE class="or_formtable" style="width: 80%;">';
+            '.csrf__field().'';
 
     foreach ($inv_langs as $inv_lang) {
+        $field_dir=(isset($lang_dirs[$inv_lang]) && $lang_dirs[$inv_lang] ? 'rtl' : 'ltr');
         // split in subject and text
         $subject=str_replace(strstr($experiment_mail[$inv_lang],"\n"),"",$experiment_mail[$inv_lang]);
         $body=substr($experiment_mail[$inv_lang],strpos($experiment_mail[$inv_lang],"\n")+1,strlen($experiment_mail[$inv_lang]));
@@ -134,117 +175,108 @@ if ($proceed) {
         }
 
         if (count($inv_langs) > 1) {
-            echo '<TR><TD colspan=2>
-                        <TABLE width="100%" border=0 class="or_panel_title"><TR>
-                        <TD style="background: '.$color['panel_title_background'].'; color: '.$color['panel_title_textcolor'].'">
-                            '.$inv_lang.':
-                        </TD>
-                        </TR></TABLE>
-                    </TD></TR>';
+            echo '<div class="field">
+                    <label class="label">'.$inv_lang.':</label>
+                </div>';
         }
 
-        echo '
-            <TR>
-                <TD>
-                    '.lang('subject').':
-                </TD>
-                <TD>
-                    <INPUT type=text name="'.$inv_lang.'_subject" size=30 maxlength=80 value="'.
-                        stripslashes($subject).'">
-                </TD>
-            </TR>
-                    <TR>
-                <TD valign=top colspan=2>
-                    '.lang('body_of_message').':<BR>
-                    <FONT class="small">'.lang('experimentmail_how_to_rebuild_default').'</FONT>
-                    <BR>
-
-                    <center>
-                    <textarea name="'.$inv_lang.'_body" wrap=virtual rows=20 cols=50>'.
-                        stripslashes($body).'</textarea>
-                    </center>
-                </TD>
-            </TR>';
-
-        echo ' <TR><TD colspan=2>&nbsp;</TD></TR>';
-
+        echo '<div class="field">
+                    <label class="label">'.lang('subject').':</label>
+                    <div class="control">
+                        <input class="input is-primary orsee-input orsee-input-text" dir="'.$field_dir.'" type="text" name="'.$inv_lang.'_subject" size="30" maxlength="80" value="'.htmlspecialchars((string)stripslashes($subject),ENT_QUOTES).'">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">'.lang('body_of_message').':</label>
+                    <p class="help">'.lang('experimentmail_how_to_rebuild_default').'</p>
+                    <div class="control">
+                        <textarea class="textarea is-primary orsee-textarea" dir="'.$field_dir.'" name="'.$inv_lang.'_body" wrap="virtual" rows="17" cols="50">'.htmlspecialchars((string)stripslashes($body),ENT_QUOTES).'</textarea>
+                    </div>
+                </div>';
     }
 
-    echo '
-            <TR><TD colspan=2>
-                <TABLE class="or_option_buttons_box" style="background: '.$color['options_box_background'].';">
-                <TR><TD colspan="2" align="left">
-                    1. '.lang('save_mail_text_only').'
-                </TD></TR>
-                <TR class="empty"><TD align="left">
-                    <INPUT class="button" type=submit name="preview" class="small" value="'.lang('mail_preview').'">
-                </TD><TD align="right">
-                    <INPUT class="button" type=submit name="save" value="'.lang('save').'">
-                </TD></TR>
-                </TABLE>
-            </TD></TR>
-            <TR>
-                <TD colspan=2>
-                    <TABLE class="or_option_buttons_box" style="background: '.$color['options_box_background'].';">
-                    <TR>
-                    <TD>'.lang('assigned_subjects').': '.experiment__count_participate_at($experiment_id).'</TD>
-                    <TD>'.lang('invited_subjects').': '.experiment__count_participate_at($experiment_id,"","invited = :invited",array(':invited'=>1)).'</TD>
-                    <TD>'.lang('registered_subjects').': '.experiment__count_participate_at($experiment_id,"","session_id != :session_id",array(':session_id'=>0)).'</TD>
-                    </TR>
-                    <TR class="empty">
-                    <TD colspan=3>'.lang('inv_mails_in_mail_queue').': ';
-                    $qmails=experimentmail__mails_in_queue("invitation",$experiment_id);
-                    echo $qmails;
+    echo '<div class="orsee-options-edit-list">
+          <div class="orsee-surface-card">
+            <div class="orsee-option-item" style="display: block;">
+                <div class="field">
+                    <div class="control">1. '.lang('save_mail_text_only').'</div>
+                </div>
+                <div class="field orsee-form-row-grid orsee-form-row-grid--2 orsee-form-actions">
+                    <div class="orsee-form-row-col has-text-left">
+                        <INPUT class="button orsee-btn" type=submit name="preview" value="'.lang('mail_preview').'">
+                    </div>
+                    <div class="orsee-form-row-col has-text-right">
+                        <INPUT class="button orsee-btn" type=submit name="save" value="'.lang('save').'">
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="orsee-surface-card">
+            <div class="orsee-option-item" style="display: block;">
+                <div class="orsee-form-row-grid orsee-form-row-grid--3" style="align-items: center;">
+                    <div class="orsee-form-row-col">'.lang('assigned_subjects').': '.experiment__count_participate_at($experiment_id).'</div>
+                    <div class="orsee-form-row-col">'.lang('invited_subjects').': '.experiment__count_participate_at($experiment_id,"","invited = :invited",array(':invited'=>1)).'</div>
+                    <div class="orsee-form-row-col">'.lang('registered_subjects').': '.experiment__count_participate_at($experiment_id,"","session_id != :session_id",array(':session_id'=>0)).'</div>
+                </div>
+            </div>
+            <div class="orsee-option-item" style="display: block;">
+                <div class="field">
+                    <div class="control">'.lang('inv_mails_in_mail_queue').': ';
+    $qmails=experimentmail__mails_in_queue("invitation",$experiment_id);
+    echo $qmails;
 
-        if (check_allow('mailqueue_show_experiment')) {
-                echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.button_link('experiment_mailqueue_show.php?experiment_id='.
-                        $experiment['experiment_id'],lang('monitor_experiment_mail_queue'),'envelope-square');
-        }
-            echo '</TD></TR></TABLE>
-                </TD>
-            </TR>';
+    if (check_allow('mailqueue_show_experiment')) {
+        echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.button_link('experiment_mailqueue_show.php?experiment_id='.
+                $experiment['experiment_id'],lang('monitor_experiment_mail_queue'),'envelope-square');
+    }
+    echo '  </div>
+                </div>
+            </div>
+          </div>';
 
 
-        if ($qmails>0) {
-            echo '  <TR>
-                    <TD colspan=2>
-                        <TABLE class="or_option_buttons_box" style="background: '.$color['options_box_background'].';">
-                            <TR><TD align="left" style="color: '.$color['important_note_textcolor'].';">
+    if ($qmails>0) {
+        echo '<div class="orsee-surface-card">
+                    <div class="orsee-option-item" style="display: block;">
+                        <div class="field">
+                            <div class="control" style="color: var(--color-important-note-text);">
                                 '.$qmails.' '.lang('xxx_inv_mails_for_this_exp_still_in_queue').'
-                            </TD></TR>
-                        </TABLE>
-                    </TD>
-                </TR>';
-        } elseif (check_allow('experiment_invite_participants')) {
-                    echo '  <TR><TD colspan=2>
-                    <TABLE class="or_option_buttons_box" style="background: '.$color['options_box_background'].';">
-                    <TR><TD align="left">
-                                2. '.lang('mail_to_not_got_one').'
-                    </TD></TR>
-                    <TR><TD align="right">
-                        <INPUT class="button" type=submit name="send" value="'.lang('send').'">
-                    </TD></TR>
-                    </TABLE>
-                    </TD></TR>
-                    <TR><TD colspan=2>
-                    <TABLE class="or_option_buttons_box" style="background: '.$color['options_box_background'].';">
-                    <TR><TD align="left">
-                                3. '.lang('mail_have_got_it_already').'
-                    </TD></TR>
-                    <TR class="empty"><TD align="right">
-                        <INPUT class="button" type=submit name="sendall" value="'.lang('send_to_all').'">
-                    </TD></TR>
-                    </TABLE>
-                    </TD></TR>';
-            }
-    echo '
-            </TABLE>
-            </FORM>';
-
-    echo '<BR><A HREF="experiment_show.php?experiment_id='.$experiment_id.'">'.
-            lang('mainpage_of_this_experiment').'</A><BR><BR>
-
-        </CENTER>';
+                            </div>
+                        </div>
+                    </div>
+                  </div>';
+    } elseif (check_allow('experiment_invite_participants')) {
+        echo '<div class="orsee-surface-card">
+                            <div class="orsee-option-item" style="display: block;">
+                                <div class="field">
+                                    <div class="control">2. '.lang('mail_to_not_got_one').'</div>
+                                </div>
+                                <div class="field orsee-form-actions">
+                                    <div class="control has-text-right">
+                                        <INPUT class="button orsee-btn" type=submit name="send" value="'.lang('send').'">
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                          <div class="orsee-surface-card">
+                            <div class="orsee-option-item" style="display: block;">
+                                <div class="field">
+                                    <div class="control">3. '.lang('mail_have_got_it_already').'</div>
+                                </div>
+                                <div class="field orsee-form-actions">
+                                    <div class="control has-text-right">
+                                        <INPUT class="button orsee-btn" type=submit name="sendall" value="'.lang('send_to_all').'">
+                                    </div>
+                                </div>
+                            </div>
+                          </div>';
+    }
+    echo '</div>
+          </FORM>
+          <div class="orsee-options-actions">'.button_back('experiment_show.php?experiment_id='.$experiment_id).'</div>
+        </div>
+      </div>';
 }
-include ("footer.php");
+include("footer.php");
+
 ?>

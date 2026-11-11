@@ -1,10 +1,10 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-
 $title="configure_oauth_tokens";
 $menu__area="options_main";
-include ("header.php");
+include("header.php");
+
 if ($proceed) {
     $allow=check_allow('settings_oauth_edit','options_main.php');
 }
@@ -62,28 +62,28 @@ if ($proceed) {
                 header("Location: ".$authorization_url);
                 exit;
             }
-            message(lang('oauth_msg_url_generated_no_redirect'),"error_message");
+            message(lang('oauth_msg_url_generated_no_redirect'),'warning');
         } catch (Exception $e) {
-            message(lang('oauth_msg_url_generation_failed').": ".$e->getMessage(),"error_message");
+            message(lang('oauth_msg_url_generation_failed').": ".$e->getMessage(),'error');
         }
     }
 
     if ($allow_edit && isset($_REQUEST['do_action']) && $_REQUEST['do_action']=="exchange_code") {
         $authorization_code=(isset($_REQUEST['authorization_code']) ? trim((string)$_REQUEST['authorization_code']) : "");
         if ($authorization_code==="") {
-            message(lang('oauth_msg_please_provide_authorization_code'),"error_message");
+            message(lang('oauth_msg_please_provide_authorization_code'),'warning');
         } else {
             try {
                 $token_response=experimentmail__oauth_exchange_authorization_code($oauth_config,$redirect_uri,$authorization_code);
                 $saved=experimentmail__oauth_store_token_response($oauth_config,$token_response,'smtp_send');
                 $token_response_json=json_encode($token_response,JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
                 if (!$saved) {
-                    message(lang('oauth_msg_token_exchange_storing_failed'),"error_message");
+                    message(lang('oauth_msg_token_exchange_storing_failed'),'error');
                 } else {
                     message(lang('oauth_msg_token_stored_for_identity')." ".$oauth_config['identity'].".");
                 }
             } catch (Exception $e) {
-                message(lang('oauth_msg_code_exchange_failed').": ".$e->getMessage(),"error_message");
+                message(lang('oauth_msg_code_exchange_failed').": ".$e->getMessage(),'error');
             }
         }
     }
@@ -96,36 +96,36 @@ if ($proceed) {
             $saved=experimentmail__oauth_store_token_response($oauth_config,$token_response,'smtp_send');
             $token_response_json=json_encode($token_response,JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             if (!$saved) {
-                message(lang('oauth_msg_auto_token_exchange_storing_failed'),"error_message");
+                message(lang('oauth_msg_auto_token_exchange_storing_failed'),'error');
             } else {
                 message(lang('oauth_msg_auto_token_stored_for_identity')." ".$oauth_config['identity'].".");
             }
         } catch (Exception $e) {
-            message(lang('oauth_msg_auto_code_exchange_failed').": ".$e->getMessage(),"error_message");
+            message(lang('oauth_msg_auto_code_exchange_failed').": ".$e->getMessage(),'error');
         }
     } elseif (isset($_REQUEST['error']) && trim((string)$_REQUEST['error'])!=="") {
         $oauth_error=trim((string)$_REQUEST['error']);
         $oauth_error_desc=(isset($_REQUEST['error_description']) ? trim((string)$_REQUEST['error_description']) : "");
         if ($oauth_error_desc!=="") {
-            message(lang('oauth_msg_provider_returned_error').": ".$oauth_error." (".$oauth_error_desc.")","error_message");
+            message(lang('oauth_msg_provider_returned_error').": ".$oauth_error." (".$oauth_error_desc.")",'error');
         } else {
-            message(lang('oauth_msg_provider_returned_error').": ".$oauth_error,"error_message");
+            message(lang('oauth_msg_provider_returned_error').": ".$oauth_error,'error');
         }
     }
 
     if ($allow_edit && isset($_REQUEST['do_action']) && $_REQUEST['do_action']=="refresh_test") {
         if (!$has_refresh_token_available) {
-            message(lang('oauth_msg_no_refresh_token_available'),"error_message");
+            message(lang('oauth_msg_no_refresh_token_available'),'warning');
         } else {
             try {
                 $access_token=experimentmail__oauth_get_valid_access_token($oauth_config,'smtp_send');
                 if ($access_token && strlen($access_token)>10) {
                     message(lang('oauth_msg_refresh_test_succeeded'));
                 } else {
-                    message(lang('oauth_msg_refresh_test_failed_no_access_token'),"error_message");
+                    message(lang('oauth_msg_refresh_test_failed_no_access_token'),'error');
                 }
             } catch (Exception $e) {
-                message(lang('oauth_msg_refresh_test_failed').": ".$e->getMessage(),"error_message");
+                message(lang('oauth_msg_refresh_test_failed').": ".$e->getMessage(),'error');
             }
         }
         $stored_token=experimentmail__oauth_tokens__load('smtp_send',$oauth_config['identity'],$oauth_config['provider']);
@@ -135,102 +135,162 @@ if ($proceed) {
 }
 
 if ($proceed) {
-    echo '<center>';
     show_message();
 
-    echo '<TABLE class="or_formtable" style="width: 90%; max-width: 1100px;">
-            ';
+    echo '<div class="orsee-panel">
+            <div class="orsee-panel-title">
+                <div class="orsee-panel-title-main">'.lang('configure_oauth_tokens').'</div>
+            </div>
+            <div class="orsee-form-shell">';
 
-    echo '<TR><TD colspan="2">
-            This page uses OAuth identity definitions from <code>config/settings.php</code> (<code>$settings__phpmailer_smtp_oauth_identities</code>).
-            You can authenticate the selected identity here with the provider.
-            Tokens are currently stored for SMTP sending (<code>purpose=smtp_send</code>).
-          </TD></TR>';
+    echo '      <div class="field">
+                    <div class="control">
+                        This page uses OAuth identity definitions from <code>config/settings.php</code> (<code>$settings__phpmailer_smtp_oauth_identities</code>).
+                        You can authenticate the selected identity here with the provider.
+                        Tokens are currently stored for SMTP sending (<code>purpose=smtp_send</code>).
+                    </div>
+                </div>';
 
-    echo '<TR><TD colspan="2"><hr></TD></TR>';
-    echo '<TR><TD colspan="2"><B>Step 1: Generate authorization URL (skip if you already have an authorization code)</B></TD></TR>';
+    echo '      <div class="field">
+                    <hr>
+                </div>';
 
-    echo '<FORM action="options_oauth_tokens.php" method="post">';
-    echo '<INPUT type="hidden" name="do_action" value="generate_url">';
-    echo '<TR><TD>Configured identity</TD><TD>';
-    echo '<SELECT name="identity_key">';
+    echo '      <form action="options_oauth_tokens.php" method="post">
+                    <input type="hidden" name="do_action" value="generate_url">
+                    <div class="field">
+                        <label class="label">Configured identity</label>
+                        <div class="control">
+                            <div class="select is-primary">
+                                <select name="identity_key">';
     foreach ($identity_keys as $k) {
-        echo '<OPTION value="'.htmlspecialchars($k).'"';
+        echo '<option value="'.htmlspecialchars($k).'"';
         if ($k===$selected_identity_key) {
             echo ' selected';
         }
-        echo '>'.htmlspecialchars($k).'</OPTION>';
+        echo '>'.htmlspecialchars($k).'</option>';
     }
-    echo '</SELECT>';
-    echo '</TD></TR>';
-
-    echo '<TR><TD>Provider</TD><TD>'.htmlspecialchars((string)$oauth_config['provider']).'</TD></TR>';
-    echo '<TR><TD>OAuth identity</TD><TD>'.htmlspecialchars((string)$oauth_config['identity']).'</TD></TR>';
-    echo '<TR><TD>Token endpoint</TD><TD>'.htmlspecialchars((string)$oauth_config['token_endpoint']).'</TD></TR>';
-    echo '<TR><TD>Scopes</TD><TD>'.htmlspecialchars((string)$oauth_config['scopes']).'</TD></TR>';
-    echo '<TR><TD>Redirect URI</TD><TD>'.htmlspecialchars($redirect_uri).'</TD></TR>';
-    echo '<TR><TD>State</TD><TD>'.htmlspecialchars($state).'</TD></TR>';
+    echo '                      </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Provider</label>
+                        <div class="control">'.htmlspecialchars((string)$oauth_config['provider']).'</div>
+                    </div>
+                    <div class="field">
+                        <label class="label">OAuth identity</label>
+                        <div class="control">'.htmlspecialchars((string)$oauth_config['identity']).'</div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Token endpoint</label>
+                        <div class="control">'.htmlspecialchars((string)$oauth_config['token_endpoint']).'</div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Scopes</label>
+                        <div class="control">'.htmlspecialchars((string)$oauth_config['scopes']).'</div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Redirect URI</label>
+                        <div class="control">'.htmlspecialchars($redirect_uri).'</div>
+                    </div>
+                    <div class="field">
+                        <label class="label">State</label>
+                        <div class="control">'.htmlspecialchars($state).'</div>
+                    </div>';
     if (count($oauth_missing_fields)>0) {
-        echo '<TR><TD>Configuration warning</TD><TD><FONT color="red">This identity entry in config/settings.php is incomplete. Missing: '.htmlspecialchars(implode(", ",$oauth_missing_fields)).'.</FONT></TD></TR>';
+        echo '  <div class="field">
+                    <label class="label">Configuration warning</label>
+                    <div class="control"><font color="red">This identity entry in config/settings.php is incomplete. Missing: '.htmlspecialchars(implode(", ",$oauth_missing_fields)).'.</font></div>
+                </div>';
     }
-    echo '<TR><TD></TD><TD><INPUT class="button" type="submit" value="'.lang('oauth_authenticate_with_provider').'"';
+    echo '          <div class="field orsee-form-actions">
+                        <div class="control has-text-right">
+                            <input class="button orsee-btn" type="submit" value="'.lang('oauth_authenticate_with_provider').'"';
     if (count($oauth_missing_fields)>0) {
         echo ' disabled';
     }
-    echo '></TD></TR>';
-    echo '</FORM>';
+    echo '                  ">
+                        </div>
+                    </div>
+                </form>';
 
     if ($authorization_url!=="") {
-        echo '<TR><TD>Authorization URL</TD><TD><TEXTAREA rows="5" cols="110" readonly>'.htmlspecialchars($authorization_url).'</TEXTAREA></TD></TR>';
+        echo '  <div class="field">
+                    <label class="label">Authorization URL</label>
+                    <div class="control">
+                        <textarea class="textarea is-primary orsee-textarea" rows="5" readonly>'.htmlspecialchars($authorization_url).'</textarea>
+                    </div>
+                </div>';
     }
 
-    echo '<TR><TD colspan="2"><hr></TD></TR>';
-    echo '<TR><TD colspan="2">';
-    echo '<details>';
-    echo '<summary><B>Advanced: Manual code exchange (fallback)</B></summary>';
-    echo '<BR>';
-    echo '<FORM action="options_oauth_tokens.php" method="post">';
-    echo '<INPUT type="hidden" name="do_action" value="exchange_code">';
-    echo '<INPUT type="hidden" name="identity_key" value="'.htmlspecialchars($selected_identity_key).'">';
-    echo '<TABLE width="100%">';
-    echo '<TR><TD width="220">Authorization code</TD><TD><TEXTAREA name="authorization_code" rows="4" cols="100">';
+    echo '      <div class="field">
+                    <hr>
+                </div>';
+
+    echo '      <div class="field">
+                    <details>
+                        <summary><b>Advanced: Manual code exchange (fallback)</b></summary>
+                        <br>
+                        <form action="options_oauth_tokens.php" method="post">
+                            <input type="hidden" name="do_action" value="exchange_code">
+                            <input type="hidden" name="identity_key" value="'.htmlspecialchars($selected_identity_key).'">
+                            <div class="field">
+                                <label class="label">Authorization code</label>
+                                <div class="control">
+                                    <textarea class="textarea is-primary orsee-textarea" name="authorization_code" dir="ltr" rows="4">';
     if (isset($_REQUEST['code']) && trim((string)$_REQUEST['code'])!=="") {
         echo htmlspecialchars(trim((string)$_REQUEST['code']));
     }
-    echo '</TEXTAREA></TD></TR>';
-    echo '<TR><TD></TD><TD><INPUT class="button" type="submit" value="'.lang('oauth_exchange_code').'"></TD></TR>';
-    echo '</TABLE>';
-    echo '</FORM>';
-    echo '</details>';
-    echo '</TD></TR>';
+    echo '                          </textarea>
+                                </div>
+                            </div>
+                            <div class="field orsee-form-actions">
+                                <div class="control has-text-right">
+                                    <input class="button orsee-btn" type="submit" value="'.lang('oauth_exchange_code').'">
+                                </div>
+                            </div>
+                        </form>
+                    </details>
+                </div>';
 
-    echo '<TR><TD colspan="2"><hr></TD></TR>';
+    echo '      <div class="field">
+                    <hr>
+                </div>';
 
-    echo '<FORM action="options_oauth_tokens.php" method="post">';
-    echo '<INPUT type="hidden" name="do_action" value="refresh_test">';
-    echo '<INPUT type="hidden" name="identity_key" value="'.htmlspecialchars($selected_identity_key).'">';
-    echo '<TR><TD>Test current OAuth refresh token</TD><TD>';
-    echo 'Use this to verify that ORSEE can refresh and get a valid access token for the selected identity.<BR>';
-    echo 'If the test fails, you need to reauthorize to obtain a new OAuth refresh token.<BR><BR>';
+    echo '      <form action="options_oauth_tokens.php" method="post">
+                    <input type="hidden" name="do_action" value="refresh_test">
+                    <input type="hidden" name="identity_key" value="'.htmlspecialchars($selected_identity_key).'">
+                    <div class="field">
+                        <label class="label">Test current OAuth refresh token</label>
+                        <div class="control">
+                            Use this to verify that ORSEE can refresh and get a valid access token for the selected identity.<br>
+                            If the test fails, you need to reauthorize to obtain a new OAuth refresh token.<br><br>';
     if (is_array($stored_token)) {
         $exp=(isset($stored_token['access_token_expires_at']) ? (int)$stored_token['access_token_expires_at'] : 0);
-        echo 'Refresh token: '.((isset($stored_token['refresh_token']) && trim((string)$stored_token['refresh_token'])!=="") ? 'yes' : 'no').'<BR>';
-        echo 'Access token cached: '.((isset($stored_token['access_token']) && trim((string)$stored_token['access_token'])!=="") ? 'yes' : 'no').'<BR>';
+        echo 'Refresh token: '.((isset($stored_token['refresh_token']) && trim((string)$stored_token['refresh_token'])!=="") ? 'yes' : 'no').'<br>';
+        echo 'Access token cached: '.((isset($stored_token['access_token']) && trim((string)$stored_token['access_token'])!=="") ? 'yes' : 'no').'<br>';
         echo 'Access token expires: '.($exp>0 ? ortime__format($exp) : 'n/a');
     } else {
         echo 'No token currently stored for this identity.';
     }
-    echo '</TD></TR>';
-    echo '<TR><TD></TD><TD><INPUT class="button" type="submit" value="'.lang('oauth_test_current_refresh_token').'"';
+    echo '              </div>
+                    </div>
+                    <div class="field orsee-form-actions">
+                        <div class="control has-text-right">
+                            <input class="button orsee-btn" type="submit" value="'.lang('oauth_test_current_refresh_token').'"';
     if (!$has_refresh_token_available) {
         echo ' disabled';
     }
-    echo '></TD></TR>';
-    echo '</FORM>';
+    echo '                  ">
+                        </div>
+                    </div>
+                </form>';
 
-    echo '</TABLE>';
-    echo '<BR><BR><A href="options_main.php">'.icon('back').' '.lang('back').'</A><BR><BR>';
-    echo '</center>';
+    echo '      <div class="field orsee-form-actions has-text-left">
+                    '.button_back('options_main.php').'
+                </div>
+            </div>
+          </div>';
 
     if (!$allow_edit) {
         echo '<script type="text/javascript">
@@ -240,5 +300,6 @@ if ($proceed) {
     }
 }
 
-include ("footer.php");
+include("footer.php");
+
 ?>
