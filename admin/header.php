@@ -11,6 +11,10 @@ $proceed=true;
 
 header('X-Frame-Options: SAMEORIGIN');
 
+// Adds the Content-Security-Policy to the HTTP header.
+header("Content-Security-Policy: default-src 'self'; script-src 'self';");
+header("X-Content-Security-Policy: default-src 'self'; script-src 'self';"); 
+
 if ($proceed) {
     $document=thisdoc();
     if ($settings__stop_admin_site=="y" && $document!="error_temporarily_disabled.php") {

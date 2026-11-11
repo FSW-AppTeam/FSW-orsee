@@ -9,6 +9,10 @@ error_reporting(0);  // shut down all error reporting
 
 header('X-Frame-Options: SAMEORIGIN');
 
+// Adds the Content-Security-Policy to the HTTP header.
+header("Content-Security-Policy: default-src 'self'; script-src 'self';");
+header("X-Content-Security-Policy: default-src 'self'; script-src 'self';"); 
+
 $proceed=true;
 if ($proceed) {
     $document=thisdoc();
