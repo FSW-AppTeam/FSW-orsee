@@ -9,6 +9,11 @@ error_reporting(0);  // shut down all error reporting
 
 header('X-Frame-Options: SAMEORIGIN');
 
+if (!empty($_SERVER['HTTPS'])) {
+    // Adds Strict-Transport-Security to the HTTP header.
+    header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+}
+
 // Adds the Content-Security-Policy to the HTTP header.
 header("Content-Security-Policy: default-src 'self'; script-src 'self';");
 header("X-Content-Security-Policy: default-src 'self'; script-src 'self';"); 
