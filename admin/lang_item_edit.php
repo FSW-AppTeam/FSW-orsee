@@ -2,6 +2,13 @@
 // part of orsee. see orsee.org
 ob_start();
 $menu__area="options";
+
+$_REQUEST = stripTagsRequestArray($_REQUEST, array('iten', 'return_to', 'edit', 'id', 'content_shortcut'));
+if(isset($_REQUEST['return_to'])) {
+    // ruin possible XSS attempts
+    $_REQUEST['return_to'] = str_replace( array("'", '"', '(', ')', ':', ';', '='), '',$_REQUEST['return_to']);
+}
+
 if (isset($_REQUEST['item'])) {
     $item=$_REQUEST['item'];
 } else {
