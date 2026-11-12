@@ -253,7 +253,7 @@ class fMailbox
         foreach ($part_with_encoding as $part) {
             if (!fmailbox_detectUTF8($part['string'])) {
                 //$output .= self::iconv($part['encoding'], 'UTF-8', $part['string']);
-                $output .= utf8_encode($part['string']);
+                $output .= mb_convert_encoding($part['string'], 'UTF-8', 'ISO-8859-1');
             }
         }
 
@@ -329,7 +329,7 @@ class fMailbox
                 }
             }
             //$content = self::iconv($charset, 'UTF-8', $content);
-            $content = utf8_encode($content);
+            $content = mb_convert_encoding($content, 'UTF-8', 'ISO-8859-1');
             if ($structure['subtype'] == 'html') {
                 $content = preg_replace('#(content=(["\'])text/html\s*;\s*charset=(["\']?))' . preg_quote($charset, '#') . '(\3\2)#i', '\1utf-8\4', $content);
             }
@@ -1197,7 +1197,7 @@ class fMailbox
      */
     public function enableDebugging($flag)
     {
-        $this->debug = (boolean) $flag;
+        $this->debug = (bool) $flag;
     }
 
 

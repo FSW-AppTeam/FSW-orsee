@@ -30,6 +30,9 @@ if ($proceed) {
 if ($proceed) {
 
     if ($reallydelete) {
+        if (!csrf__validate_request_message()) {
+            redirect ('admin/payments_budget_delete.php?budget_id='.$budget_id);
+        }
         $budgets=payments__load_budgets();
         if (!isset($_REQUEST['merge_with']) || !isset($budgets[$_REQUEST['merge_with']])) {
             redirect ('admin/payments_budget_delete.php?budget_id='.$budget_id);
@@ -104,9 +107,9 @@ if ($proceed) {
     // form
 
     echo '  <CENTER>
-            <FORM action="payments_budget_delete.php">
-            ' . addCsrfTokenToForm() . '
+            <FORM action="payments_budget_delete.php" method="POST">
             <INPUT type="hidden" name="budget_id" value="'.$budget_id.'">
+            '.csrf__field().'
             <TABLE class="or_formtable">
                 <TR><TD colspan="2">
                     <TABLE width="100%" border=0 class="or_panel_title"><TR>

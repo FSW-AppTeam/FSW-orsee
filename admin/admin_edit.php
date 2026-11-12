@@ -20,6 +20,9 @@ if ($proceed) {
         $allow=check_allow('admin_edit','admin_show.php');
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/admin_edit.php?admin_id=".$admin_id);
+        }
 
         $continue=true;
 
@@ -108,8 +111,8 @@ if ($proceed) {
     show_message();
 
     echo '
-        <form action="admin_edit.php" method=post>';
-    echo addCsrfTokenToForm();
+        <form action="admin_edit.php" method=post>'.csrf__field();
+
     if ($admin_id) echo '<input type=hidden name="admin_id" value="'.$admin_id.'">';
     else echo '<input type=hidden name="new" value="true">';
 
@@ -371,7 +374,7 @@ if ($proceed) {
             <table border=0 width=80%>
             <tr>
                 <td align=right>
-                    '.button_link('admin_delete.php?admin_id='.urlencode($admin_id),
+                    '.button_link('admin_delete.php?admin_id='.urlencode($admin_id).'&csrf_token='.urlencode(csrf__get_token()),
                             lang('delete'),'trash-o').'
                 <td>
             </tr>

@@ -1,19 +1,768 @@
 <?php
 // part of orsee. see orsee.org
 
+namespace PHPMailer\PHPMailer {
+    if (!interface_exists('PHPMailer\\PHPMailer\\OAuthTokenProvider', false)) {
+        interface OAuthTokenProvider
+        {
+            public function getOauth64(): string;
+        }
+    }
+}
+
+namespace {
+
+class ORSEE_PHPMailer_OAuthTokenProvider implements \PHPMailer\PHPMailer\OAuthTokenProvider
+{
+    private $oauth_config;
+    private $purpose;
+
+    public function __construct($oauth_config, $purpose = 'smtp_send')
+    {
+        $this->oauth_config = $oauth_config;
+        $this->purpose = $purpose;
+    }
+
+    public function getOauth64(): string
+    {
+        return experimentmail__oauth_build_oauth64($this->oauth_config, $this->purpose);
+    }
+}
+
 function experimentmail__mail($recipient,$subject,$message,$headers,$env_sender="") {
-    global $settings;
     $headers .= "Content-Type: text/plain; charset=\"UTF-8\"\r\n";
     $message=html_entity_decode($message,ENT_COMPAT,'UTF-8');
     $subject=html_entity_decode($subject,ENT_COMPAT,'UTF-8');
-    $subject='=?UTF-8?B?'.base64_encode($subject).'?=';
-    $done=experimentmail__send($recipient,$subject,$message,$headers,$env_sender="");
+    if (!experimentmail__use_phpmailer()) {
+        $subject='=?UTF-8?B?'.base64_encode($subject).'?=';
+    }
+    $done=experimentmail__send($recipient,$subject,$message,$headers,$env_sender);
     return $done;
 }
 
+function experimentmail__use_phpmailer() {
+    global $settings__mail_transport;
+    return (isset($settings__mail_transport) && strtolower((string)$settings__mail_transport)=="phpmailer");
+}
+
+function experimentmail__phpmailer_debug_enabled() {
+    global $settings__phpmailer_debug;
+    return (isset($settings__phpmailer_debug) && strtolower((string)$settings__phpmailer_debug)=="y");
+}
+
+function experimentmail__phpmailer_debug_log($line) {
+    if (!experimentmail__phpmailer_debug_enabled()) {
+        return;
+    }
+    error_log("ORSEE PHPMailer: ".experimentmail__phpmailer_debug_sanitize((string)$line));
+}
+
+function experimentmail__phpmailer_debug_sanitize($line) {
+    if (!is_string($line) || $line==="") {
+        return "";
+    }
+    $line=preg_replace('/(AUTH XOAUTH2\\s+)[A-Za-z0-9+\\/=\\-_.]+/i','$1[oauth_token_hidden]',$line);
+    $line=preg_replace('/(auth=Bearer\\s+)[^\\x01\\r\\n\\s]+/i','$1[oauth_token_hidden]',$line);
+    $line=preg_replace('/(refresh_token=)[^&\\s]+/i','$1[oauth_refresh_token_hidden]',$line);
+    return $line;
+}
+
+function experimentmail__phpmailer_smtp_auth_type() {
+    global $settings__phpmailer_smtp_auth_type;
+    if (isset($settings__phpmailer_smtp_auth_type) && $settings__phpmailer_smtp_auth_type) {
+        $type=strtolower(trim((string)$settings__phpmailer_smtp_auth_type));
+        if ($type=="oauth2" || $type=="password" || $type=="none") {
+            return $type;
+        }
+    }
+    return "none";
+}
+
+function experimentmail__oauth_provider_defaults($provider,$tenant="common") {
+    $provider=strtolower(trim((string)$provider));
+    $defaults=array(
+        "provider"=>$provider,
+        "token_endpoint"=>"",
+        "auth_endpoint"=>"",
+        "scopes"=>""
+    );
+    if ($provider=="google") {
+        $defaults["token_endpoint"]="https://oauth2.googleapis.com/token";
+        $defaults["auth_endpoint"]="https://accounts.google.com/o/oauth2/v2/auth";
+        $defaults["scopes"]="https://mail.google.com/";
+    } elseif ($provider=="microsoft") {
+        $tenant=trim((string)$tenant);
+        if ($tenant==="") {
+            $tenant="common";
+        }
+        $defaults["token_endpoint"]="https://login.microsoftonline.com/".$tenant."/oauth2/v2.0/token";
+        $defaults["auth_endpoint"]="https://login.microsoftonline.com/".$tenant."/oauth2/v2.0/authorize";
+        $defaults["scopes"]="offline_access https://outlook.office.com/SMTP.Send";
+    }
+    return $defaults;
+}
+
+function experimentmail__oauth_default_state() {
+    return create_random_token("smtp_oauth_state");
+}
+
+function experimentmail__oauth_authorization_url($oauth_config,$redirect_uri,$state="") {
+    if (!is_array($oauth_config)) {
+        throw new RuntimeException("OAuth identity config is not valid.");
+    }
+    $provider=isset($oauth_config['provider']) ? strtolower(trim((string)$oauth_config['provider'])) : "";
+    $client_id=isset($oauth_config['client_id']) ? trim((string)$oauth_config['client_id']) : "";
+    $auth_endpoint=isset($oauth_config['auth_endpoint']) ? trim((string)$oauth_config['auth_endpoint']) : "";
+    $scopes=isset($oauth_config['scopes']) ? trim((string)$oauth_config['scopes']) : "";
+    $identity=isset($oauth_config['identity']) ? trim((string)$oauth_config['identity']) : "";
+
+    if ($provider==="") {
+        throw new RuntimeException("OAuth provider is missing.");
+    }
+    if ($client_id==="") {
+        throw new RuntimeException("OAuth client id is missing.");
+    }
+    if ($auth_endpoint==="") {
+        throw new RuntimeException("OAuth authorization endpoint is missing.");
+    }
+    if ($scopes==="") {
+        throw new RuntimeException("OAuth scopes are missing.");
+    }
+    if (!is_string($redirect_uri) || trim($redirect_uri)==="") {
+        throw new RuntimeException("OAuth redirect URI is missing.");
+    }
+    $redirect_uri=trim($redirect_uri);
+    if ($state==="") {
+        $state=experimentmail__oauth_default_state();
+    }
+
+    $pars=array(
+        'client_id'=>$client_id,
+        'response_type'=>'code',
+        'redirect_uri'=>$redirect_uri,
+        'scope'=>$scopes,
+        'state'=>$state
+    );
+    if ($provider==="google") {
+        $pars['access_type']='offline';
+        $pars['prompt']='consent';
+        $pars['include_granted_scopes']='true';
+    } elseif ($provider==="microsoft") {
+        $pars['response_mode']='query';
+    }
+    if ($identity!=="" && filter_var($identity,FILTER_VALIDATE_EMAIL)) {
+        $pars['login_hint']=$identity;
+    }
+    return $auth_endpoint."?".http_build_query($pars,'','&',PHP_QUERY_RFC3986);
+}
+
+function experimentmail__oauth_trim($value) {
+    return trim((string)$value);
+}
+
+function experimentmail__oauth_normalize_identity_config($identity_key,$raw) {
+    if (!is_array($raw)) {
+        $raw=array();
+    }
+    $provider=isset($raw["provider"]) ? experimentmail__oauth_trim($raw["provider"]) : "";
+    if ($provider==="") {
+        $provider="google";
+    }
+    if ($provider==="") {
+        $provider="google";
+    }
+    $tenant=isset($raw["tenant"]) ? experimentmail__oauth_trim($raw["tenant"]) : "";
+    if ($tenant==="") {
+        $tenant="common";
+    }
+    $defaults=experimentmail__oauth_provider_defaults($provider,$tenant);
+
+    $identity=isset($raw["identity"]) ? experimentmail__oauth_trim($raw["identity"]) : "";
+    if ($identity==="" && is_string($identity_key) && $identity_key!=="*" && filter_var($identity_key,FILTER_VALIDATE_EMAIL)) {
+        $identity=$identity_key;
+    }
+
+    $cfg=array();
+    $cfg["provider"]=$provider;
+    $cfg["tenant"]=$tenant;
+    $cfg["identity"]=strtolower($identity);
+    $cfg["client_id"]=isset($raw["client_id"]) ? experimentmail__oauth_trim($raw["client_id"]) : "";
+    $cfg["client_secret"]=isset($raw["client_secret"]) ? experimentmail__oauth_trim($raw["client_secret"]) : "";
+    $cfg["token_endpoint"]=isset($raw["token_endpoint"]) ? experimentmail__oauth_trim($raw["token_endpoint"]) : "";
+    if ($cfg["token_endpoint"]==="") {
+        $cfg["token_endpoint"]=$defaults["token_endpoint"];
+    }
+    $cfg["auth_endpoint"]=isset($raw["auth_endpoint"]) ? experimentmail__oauth_trim($raw["auth_endpoint"]) : "";
+    if ($cfg["auth_endpoint"]==="") {
+        $cfg["auth_endpoint"]=$defaults["auth_endpoint"];
+    }
+    $cfg["scopes"]=isset($raw["scopes"]) ? experimentmail__oauth_trim($raw["scopes"]) : "";
+    if ($cfg["scopes"]==="") {
+        $cfg["scopes"]=$defaults["scopes"];
+    }
+    $cfg["refresh_token"]=isset($raw["refresh_token"]) ? experimentmail__oauth_trim($raw["refresh_token"]) : "";
+    return $cfg;
+}
+
+function experimentmail__oauth_identity_map() {
+    global $settings__phpmailer_smtp_oauth_identities;
+    $map=array();
+    if (isset($settings__phpmailer_smtp_oauth_identities) && is_array($settings__phpmailer_smtp_oauth_identities)) {
+        foreach ($settings__phpmailer_smtp_oauth_identities as $key=>$raw) {
+            $map[strtolower(trim((string)$key))]=experimentmail__oauth_normalize_identity_config($key,$raw);
+        }
+    }
+    if (count($map)<1) {
+        $map["*"]=experimentmail__oauth_normalize_identity_config("*",array("provider"=>"google","tenant"=>"common"));
+    }
+    return $map;
+}
+
+function experimentmail__oauth_resolve_identity_config($from_address) {
+    $from_address=strtolower(trim((string)$from_address));
+    $map=experimentmail__oauth_identity_map();
+    if (isset($map[$from_address])) {
+        return $map[$from_address];
+    }
+    if (isset($map["*"])) {
+        $cfg=$map["*"];
+        if ($cfg["identity"]==="") {
+            $cfg["identity"]=$from_address;
+        }
+        return $cfg;
+    }
+    foreach ($map as $cfg) {
+        if (is_array($cfg) && isset($cfg["identity"]) && $cfg["identity"]!=="") {
+            return $cfg;
+        }
+    }
+    return false;
+}
+
+function experimentmail__oauth_tokens__load($purpose,$identity,$provider) {
+    if (!experimentmail__oauth_tokens__table_ready()) {
+        return false;
+    }
+    $purpose=trim((string)$purpose);
+    $identity=strtolower(trim((string)$identity));
+    $provider=strtolower(trim((string)$provider));
+    if ($purpose==="" || $identity==="" || $provider==="") {
+        return false;
+    }
+    $pars=array(':purpose'=>$purpose,':identity'=>$identity,':provider'=>$provider);
+    $query="SELECT * FROM ".table('oauth_tokens')."
+            WHERE purpose= :purpose
+            AND identity_email= :identity
+            AND provider= :provider";
+    $result=or_query($query,$pars);
+    if (!$result) {
+        return false;
+    }
+    $line=pdo_fetch_assoc($result);
+    if (!is_array($line)) {
+        return false;
+    }
+    return $line;
+}
+
+function experimentmail__oauth_tokens__save($purpose,$identity,$provider,$refresh_token,$access_token,$expires_at) {
+    if (!experimentmail__oauth_tokens__table_ready()) {
+        return false;
+    }
+    $purpose=trim((string)$purpose);
+    $identity=strtolower(trim((string)$identity));
+    $provider=strtolower(trim((string)$provider));
+    if ($purpose==="" || $identity==="" || $provider==="") {
+        return false;
+    }
+    $now=time();
+    $existing=experimentmail__oauth_tokens__load($purpose,$identity,$provider);
+    if ($existing && isset($existing['token_id'])) {
+        $pars=array(
+            ':token_id'=>$existing['token_id'],
+            ':refresh_token'=>(string)$refresh_token,
+            ':access_token'=>(string)$access_token,
+            ':access_token_expires_at'=>(int)$expires_at,
+            ':updated_at'=>$now
+        );
+        $query="UPDATE ".table('oauth_tokens')."
+                SET refresh_token= :refresh_token,
+                    access_token= :access_token,
+                    access_token_expires_at= :access_token_expires_at,
+                    updated_at= :updated_at
+                WHERE token_id= :token_id";
+        return or_query($query,$pars);
+    }
+    $pars=array(
+        ':purpose'=>$purpose,
+        ':identity'=>$identity,
+        ':provider'=>$provider,
+        ':refresh_token'=>(string)$refresh_token,
+        ':access_token'=>(string)$access_token,
+        ':access_token_expires_at'=>(int)$expires_at,
+        ':created_at'=>$now,
+        ':updated_at'=>$now
+    );
+    $query="INSERT INTO ".table('oauth_tokens')."
+            SET purpose= :purpose,
+                identity_email= :identity,
+                provider= :provider,
+                refresh_token= :refresh_token,
+                access_token= :access_token,
+                access_token_expires_at= :access_token_expires_at,
+                created_at= :created_at,
+                updated_at= :updated_at";
+    return or_query($query,$pars);
+}
+
+function experimentmail__oauth_tokens__table_ready() {
+    static $checked=false;
+    static $ready=false;
+    if ($checked) {
+        return $ready;
+    }
+    $checked=true;
+    $table_name=table('oauth_tokens');
+    $query="SHOW TABLES LIKE ".pdo_escape_string($table_name);
+    $result=or_query($query);
+    if (!$result) {
+        $ready=false;
+        return $ready;
+    }
+    $line=$result->fetch(\PDO::FETCH_NUM);
+    $ready=(is_array($line) && isset($line[0]) && $line[0]==$table_name);
+    return $ready;
+}
+
+function experimentmail__oauth_refresh_access_token($oauth_config,$refresh_token) {
+    $token_endpoint=isset($oauth_config['token_endpoint']) ? trim((string)$oauth_config['token_endpoint']) : "";
+    if ($token_endpoint==="") {
+        throw new RuntimeException("OAuth token endpoint is missing.");
+    }
+    $post=array(
+        'grant_type'=>'refresh_token',
+        'refresh_token'=>$refresh_token,
+        'client_id'=>isset($oauth_config['client_id']) ? (string)$oauth_config['client_id'] : ""
+    );
+    if (isset($oauth_config['client_secret']) && $oauth_config['client_secret']!=="") {
+        $post['client_secret']=(string)$oauth_config['client_secret'];
+    }
+    if (isset($oauth_config['provider']) && strtolower((string)$oauth_config['provider'])==="microsoft"
+        && isset($oauth_config['scopes']) && trim((string)$oauth_config['scopes'])!=="") {
+        $post['scope']=trim((string)$oauth_config['scopes']);
+    }
+    $ch=curl_init($token_endpoint);
+    curl_setopt_array($ch,array(
+        CURLOPT_POST=>true,
+        CURLOPT_POSTFIELDS=>http_build_query($post,'','&'),
+        CURLOPT_RETURNTRANSFER=>true,
+        CURLOPT_TIMEOUT=>15,
+        CURLOPT_HTTPHEADER=>array(
+            'Content-Type: application/x-www-form-urlencoded'
+        )
+    ));
+    $raw=curl_exec($ch);
+    if ($raw===false) {
+        $err=curl_error($ch);
+        curl_close($ch);
+        throw new RuntimeException("OAuth token request failed: ".$err);
+    }
+    $code=curl_getinfo($ch,CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    $json=json_decode($raw,true);
+    if ($code<200 || $code>=300 || !is_array($json) || !isset($json['access_token']) || !$json['access_token']) {
+        throw new RuntimeException("OAuth token response unexpected: HTTP ".$code);
+    }
+    return $json;
+}
+
+function experimentmail__oauth_exchange_authorization_code($oauth_config,$redirect_uri,$authorization_code) {
+    if (!is_array($oauth_config)) {
+        throw new RuntimeException("OAuth identity config is not valid.");
+    }
+    $provider=isset($oauth_config['provider']) ? strtolower(trim((string)$oauth_config['provider'])) : "";
+    $token_endpoint=isset($oauth_config['token_endpoint']) ? trim((string)$oauth_config['token_endpoint']) : "";
+    $client_id=isset($oauth_config['client_id']) ? trim((string)$oauth_config['client_id']) : "";
+    $client_secret=isset($oauth_config['client_secret']) ? trim((string)$oauth_config['client_secret']) : "";
+    $scopes=isset($oauth_config['scopes']) ? trim((string)$oauth_config['scopes']) : "";
+
+    if ($provider==="") {
+        throw new RuntimeException("OAuth provider is missing.");
+    }
+    if ($token_endpoint==="") {
+        throw new RuntimeException("OAuth token endpoint is missing.");
+    }
+    if ($client_id==="") {
+        throw new RuntimeException("OAuth client id is missing.");
+    }
+    if (!is_string($authorization_code) || trim($authorization_code)==="") {
+        throw new RuntimeException("OAuth authorization code is missing.");
+    }
+    if (!is_string($redirect_uri) || trim($redirect_uri)==="") {
+        throw new RuntimeException("OAuth redirect URI is missing.");
+    }
+
+    $post=array(
+        'grant_type'=>'authorization_code',
+        'client_id'=>$client_id,
+        'code'=>trim($authorization_code),
+        'redirect_uri'=>trim($redirect_uri)
+    );
+    if ($client_secret!=="") {
+        $post['client_secret']=$client_secret;
+    }
+    if ($provider==="microsoft" && $scopes!=="") {
+        $post['scope']=$scopes;
+    }
+
+    $ch=curl_init($token_endpoint);
+    curl_setopt_array($ch,array(
+        CURLOPT_POST=>true,
+        CURLOPT_POSTFIELDS=>http_build_query($post,'','&'),
+        CURLOPT_RETURNTRANSFER=>true,
+        CURLOPT_TIMEOUT=>20,
+        CURLOPT_HTTPHEADER=>array(
+            'Content-Type: application/x-www-form-urlencoded'
+        )
+    ));
+    $raw=curl_exec($ch);
+    if ($raw===false) {
+        $err=curl_error($ch);
+        curl_close($ch);
+        throw new RuntimeException("OAuth code exchange failed: ".$err);
+    }
+    $code=curl_getinfo($ch,CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    $json=json_decode($raw,true);
+    if ($code<200 || $code>=300 || !is_array($json) || !isset($json['access_token']) || !$json['access_token']) {
+        throw new RuntimeException("OAuth code exchange response unexpected: HTTP ".$code);
+    }
+    return $json;
+}
+
+function experimentmail__oauth_store_refresh_token($oauth_config,$refresh_token,$purpose='smtp_send') {
+    if (!is_array($oauth_config)) {
+        return false;
+    }
+    $identity=isset($oauth_config['identity']) ? strtolower(trim((string)$oauth_config['identity'])) : "";
+    $provider=isset($oauth_config['provider']) ? strtolower(trim((string)$oauth_config['provider'])) : "";
+    $refresh_token=trim((string)$refresh_token);
+    if ($identity==="" || $provider==="" || $refresh_token==="") {
+        return false;
+    }
+    $existing=experimentmail__oauth_tokens__load($purpose,$identity,$provider);
+    $access_token="";
+    $expires_at=0;
+    if ($existing) {
+        if (isset($existing['access_token'])) {
+            $access_token=(string)$existing['access_token'];
+        }
+        if (isset($existing['access_token_expires_at'])) {
+            $expires_at=(int)$existing['access_token_expires_at'];
+        }
+    }
+    return experimentmail__oauth_tokens__save($purpose,$identity,$provider,$refresh_token,$access_token,$expires_at);
+}
+
+function experimentmail__oauth_store_token_response($oauth_config,$token_response,$purpose='smtp_send') {
+    if (!is_array($oauth_config) || !is_array($token_response)) {
+        return false;
+    }
+    $identity=isset($oauth_config['identity']) ? strtolower(trim((string)$oauth_config['identity'])) : "";
+    $provider=isset($oauth_config['provider']) ? strtolower(trim((string)$oauth_config['provider'])) : "";
+    if ($identity==="" || $provider==="") {
+        return false;
+    }
+    $existing=experimentmail__oauth_tokens__load($purpose,$identity,$provider);
+    $refresh_token="";
+    if (isset($token_response['refresh_token']) && trim((string)$token_response['refresh_token'])!=="") {
+        $refresh_token=trim((string)$token_response['refresh_token']);
+    } elseif ($existing && isset($existing['refresh_token'])) {
+        $refresh_token=(string)$existing['refresh_token'];
+    }
+    $access_token=isset($token_response['access_token']) ? trim((string)$token_response['access_token']) : "";
+    if ($access_token==="" && $existing && isset($existing['access_token'])) {
+        $access_token=(string)$existing['access_token'];
+    }
+    $expires_in=isset($token_response['expires_in']) ? (int)$token_response['expires_in'] : 0;
+    $expires_at=0;
+    if ($expires_in>0) {
+        if ($expires_in<60) {
+            $expires_in=60;
+        }
+        $expires_at=time()+$expires_in;
+    } elseif ($existing && isset($existing['access_token_expires_at'])) {
+        $expires_at=(int)$existing['access_token_expires_at'];
+    }
+    if ($refresh_token==="") {
+        return false;
+    }
+    return experimentmail__oauth_tokens__save($purpose,$identity,$provider,$refresh_token,$access_token,$expires_at);
+}
+
+function experimentmail__oauth_get_valid_access_token($oauth_config,$purpose='smtp_send') {
+    $purpose=trim((string)$purpose);
+    if ($purpose==="") {
+        $purpose='smtp_send';
+    }
+    if (!is_array($oauth_config)) {
+        throw new RuntimeException("OAuth identity config is not valid.");
+    }
+    $identity=isset($oauth_config['identity']) ? strtolower(trim((string)$oauth_config['identity'])) : "";
+    $provider=isset($oauth_config['provider']) ? strtolower(trim((string)$oauth_config['provider'])) : "";
+    if ($identity==="") {
+        throw new RuntimeException("OAuth identity is missing.");
+    }
+    if ($provider==="") {
+        throw new RuntimeException("OAuth provider is missing.");
+    }
+    if (!isset($oauth_config['client_id']) || trim((string)$oauth_config['client_id'])==="") {
+        throw new RuntimeException("OAuth client id is missing.");
+    }
+    $stored=experimentmail__oauth_tokens__load($purpose,$identity,$provider);
+    $refresh_token=isset($oauth_config['refresh_token']) ? trim((string)$oauth_config['refresh_token']) : "";
+    if ($refresh_token==="") {
+        $refresh_token=($stored && isset($stored['refresh_token'])) ? trim((string)$stored['refresh_token']) : "";
+    }
+    if ($refresh_token==="") {
+        throw new RuntimeException("OAuth refresh token is missing for ".$identity.".");
+    }
+
+    if ($stored && isset($stored['access_token']) && isset($stored['access_token_expires_at'])) {
+        $stored_access=trim((string)$stored['access_token']);
+        $stored_expires=(int)$stored['access_token_expires_at'];
+        if ($stored_access!=="" && time() < ($stored_expires-60)) {
+            return $stored_access;
+        }
+    }
+
+    $json=experimentmail__oauth_refresh_access_token($oauth_config,$refresh_token);
+    $access_token=(string)$json['access_token'];
+    $expires_in=isset($json['expires_in']) ? (int)$json['expires_in'] : 3600;
+    if ($expires_in<60) {
+        $expires_in=60;
+    }
+    $expires_at=time()+$expires_in;
+    $new_refresh=$refresh_token;
+    if (isset($json['refresh_token']) && trim((string)$json['refresh_token'])!=="") {
+        $new_refresh=trim((string)$json['refresh_token']);
+    }
+    $done=experimentmail__oauth_tokens__save($purpose,$identity,$provider,$new_refresh,$access_token,$expires_at);
+    if (!$done) {
+        experimentmail__phpmailer_debug_log("oauth token storage update failed for ".$identity);
+    }
+    return $access_token;
+}
+
+function experimentmail__oauth_build_oauth64($oauth_config,$purpose='smtp_send') {
+    $identity=isset($oauth_config['identity']) ? trim((string)$oauth_config['identity']) : "";
+    if ($identity==="") {
+        throw new RuntimeException("OAuth identity is missing.");
+    }
+    $token=experimentmail__oauth_get_valid_access_token($oauth_config,$purpose);
+    $auth_string="user=".$identity."\x01auth=Bearer ".$token."\x01\x01";
+    return base64_encode($auth_string);
+}
+
+function experimentmail__split_addresses($addresses) {
+    if (!is_string($addresses) || !$addresses) {
+        return array();
+    }
+    $parts=preg_split("/[,;]+/",$addresses);
+    $result=array();
+    foreach ($parts as $part) {
+        $addr=trim($part);
+        if ($addr) {
+            $result[]=$addr;
+        }
+    }
+    return $result;
+}
+
+function experimentmail__parse_headers($headers) {
+    $parsed=array();
+    if (!is_string($headers) || !$headers) {
+        return $parsed;
+    }
+    $lines=preg_split("/\r\n|\n|\r/",$headers);
+    foreach ($lines as $line) {
+        if (!$line || strpos($line,":")===false) {
+            continue;
+        }
+        list($name,$value)=explode(":",$line,2);
+        $name=trim($name);
+        $value=trim($value);
+        if ($name!=="" && $value!=="") {
+            $parsed[]=array("name"=>$name,"value"=>$value);
+        }
+    }
+    return $parsed;
+}
+
+function experimentmail__extract_email_address($value) {
+    if (!is_string($value) || !$value) {
+        return "";
+    }
+    $value=trim($value);
+    if (preg_match("/<([^>]+)>/",$value,$matches)) {
+        $value=trim($matches[1]);
+    }
+    if (filter_var($value,FILTER_VALIDATE_EMAIL)) {
+        return $value;
+    }
+    return "";
+}
+
+function experimentmail__apply_header_addresses(&$mailer,$header_name,$header_value) {
+    $addresses=experimentmail__split_addresses($header_value);
+    foreach ($addresses as $address_line) {
+        $address=experimentmail__extract_email_address($address_line);
+        if (!$address) {
+            continue;
+        }
+        if ($header_name=="cc") {
+            $mailer->addCC($address);
+        } elseif ($header_name=="bcc") {
+            $mailer->addBCC($address);
+        } elseif ($header_name=="reply-to") {
+            $mailer->addReplyTo($address);
+        }
+    }
+}
+
+function experimentmail__send_via_phpmailer($recipient,$subject,$message,$headers,$env_sender="",$attachments=array()) {
+    global $settings, $settings__phpmailer_host, $settings__phpmailer_port,
+        $settings__phpmailer_smtp_secure, $settings__phpmailer_username,
+        $settings__phpmailer_password, $settings__phpmailer_timeout;
+
+    try {
+        $mailer = new PHPMailer\PHPMailer\PHPMailer(true);
+        $mailer->CharSet = "UTF-8";
+        $mailer->isSMTP();
+        $mailer->Host       = (isset($settings__phpmailer_host) && $settings__phpmailer_host) ? $settings__phpmailer_host : "127.0.0.1";
+        $mailer->Port       = (isset($settings__phpmailer_port) && (int)$settings__phpmailer_port > 0) ? (int)$settings__phpmailer_port : 587;
+        $mailer->SMTPAuth   = false;
+        $mailer->Username   = (isset($settings__phpmailer_username)) ? (string)$settings__phpmailer_username : "";
+        $mailer->Password   = (isset($settings__phpmailer_password)) ? (string)$settings__phpmailer_password : "";
+        $mailer->SMTPSecure = (isset($settings__phpmailer_smtp_secure)) ? (string)$settings__phpmailer_smtp_secure : "";
+        $mailer->Timeout    = (isset($settings__phpmailer_timeout) && (int)$settings__phpmailer_timeout > 0) ? (int)$settings__phpmailer_timeout : 15;
+
+        if (experimentmail__phpmailer_debug_enabled()) {
+            $mailer->SMTPDebug = 2;
+            $mailer->Debugoutput = function ($str,$level) {
+                experimentmail__phpmailer_debug_log("SMTP[".$level."] ".$str);
+            };
+        }
+
+        $parsed_headers=experimentmail__parse_headers($headers);
+
+        $from_address=$env_sender;
+        if (!$from_address && isset($settings["support_mail"])) {
+            $from_address=$settings["support_mail"];
+        }
+        foreach ($parsed_headers as $header) {
+            if (strtolower($header["name"])=="from") {
+                $header_from=experimentmail__extract_email_address($header["value"]);
+                if ($header_from) {
+                    $from_address=$header_from;
+                }
+                break;
+            }
+        }
+        if (!$from_address || !filter_var($from_address,FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
+        $mailer->setFrom($from_address);
+        $mailer->Sender=$from_address;
+
+        $smtp_auth_type=experimentmail__phpmailer_smtp_auth_type();
+        if ($smtp_auth_type=="none") {
+            $mailer->SMTPAuth=false;
+            $mailer->Username="";
+            $mailer->Password="";
+            $mailer->AuthType="";
+        } elseif ($smtp_auth_type=="password") {
+            $mailer->SMTPAuth=true;
+            $mailer->AuthType="";
+        } elseif ($smtp_auth_type=="oauth2") {
+            $oauth_config=experimentmail__oauth_resolve_identity_config($from_address);
+            if (!is_array($oauth_config)) {
+                experimentmail__phpmailer_debug_log("oauth2 config missing for from address ".$from_address);
+                return false;
+            }
+            if (!isset($oauth_config['identity']) || !filter_var($oauth_config['identity'],FILTER_VALIDATE_EMAIL)) {
+                experimentmail__phpmailer_debug_log("oauth2 identity invalid for from address ".$from_address);
+                return false;
+            }
+            $mailer->SMTPAuth=true;
+            $mailer->AuthType='XOAUTH2';
+            $mailer->Username=$oauth_config['identity'];
+            $mailer->Password="";
+            $mailer->setOAuth(new ORSEE_PHPMailer_OAuthTokenProvider($oauth_config,'smtp_send'));
+        } else {
+            experimentmail__phpmailer_debug_log("unknown smtp auth type ".$smtp_auth_type);
+            return false;
+        }
+
+        $recipient_addresses=experimentmail__split_addresses($recipient);
+        foreach ($recipient_addresses as $recipient_address_line) {
+            $recipient_address=experimentmail__extract_email_address($recipient_address_line);
+            if ($recipient_address) {
+                $mailer->addAddress($recipient_address);
+            }
+        }
+        if (count($mailer->getToAddresses())<1) {
+            return false;
+        }
+
+        if (isset($settings["bcc_all_outgoing_emails"]) && $settings["bcc_all_outgoing_emails"]=="y"
+            && isset($settings["bcc_all_outgoing_emails__address"]) && $settings["bcc_all_outgoing_emails__address"]) {
+            $bcc_address=experimentmail__extract_email_address($settings["bcc_all_outgoing_emails__address"]);
+            if ($bcc_address) {
+                $mailer->addBCC($bcc_address);
+            }
+        }
+
+        foreach ($parsed_headers as $header) {
+            $header_name_lower=strtolower($header["name"]);
+            if ($header_name_lower=="from" || $header_name_lower=="content-type" || $header_name_lower=="return-path") {
+                continue;
+            }
+            if ($header_name_lower=="cc" || $header_name_lower=="bcc" || $header_name_lower=="reply-to") {
+                experimentmail__apply_header_addresses($mailer,$header_name_lower,$header["value"]);
+            } else {
+                $mailer->addCustomHeader($header["name"],$header["value"]);
+            }
+        }
+
+        $mailer->Subject=$subject;
+        $mailer->Body=$message;
+        $mailer->isHTML(false);
+
+        foreach ($attachments as $attachment) {
+            if (isset($attachment["filename"]) && isset($attachment["content"])) {
+                $mailer->addStringAttachment($attachment["content"],$attachment["filename"]);
+            }
+        }
+
+        if (!$mailer->send()) {
+            experimentmail__phpmailer_debug_log("send failed: ".$mailer->ErrorInfo);
+            return false;
+        }
+        experimentmail__phpmailer_debug_log("send ok");
+        return true;
+    } catch (Exception $e) {
+        experimentmail__phpmailer_debug_log("exception: ".$e->getMessage());
+        return false;
+    }
+}
 
 function experimentmail__send($recipient,$subject,$message,$headers,$env_sender="") {
     global $settings;
+    experimentmail__phpmailer_debug_log("experimentmail__send transport=".(experimentmail__use_phpmailer() ? "phpmailer" : "legacy"));
+    if (experimentmail__use_phpmailer()) {
+        return experimentmail__send_via_phpmailer($recipient,$subject,$message,$headers,$env_sender);
+    }
     if (isset($settings['bcc_all_outgoing_emails']) && $settings['bcc_all_outgoing_emails']=='y'
         && isset($settings['bcc_all_outgoing_emails__address']) && $settings['bcc_all_outgoing_emails__address']) {
         $headers=$headers."Bcc: ".$settings['bcc_all_outgoing_emails__address']."\r\n";
@@ -40,6 +789,16 @@ function experimentmail__send($recipient,$subject,$message,$headers,$env_sender=
 
 
 function experimentmail__mail_attach($to, $from, $subject, $message, $filename, $filecontent,$lb="\n") {
+    if (experimentmail__use_phpmailer()) {
+        $headers = "From: ".$from."\r\n";
+        $message=html_entity_decode($message,ENT_COMPAT,'UTF-8');
+        $subject=html_entity_decode($subject,ENT_COMPAT,'UTF-8');
+        if (experimentmail__send_via_phpmailer($to,$subject,$message,$headers,"",array(array("filename"=>$filename,"content"=>$filecontent)))) {
+            return true;
+        }
+        return false;
+    }
+
     $mime_boundary = "<<<:" . md5(uniqid(mt_rand(), 1));
     $data = chunk_split(base64_encode($filecontent),60,"\r\n");
     $header = "From: ".$from.$lb;
@@ -111,7 +870,7 @@ function experimentmail__load_bulk_mail($bulk_id,$tlang="") {
         $query="SELECT * from ".table('bulk_mail_texts')."
                 WHERE bulk_id= :bulk_id
                 AND lang= :tlang";
-        $bulk_mail=orsee_query($query);
+        $bulk_mail=orsee_query($query,$pars);
     }
     return $bulk_mail;
 }
@@ -129,7 +888,7 @@ function process_mail_template($template,$vararray) {
     foreach ($vars as $key) {
         $i=0;
         foreach ($output as $outputline) {
-            $output[$i]=str_replace("#".$key."#",$vararray[$key],$output[$i]);
+            $output[$i]=str_replace("#".$key."#",($vararray[$key] ?? ''),$output[$i]);
             $i++;
         }
     }
@@ -177,7 +936,7 @@ function experimentmail__send_invitations_to_queue($experiment_id,$whom="not-inv
         case "all":             $aquery=""; break;
         default:                $aquery=" AND ".table('participants').".participant_id='0' ";
     }
-    mt_srand((double)microtime()*1000000);
+    mt_srand((float)microtime()*1000000);
     $order="ORDER BY rand(".mt_rand().") ";
     $now=time();
     $status_query=participant_status__get_pquery_snippet("eligible_for_experiments");
@@ -1048,6 +1807,8 @@ function experimentmail__bulk_mail_form() {
     global $lang;
     //echo '<A HREF="participants_bulk_mail.php">'.lang('send_mail_to_listed_participants').'</A>';
     echo button_link("participants_bulk_mail.php",lang('send_mail_to_listed_participants'),"envelope-o");
+}
+
 }
 
 

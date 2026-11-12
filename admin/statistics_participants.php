@@ -43,8 +43,7 @@ if ($proceed) {
     echo '<center>';
 
     if ($browsable) {
-        echo '<FORM action="'.thisdoc().'" METHOD="POST">';
-        echo addCsrfTokenToForm();
+        echo '<FORM action="'.thisdoc().'" METHOD="GET">';
         echo '<INPUT type="hidden" name="all" value="'.urlencode($all).'">';
     }
     echo '<TABLE border=0 cellspacing="0" width="100%">';

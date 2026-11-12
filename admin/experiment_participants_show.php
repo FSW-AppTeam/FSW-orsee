@@ -91,6 +91,9 @@ if ($proceed) {
         }
 
         if (isset($_REQUEST['change']) && $_REQUEST['change']) {
+            if (!csrf__validate_request_message()) {
+                redirect('admin/'.thisdoc().$thiscgis);
+            }
 
             $allow=check_allow('experiment_edit_participants','experiment_participants_show.php'.$thiscgis);
 
@@ -359,7 +362,7 @@ if ($proceed) {
     // form
     echo '
         <FORM name="part_list" method=post action="'.thisdoc().'">
-        ' . addCsrfTokenToForm() . '
+        '.csrf__field().'
 
         <BR>
         <table class="or_listtable" style="width: 95%"><thead>
@@ -533,7 +536,7 @@ if ($proceed) {
             $send_button_title=lang('session_reminder_send_now');
         }
         echo '<FONT color="'.$statecolor.'">'.lang('session_reminder').': '.$state.'</FONT><BR>';
-        echo $explanation.'<BR><FORM action="session_send_reminder.php">'.
+        echo $explanation.'<BR><FORM action="session_send_reminder.php" method="POST">'.csrf__field().
             '<INPUT type=hidden name="session_id" value="'.$session_id.'">'.
             '<INPUT class="button" type=submit name="submit" value="'.$send_button_title.'"></FORM>';
     }

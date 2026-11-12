@@ -51,6 +51,14 @@ if ($proceed) {
 
 if ($proceed) {
     if (isset($_REQUEST['save']) && $_REQUEST['save']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['save']) && $_REQUEST['save']) {
         $pform_field['mysql_column_name']=$field_name;
         if (in_array('enabled',$restrict_to)) $pform_field['enabled']=($_REQUEST['enabled']=='y')?1:0;
         if (in_array('type',$restrict_to)) $pform_field['type']=$_REQUEST['type'];
@@ -85,8 +93,8 @@ if ($proceed) {
     javascript__tooltip_prepare();
 
     echo '<FORM action="'.thisdoc().'" method="POST">';
-    echo addCsrfTokenToForm();
     echo '<INPUT type="hidden" name="mysql_column_name" value="'.$field_name.'">';
+    echo csrf__field();
     echo '<TABLE class="or_formtable">
             <TR><TD colspan="2">
                 <TABLE width="100%" border=0 class="or_panel_title"><TR>
@@ -320,7 +328,7 @@ if ($proceed) {
 
     //if (!$new && check_allow('pform_config_field_delete')) {
         echo '<BR><BR>
-            '.button_link('options_participant_profile_delete.php?mysql_column_name='.urlencode($field_name),
+            '.button_link('options_participant_profile_delete.php?mysql_column_name='.urlencode($field_name).'&csrf_token='.urlencode(csrf__get_token()),
                             lang('delete'),'trash-o');
     //}
 

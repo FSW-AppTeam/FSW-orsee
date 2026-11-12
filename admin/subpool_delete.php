@@ -46,6 +46,9 @@ if ($proceed) {
     echo '<center>';
 
     if ($reallydelete) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/subpool_delete.php?subpool_id=".$subpool_id);
+        }
 
         if (isset($_REQUEST['merge_with']) && $_REQUEST['merge_with']) $merge_with=$_REQUEST['merge_with']; else $merge_with=1;
         $subpools=subpools__get_subpools();
@@ -79,9 +82,9 @@ if ($proceed) {
 if ($proceed) {
         // form
         echo '  <CENTER>
-                <FORM action="subpool_delete.php">
-                ' . addCsrfTokenToForm() . '
+                <FORM action="subpool_delete.php" method="POST">
                 <INPUT type=hidden name="subpool_id" value="'.$subpool_id.'">
+                '.csrf__field().'
                 <TABLE class="or_formtable">
                 <TR><TD colspan="2">
                 <TABLE width="100%" border=0 class="or_panel_title"><TR>

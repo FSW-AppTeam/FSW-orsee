@@ -1,8 +1,8 @@
 <?php
 // part of orsee. see orsee.org
 // THIS FILE WILL CHANGE FROM VERSION TO VERSION. BETTER NOT EDIT.
-$system__version="3.2.0";
-$system__database_version=2020022800;
+$system__version="3.3.0";
+$system__database_version=2026031100;
 
 // implemented experiment types
 $system__experiment_types=array('laboratory','online-survey','internet');
@@ -175,6 +175,7 @@ $system__admin_rights=array(
 "session_nonempty_delete:delete a session independent of participant signups:experiment_show,session_edit",
 "session_send_reminder:send session reminder manually:experiment_show,experiment_show_participants",
 "settings_edit:edit general settings and defaults",
+"settings_oauth_edit:configure OAuth token settings",
 "settings_edit_colors:edit color values for ORSEE styles",
 "settings_view:view general settings and defaults",
 "settings_view_colors:view color values for ORSEE styles",
@@ -250,15 +251,6 @@ $system__options_general[]=array(
 'option_values_lang'=>'direct,indirect',
 'default_value'=>'direct',
 'include_none_option'=>'n'
-);
-
-$system__options_general[]=array(
-'option_name'=>'email_sendmail_path',
-'option_text'=>'If indirect: path to sendmail program/wrapper?',
-'type'=>'textline',
-'default_value'=>'/usr/sbin/sendmail',
-'size'=>'30',
-'maxlength'=>'200',
 );
 
 $system__options_general[]=array(

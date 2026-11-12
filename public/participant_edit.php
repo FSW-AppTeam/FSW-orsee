@@ -9,6 +9,9 @@ if ($proceed) {
     $form=true;
     $errors__dataform=array();
     if (isset($_REQUEST['add']) && $_REQUEST['add']) {
+        if (!csrf__validate_request_message()) {
+            redirect("public/participant_edit.php".$token_string);
+        }
         $continue=true;
         $_REQUEST['participant_id']=$participant['participant_id'];
         if (isset($participant['pending_profile_update_request']) && $participant['pending_profile_update_request']=='y' &&

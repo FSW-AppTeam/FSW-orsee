@@ -20,6 +20,7 @@ if ($proceed) {
     if (check_allow('regular_tasks_show')) $optionlist[]='<A HREF="cronjob_main.php" class="option">'.oicon('history').lang('regular_tasks').'</A>';
     if (check_allow('admin_type_edit')) $optionlist[]='<A HREF="admin_type_show.php" class="option">'.oicon('graduation-cap').lang('user_types_and_privileges').'</A>';
     if (check_allow('admin_edit')) $optionlist[]='<A HREF="admin_show.php" class="option">'.oicon('users').lang('user_management').'</A>';
+    if (check_allow('settings_oauth_edit')) $optionlist[]='<A HREF="options_oauth_tokens.php" class="option">'.oicon('key').lang('configure_oauth_tokens').'</A>';
     options__show_main_section(lang('system_setup'),$optionlist);
 
     $optionlist=array();

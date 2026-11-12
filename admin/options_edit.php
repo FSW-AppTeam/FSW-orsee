@@ -38,6 +38,14 @@ if ($proceed) {
     }
 
     if (check_allow('settings_edit') && isset($_REQUEST['change']) && $_REQUEST['change']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (check_allow('settings_edit') && isset($_REQUEST['change']) && $_REQUEST['change']) {
         $newoptions=$_REQUEST['options']; $now=time();
         
         // add and process option values which may be differently submitted
@@ -84,9 +92,10 @@ if ($proceed) {
 
 if ($proceed) {
     if (check_allow('settings_edit')) echo '
-        <FORM action="options_edit.php" method=post>' .
-            addCsrfTokenToForm(). '
-        <INPUT type=hidden name="otype" value="'.$otype.'">';
+        <FORM action="options_edit.php" method=post>
+        <INPUT type=hidden name="otype" value="'.$otype.'">
+        '.csrf__field().'
+        ';
 
     echo '  <TABLE class="or_formtable" style="width: 80%;">';
     if (check_allow('settings_edit')) echo '
@@ -120,5 +129,6 @@ if ($proceed) {
             </script>';
 
 }
+
 include ("footer.php");
 ?>

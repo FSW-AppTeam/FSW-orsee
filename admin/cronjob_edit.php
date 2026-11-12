@@ -26,6 +26,9 @@ if ($proceed) {
     $continue=true;
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/cronjob_edit.php?job_name=".$job_name);
+        }
         if (!$_REQUEST['job_name']) {
             message (lang('name_for_cronjob_required'));
             $continue=false;
@@ -52,8 +55,9 @@ if ($proceed) {
     show_message();
 
     echo '
-            <FORM action="cronjob_edit.php">
-        ' . addCsrfTokenToForm() . '
+            <FORM action="cronjob_edit.php" method="POST">
+            '.csrf__field().'
+
         <TABLE class="or_formtable">
             <TR>
                 <TD>

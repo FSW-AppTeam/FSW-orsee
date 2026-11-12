@@ -61,15 +61,21 @@ if ($proceed) {
         if ($settings['registration__require_rules_acceptance']=='y' ||
             $settings['registration__require_privacy_policy_acceptance']=='y') {
             if (isset($_REQUEST['accept_rules']) && $_REQUEST['accept_rules']) {
+                if (!csrf__validate_request_message()) {
+                    redirect ("public/".thisdoc());
+                }
                 $_SESSION['rules']=true;
                 redirect ("public/".thisdoc());
             } elseif (isset($_REQUEST['notaccept_rules']) && $_REQUEST['notaccept_rules']) {
+                if (!csrf__validate_request_message()) {
+                    redirect ("public/".thisdoc());
+                }
                 unset ($_SESSION['subpool_id']);
                 redirect ("public/");
             } else {
                 echo '<center><BR><BR>
-                      <FORM action='.thisdoc().'>
-                      ' . addCsrfTokenToForm() . '
+                      <FORM action='.thisdoc().' method="POST">
+                      '.csrf__field().'
                       <TABLE class="or_panel" style="width: 80%">';
                 if ($settings['registration__require_rules_acceptance']=='y') {
                     echo '<TR><TD>
@@ -118,6 +124,9 @@ if ($proceed) {
     echo '<center>';
     $form=true; $errors__dataform=array();
     if (isset($_REQUEST['add'])) {
+        if (!csrf__validate_request_message()) {
+            redirect("public/participant_create.php");
+        }
         $continue=true;
 
         if (!isset($_REQUEST['captcha']) || !isset($_SESSION['captcha_string']) || $_REQUEST['captcha']!=$_SESSION['captcha_string']) {

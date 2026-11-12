@@ -29,6 +29,14 @@ if ($proceed) {
 
 if ($proceed) {
     if ( $dall || $dallpage || $dsel ) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if ( $dall || $dallpage || $dsel ) {
 
         if ($experiment_id) $allow=check_allow('mailqueue_edit_experiment','experiment_mailqueue_show?experiment_id='.$experiment_id);
         else $allow=check_allow('mailqueue_edit_all','mailqueue_show.php');
@@ -122,11 +130,11 @@ if ($proceed) {
 
     if ($experiment_id && check_allow('mailqueue_edit_experiment')) {
         echo '<FORM action="experiment_mailqueue_show.php" method="POST">
-            <INPUT type="hidden" name="experiment_id" value="'.$experiment_id.'">';
-        echo addCsrfTokenToForm();
+            <INPUT type="hidden" name="experiment_id" value="'.$experiment_id.'">
+            '.csrf__field().'
+            ';
     } elseif (check_allow('mailqueue_edit_all')) {
-        echo '<FORM action="mailqueue_show.php" method="POST">';
-        echo addCsrfTokenToForm();
+        echo '<FORM action="mailqueue_show.php" method="POST">'.csrf__field();
     }
 
     echo '<TABLE width=90% border=0>

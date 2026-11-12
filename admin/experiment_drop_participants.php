@@ -30,6 +30,9 @@ if ($proceed) {
     echo '</TR></TABLE>';
 
     if ((isset($_REQUEST['dropselected']) && $_REQUEST['dropselected']) || (isset($_REQUEST['dropall']) && $_REQUEST['dropall'])) {
+        if (!csrf__validate_request_message()) {
+            redirect ('admin/'.thisdoc().'?experiment_id='.$experiment_id);
+        }
 
         // data base queries for assign ...
 
@@ -108,8 +111,9 @@ if ($proceed) {
         //dump_array($query['pars'],"Parameters");
 
         echo  '<FORM name="part_list" method="POST" action="'.thisdoc().'">
-                <INPUT type=hidden name=experiment_id value="'.$experiment_id.'">';
-        echo addCsrfTokenToForm();
+                <INPUT type=hidden name=experiment_id value="'.$experiment_id.'">
+                '.csrf__field().'
+                ';
 
         // show list of results
         $assign_ids=query_show_query_result($query,"deassign");

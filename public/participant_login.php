@@ -16,6 +16,9 @@ if ($proceed) {
         $_SESSION['requested_url']=$_REQUEST['requested_url'];
 
     if (isset($_REQUEST['login']) && isset($_REQUEST['email']) && isset($_REQUEST['password'])) {
+        if (!csrf__validate_request_message()) {
+            redirect("public/participant_login.php");
+        }
         $logged_in=participant__check_login($_REQUEST['email'],$_REQUEST['password']);
         if ($logged_in) {
             if (isset($_SESSION['requested_url']) && $_SESSION['requested_url']) {
@@ -35,7 +38,7 @@ if ($proceed) {
     show_message();
 
     echo '<BR><BR><form name="login" action="participant_login.php" method=post>
-        ' . addCsrfTokenToForm() . '
+        '.csrf__field().'
         <table class="or_formtable">
         <TR><TD>'.lang('email').':</TD><TD>
         <input type="text" size="30" maxlength="100" name="email">

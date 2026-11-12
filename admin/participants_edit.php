@@ -28,6 +28,17 @@ if ($proceed) {
     $continue=true; $errors__dataform=array();
 
     if (isset($_REQUEST['add']) && $_REQUEST['add']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    $statuses=participant_status__get_statuses();
+    $continue=true; $errors__dataform=array();
+
+    if (isset($_REQUEST['add']) && $_REQUEST['add']) {
 
         // checks and errors
         foreach ($_REQUEST as $k=>$v) {

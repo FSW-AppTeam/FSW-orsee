@@ -21,6 +21,9 @@ if ($proceed) {
 
     if (isset($_REQUEST['change_def']) && $_REQUEST['change_def']) {
         $allow=check_allow('lang_avail_edit','lang_main.php');
+        if (!csrf__validate_request_message()) {
+            redirect("admin/lang_main.php");
+        }
 
         if ($proceed) {
             $parts=array(); $pubs=array();
@@ -103,8 +106,7 @@ if ($proceed) {
 
         // show languages
 
-    echo '<FORM action="'.thisdoc().'">';
-    echo addCsrfTokenToForm();
+    echo '<FORM action="'.thisdoc().'" method="POST">'.csrf__field();
     echo '<TABLE class="or_listtable" style="width: 80%;"><thead>
             <TR style="background: '.$color['list_header_background'].'; color: '.$color['list_header_textcolor'].';">
                 <TD colspan=2>'.lang('installed_languages').'</TD>

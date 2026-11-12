@@ -11,7 +11,21 @@ if ($proceed) {
 }
 
 if ($proceed) {
-    if (isset($_REQUEST['betternot']) && $_REQUEST['betternot']) redirect ('admin/events_edit.php?event_id='.$event_id);
+    if (isset($_REQUEST['betternot']) && $_REQUEST['betternot']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        } else {
+            redirect ('admin/events_edit.php?event_id='.$event_id);
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['reallydelete']) && $_REQUEST['reallydelete']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
 }
 
 if ($proceed) {
@@ -48,11 +62,11 @@ if ($proceed) {
             </TR>
             <TR>
                 <TD align=left>
-                    '.button_link('events_delete.php?event_id='.$event_id.'&reallydelete=true',
+                    '.button_link('events_delete.php?event_id='.$event_id.'&reallydelete=true&csrf_token='.urlencode(csrf__get_token()),
                     lang('yes_delete'),'check-square biconred').'
                 </TD>
                 <TD align=right>
-                    '.button_link('events_delete.php?event_id='.$event_id.'&betternot=true',
+                    '.button_link('events_delete.php?event_id='.$event_id.'&betternot=true&csrf_token='.urlencode(csrf__get_token()),
                     lang('no_sorry'),'undo bicongreen').'
                 </TD>
             </TR>

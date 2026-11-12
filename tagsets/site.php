@@ -17,12 +17,6 @@ function stripTagsRequestArray($var,$exempt=array()) {
     return $var;
 }
 
-
-
-function addCsrfTokenToForm() {
-    return '<input type="hidden" name="csrf_token" value="' . $_SESSION['csrf_token'] . '"><input type="hidden" name="random_string" value="' . $_SESSION['csrf_token'] . '">';
-}
-
 function getRefererFileName()
 {
     $ar = pathinfo($_SERVER['HTTP_REFERER']);
@@ -47,10 +41,15 @@ if(!function_exists('hash_equals')) {
 
 // messages
 function message($new_message,$icon="") {
-    $message_text=$_SESSION['message_text'];
-    if ($message_text) $seperator="<BR>"; else $seperator="";
+    if (isset($_SESSION['message_text']) && $_SESSION['message_text'] !== "") {
+        $message_text = $_SESSION['message_text'];
+        $separator = "<BR>";
+    } else {
+        $message_text = "";
+        $separator = "";
+    }
     if ($icon) $new_message=icon($icon).' '.$new_message;
-    $_SESSION['message_text']=$message_text.$seperator.$new_message;
+    $_SESSION['message_text']=$message_text.$separator.$new_message;
 }
 
 function show_message() {
@@ -95,6 +94,7 @@ function redirect($url) {
         ob_end_flush();
     }
     session_write_close();
+    exit(1);
 }
 
 function thisdoc() {
@@ -150,6 +150,48 @@ function icon($icon,$link="",$classes="",$style="",$title="") {
 }
 
 // security-related functions
+
+function csrf__get_token() {
+    if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token']) || !$_SESSION['csrf_token']) {
+        if (function_exists('random_bytes')) {
+            try {
+                $_SESSION['csrf_token']=bin2hex(random_bytes(32));
+            } catch (Exception $e) {
+                $_SESSION['csrf_token']=create_random_token(session_id());
+            }
+        } else {
+            $_SESSION['csrf_token']=create_random_token(session_id());
+        }
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function csrf__field($name='csrf_token') {
+    $token=htmlspecialchars(csrf__get_token(),ENT_QUOTES,'UTF-8');
+    return '<input type="hidden" name="'.$name.'" value="'.$token.'">';
+}
+
+function csrf__validate_request($name='csrf_token') {
+    $submitted=null;
+    if (isset($_POST[$name])) {
+        $submitted=$_POST[$name];
+    } elseif (isset($_GET[$name])) {
+        $submitted=$_GET[$name];
+    } elseif (isset($_REQUEST[$name])) {
+        $submitted=$_REQUEST[$name];
+    }
+    if (!is_string($submitted) || $submitted==='') return false;
+    return hash_equals(csrf__get_token(),$submitted);
+}
+
+function csrf__validate_request_message($name='csrf_token',$message_key='error_not_authorized_to_access_this_function') {
+    $valid=csrf__validate_request($name);
+    if (!$valid) {
+        if (function_exists('lang')) message(lang($message_key));
+        else message('Error: not authorized to access this function');
+    }
+    return $valid;
+}
 
 // authenticate with token
 function site__check_token() {

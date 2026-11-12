@@ -63,7 +63,7 @@ function detectUTF8($string) {
 function convert_array_to_UTF8($arr) {
     foreach($arr as $k=>$v) {
         if (!detectUTF8(stripslashes($v))) {
-            $arr[$k]=utf8_encode(stripslashes($v));
+            $arr[$k]=mb_convert_encoding(stripslashes($v), 'UTF-8', 'ISO-8859-1');
         }
     }
     return $arr;

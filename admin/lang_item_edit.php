@@ -115,6 +115,14 @@ if ($proceed) {
 
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
 
         $continue=true;
 
@@ -170,9 +178,10 @@ if ($proceed) {
     show_message();
 
     // form
-    echo '  <FORM action="lang_item_edit.php" METHOD=POST> ' . addCsrfTokenToForm() . '
+    echo '  <FORM action="lang_item_edit.php" METHOD=POST>
         <INPUT type=hidden name="id" value="'.$id.'">
         <INPUT type=hidden name="item" value="'.$item.'">
+        '.csrf__field().'
 
         <TABLE class="or_formtable">
             <TR><TD colspan=2>
@@ -244,7 +253,7 @@ if ($proceed) {
 
     if ($id && check_allow($allow_cat.'_delete')) {
         echo '<BR><BR>
-            '.button_link('lang_item_delete.php?id='.urlencode($id).'&item='.urlencode($item),
+            '.button_link('lang_item_delete.php?id='.urlencode($id).'&item='.urlencode($item).'&csrf_token='.urlencode(csrf__get_token()),
                             lang('delete'),'trash-o').'
             ';
     }

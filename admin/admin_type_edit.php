@@ -20,6 +20,9 @@ if ($proceed) {
 
 
     if (isset($_REQUEST['save']) && $_REQUEST['save']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/admin_type_edit.php?type_id=".$type_id);
+        }
 
         $continue=true;
 
@@ -97,8 +100,7 @@ if ($proceed) {
     show_message();
     if (!isset($type['type_name'])) $type['type_name']="";
     // form
-    echo '<FORM action="admin_type_edit.php" method="post">
-        ' . addCsrfTokenToForm() . '
+    echo '<FORM action="admin_type_edit.php" method="post">'.csrf__field().'
         <INPUT type=hidden name="type_id" value="'.$type_id.'">
         ';
 

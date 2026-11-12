@@ -259,4 +259,343 @@ $system__database_upgrades[]=array(
     )
 );
 
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_invitations',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Invitations','de'=>'Einladungen')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_enrolments',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Enrollments','de'=>'Anmeldungen')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_history',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'History','de'=>'Teilnahmen')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_session_details',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Experiment details','de'=>'Experiment-Details')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_you_can_enroll_for',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'You can enroll for:','de'=>'Sie können sich anmelden für:')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_you_are_enrolled_for',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'You are enrolled for:','de'=>'Sie sind angemeldet für:')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_sign_up',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Sign up','de'=>'Anmelden')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_cancel_signup',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Cancel signup','de'=>'Abmelden')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_confirmation',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Confirmation','de'=>'Bestätigung')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_do_you_really_want_to_signup',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Do you really want to sign up?','de'=>'Wollen Sie sich wirklich anmelden?')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_do_you_really_want_to_cancel_signup',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Do you really want to cancel your signup?','de'=>'Wollen Sie sich wirklich abmelden?')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_sorry_no',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Sorry, no.','de'=>'Sorry, nein.')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2024031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'mobile_yes_please',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Yes, please!','de'=>'Ja bitte!')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'query',
+'specs'=> array(
+    'query_code'=>"CREATE TABLE IF NOT EXISTS TABLE(oauth_tokens) (
+        token_id int(20) NOT NULL AUTO_INCREMENT,
+        purpose varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+        identity_email varchar(200) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+        provider varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+        refresh_token mediumtext COLLATE utf8_unicode_ci,
+        access_token mediumtext COLLATE utf8_unicode_ci,
+        access_token_expires_at int(20) NOT NULL DEFAULT '0',
+        created_at int(20) NOT NULL DEFAULT '0',
+        updated_at int(20) NOT NULL DEFAULT '0',
+        PRIMARY KEY (token_id),
+        UNIQUE KEY identity_purpose_provider (purpose,identity_email,provider)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci"
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'configure_oauth_tokens',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Configure OAuth Tokens','de'=>'OAuth-Tokens konfigurieren')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_authenticate_with_provider',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Authenticate With Provider','de'=>'Mit Provider authentifizieren')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_exchange_code',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Exchange Authorization Code','de'=>'Autorisierungscode austauschen')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_test_current_refresh_token',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Test current OAuth refresh token','de'=>'Aktuelles OAuth-Refresh-Token testen')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_url_generated_no_redirect',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Authorization URL generated, but automatic redirect was not possible. Please open the URL below.','de'=>'Autorisierungs-URL wurde erstellt, aber die automatische Weiterleitung war nicht möglich. Bitte öffnen Sie die URL unten.')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_url_generation_failed',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'OAuth URL generation failed','de'=>'Erstellung der OAuth-URL fehlgeschlagen')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_please_provide_authorization_code',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Please provide an authorization code.','de'=>'Bitte geben Sie einen Autorisierungscode ein.')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_token_exchange_storing_failed',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Token exchange succeeded, but storing token failed.','de'=>'Token-Austausch war erfolgreich, aber das Speichern des Tokens ist fehlgeschlagen.')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_token_stored_for_identity',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'OAuth token stored for identity','de'=>'OAuth-Token gespeichert für Identität')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_code_exchange_failed',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'OAuth code exchange failed','de'=>'OAuth-Code-Austausch fehlgeschlagen')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_auto_token_exchange_storing_failed',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Automatic token exchange succeeded, but storing token failed.','de'=>'Automatischer Token-Austausch war erfolgreich, aber das Speichern des Tokens ist fehlgeschlagen.')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_auto_token_stored_for_identity',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'OAuth token stored automatically for identity','de'=>'OAuth-Token automatisch gespeichert für Identität')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_auto_code_exchange_failed',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Automatic OAuth code exchange failed','de'=>'Automatischer OAuth-Code-Austausch fehlgeschlagen')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_provider_returned_error',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'OAuth provider returned error','de'=>'OAuth-Provider hat einen Fehler zurückgegeben')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_no_refresh_token_available',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'No OAuth refresh token is available for the selected identity. Please authenticate with provider first.','de'=>'Für die ausgewählte Identität ist kein OAuth-Refresh-Token verfügbar. Bitte authentifizieren Sie sich zuerst beim Provider.')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_refresh_test_succeeded',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Refresh test succeeded. Access token received.','de'=>'Refresh-Test erfolgreich. Access-Token erhalten.')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_refresh_test_failed_no_access_token',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Refresh test failed: no access token returned.','de'=>'Refresh-Test fehlgeschlagen: kein Access-Token zurückgegeben.')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_lang_item',
+'specs'=> array(
+    'content_name'=>'oauth_msg_refresh_test_failed',
+    'content_type'=>'lang',
+    'content'=>array('en'=>'Refresh test failed','de'=>'Refresh-Test fehlgeschlagen')
+    )
+);
+
+$system__database_upgrades[]=array(
+'version'=>'2026031100',
+'type'=>'new_admin_right',
+'specs'=> array(
+    'right_name'=>'settings_oauth_edit',
+    'admin_types'=>array('admin','developer','installer')
+    )
+);
+
 ?>

@@ -22,6 +22,9 @@ if ($proceed) {
 if ($proceed) {
 
     if (isset($_REQUEST['add']) && $_REQUEST['add']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/lang_lang_edit.php?elang=".$tlang);
+        }
 
         // check for errors
         $continue=true;
@@ -55,8 +58,7 @@ if ($proceed) {
     show_message();
 
     echo '<center>';
-    echo '<FORM action="lang_lang_edit.php">
-        ' . addCsrfTokenToForm() . '
+    echo '<FORM action="lang_lang_edit.php" method="POST">'.csrf__field().'
         <INPUT type=hidden name="elang" value="'.$tlang.'">
 
         <TABLE class="or_formtable">

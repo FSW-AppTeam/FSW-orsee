@@ -40,6 +40,9 @@ if ($proceed) {
 if ($proceed) {
 
     if ($reallydelete) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/options_participant_profile_delete.php?mysql_column_name=".urlencode($field_name));
+        }
         // transaction?
         $pars=array(':mysql_column_name'=>$field_name);
         $query="DELETE FROM ".table('profile_fields')."
@@ -62,9 +65,9 @@ if ($proceed) {
     // form
 
     echo '  <CENTER>
-            <FORM action="options_participant_profile_delete.php">
-            ' . addCsrfTokenToForm() . '
+            <FORM action="options_participant_profile_delete.php" method="POST">
             <INPUT type="hidden" name="mysql_column_name" value="'.$field_name.'">
+            '.csrf__field().'
             <TABLE class="or_formtable">
                 <TR><TD colspan="2">
                     <TABLE width="100%" border=0 class="or_panel_title"><TR>
@@ -81,8 +84,7 @@ if ($proceed) {
                 </TR>
                 <TR>
                 <TD align=center>
-                '.button_link('options_participant_profile_delete.php?mysql_column_name='.urlencode($field_name).'&reallydelete=true',
-                                        lang('yes_delete'),'check-square biconred').'
+                <INPUT class="button" type="submit" name="reallydelete" value="'.lang('yes_delete').'">
                 </TD>
             </TR>
             <TR>

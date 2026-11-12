@@ -8,6 +8,9 @@ include ("header.php");
 
 if ($proceed) {
     if (isset($_REQUEST['submit']) && $_REQUEST['submit']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/admin_pw.php");
+        }
 
         if (isset($_REQUEST['passold'])) $passold=$_REQUEST['passold']; else $passold="";
         if (isset($_REQUEST['password'])) $password=$_REQUEST['password']; else $password="";
@@ -70,7 +73,7 @@ if ($proceed) {
 
     echo '
         <form action="admin_pw.php" method="POST">
-        ' . addCsrfTokenToForm() . '
+        '.csrf__field().'
         <table class="or_formtable" style="max-width: 50%">
         <tr>
             <td>

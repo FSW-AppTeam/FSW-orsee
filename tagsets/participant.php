@@ -447,7 +447,7 @@ function load_form_template($tpl_name,$out,$template='current_template') {
 
 
     // fill in the vars
-    foreach ($out as $k=>$o) $tpl=str_replace("#".$k."#",$o,$tpl);
+    foreach ($out as $k=>$o) $tpl=str_replace("#".$k."#",($o ?? ''),$tpl);
 
     // fill in language terms
         $pattern="/lang\[([^\]]+)\]/i";
@@ -700,7 +700,7 @@ function participant__show_form($edit,$button_title="",$errors=array(),$admin=fa
     $out=array(); $tout=array();
 
     echo '<FORM action="'.thisdoc().'" method="POST">';
-    echo addCsrfTokenToForm();
+    echo csrf__field();
     echo '<table cellspacing="0" cellpadding="10em" border="0">
             <TR><TD>';
     participant__show_inner_form($edit,$errors,$admin);
@@ -836,8 +836,7 @@ function participant__show_admin_form($edit,$button_title="",$errors=array(),$ex
     $out['is_subjectpool_'.$subpool['subpool_id']]=true;
 
     echo '<FORM action="'.thisdoc().'" method="POST">';
-
-    echo addCsrfTokenToForm();
+    echo csrf__field();
 
     echo '<table border="0">';
     echo '<TR><TD valign="top">';

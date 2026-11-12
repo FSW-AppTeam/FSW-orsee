@@ -20,6 +20,9 @@ if ($proceed) {
     if (isset($_REQUEST['nlang_base'])) $nlang_base=trim($_REQUEST['nlang_base']); else $nlang_base="";
 
     if (isset($_REQUEST['add']) && $_REQUEST['add']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/lang_lang_add.php");
+        }
 
         // check for errors
         $continue=true;
@@ -80,8 +83,8 @@ if ($proceed) {
 if ($proceed) {
     show_message();
 
-    echo '<FORM action="lang_lang_add.php">
-        ' . addCsrfTokenToForm() . '
+    echo '<FORM action="lang_lang_add.php" method="POST">
+        '.csrf__field().'
 
         <TABLE class="or_formtable">
             <TR>

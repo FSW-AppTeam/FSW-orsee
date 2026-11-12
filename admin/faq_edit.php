@@ -30,6 +30,14 @@ if ($proceed) {
     $continue=true;
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
 
         $rquestion=$_REQUEST['question'];
         $ranswer=$_REQUEST['answer'];
@@ -90,8 +98,8 @@ if ($proceed) {
     // form
     echo '<center>';
     echo '  <FORM action="faq_edit.php" METHOD=POST>
-    			' . addCsrfTokenToForm() . '
                 <INPUT type=hidden name="faq_id" value="'.$faq_id.'">
+                '.csrf__field().'
 
                 <TABLE class="or_formtable">
                     <TR><TD colspan="3">
@@ -156,7 +164,7 @@ if ($proceed) {
 
     if ($faq_id && check_allow('faq_delete')) {
         echo '<BR><BR>
-              '.button_link('faq_delete.php?faq_id='.urlencode($faq_id),
+              '.button_link('faq_delete.php?faq_id='.urlencode($faq_id).'&csrf_token='.urlencode(csrf__get_token()),
                             lang('delete'),'trash-o');
     }
     echo '<BR><BR>

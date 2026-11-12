@@ -92,7 +92,7 @@ if ($proceed) {
                         });
                     $("#faq_vote").click(function(event){
                         event.preventDefault();
-                        var vote_url="faq_vote.php?eval=true&id=" + faq_id;
+                        var vote_url="faq_vote.php?eval=true&id=" + faq_id + "&csrf_token=" + encodeURIComponent('.json_encode(csrf__get_token()).');
                         $.ajax({
                             url: vote_url
                         });

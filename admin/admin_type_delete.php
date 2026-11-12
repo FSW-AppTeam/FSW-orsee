@@ -37,6 +37,9 @@ if ($proceed) {
 
 if ($proceed) {
     if ($reallydelete) {
+        if (!csrf__validate_request_message()) {
+            redirect ('admin/admin_type_delete.php?type_id='.$type_id);
+        }
 
         if (isset($_REQUEST['stype']) && $_REQUEST['stype']) $stype=$_REQUEST['stype']; else $stype='';
         if ($stype) $stype_type=orsee_db_load_array("admin_types",$stype,"type_id");
@@ -83,9 +86,9 @@ if ($proceed) {
     // confirmation form
 
     echo '
-        <FORM action="admin_type_delete.php">
-        ' . addCsrfTokenToForm() . '
+        <FORM action="admin_type_delete.php" method="POST">
         <INPUT type=hidden name="type_id" value="'.$type_id.'">
+        '.csrf__field().'
 
         <TABLE class="or_formtable">
             <TR><TD colspan="2">

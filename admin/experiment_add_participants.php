@@ -31,11 +31,18 @@ if ($proceed) {
 
 
     if (isset($_REQUEST['make_permanent']) && $_REQUEST['make_permanent'] && $settings['allow_permanent_queries']=='y' && check_allow('experiment_assign_query_permanent_activate')) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        } else {
         // get old query
         $posted_query_json=$_SESSION['lastquery_assign_'.$experiment_id];
         $done=query__save_query($posted_query_json,'assign',$experiment_id,array('permanent_start_time'=>time()),true);
         redirect ('admin/'.thisdoc().'?experiment_id='.$experiment_id);
+        }
     } elseif ((isset($_REQUEST['addselected']) && $_REQUEST['addselected']) || (isset($_REQUEST['addall']) && $_REQUEST['addall'])) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        } else {
 
         // data base queries for assign ...
 
@@ -69,6 +76,7 @@ if ($proceed) {
         $_SESSION['assign_ids_'.$experiment_id]=array();
         message($assigned_count.' '.lang('xxx_participants_assigned'));
         redirect ('admin/'.thisdoc().'?experiment_id='.$experiment_id);
+        }
 
     } elseif(isset($_REQUEST['search_submit']) || isset($_REQUEST['search_sort'])) {
         if(isset($_REQUEST['search_sort'])){
@@ -105,6 +113,7 @@ if ($proceed) {
             $cgivars[]="make_permanent=true";
             if(isset($_REQUEST['search_sort'])) $cgivars[]='search_sort='.urlencode($_REQUEST['search_sort']);
             $cgivars[]='experiment_id='.$experiment_id;
+            $cgivars[]='csrf_token='.urlencode(csrf__get_token());
             $link=thisdoc(); if (count($cgivars)>0) $link.='?'.implode("&",$cgivars);
             echo button_link($link,lang('activate_query_permanently'),'toggle-on');
             $perm_queries=query__get_permanent($experiment_id);
@@ -130,8 +139,9 @@ if ($proceed) {
         //dump_array($query['pars'],"Parameters");
 
         echo  '<FORM name="part_list" method="POST" action="'.thisdoc().'">
-        		' . addCsrfTokenToForm() . '
-                <INPUT type=hidden name=experiment_id value="'.$experiment_id.'">';
+                <INPUT type=hidden name=experiment_id value="'.$experiment_id.'">
+                '.csrf__field().'
+                ';
 
         // show list of results
         $assign_ids=query_show_query_result($query,"assign");

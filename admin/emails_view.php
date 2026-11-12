@@ -48,6 +48,9 @@ if ($proceed) {
     $open_reply=false; $open_note=false;
     // show email or perform an action
     if ($action) {
+        if (!csrf__validate_request_message()) {
+            redirect('admin/emails_view.php?message_id='.$message_id);
+        }
         // allow to perform action
         $redirect="";
         switch ($action) {

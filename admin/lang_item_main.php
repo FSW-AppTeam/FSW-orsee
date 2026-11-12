@@ -139,6 +139,14 @@ if ($proceed) {
 
     //var_dump($_REQUEST);
     if ($allow_order && isset($_REQUEST['save_order']) && $_REQUEST['save_order']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if ($allow_order && isset($_REQUEST['save_order']) && $_REQUEST['save_order']) {
         if(isset($_REQUEST['langitem_order']) && is_array($_REQUEST['langitem_order']) && count($_REQUEST['langitem_order'])>0) {
             $done=language__save_item_order($item,$_REQUEST['langitem_order']);
             message(lang('new_order_saved'));
@@ -251,7 +259,7 @@ if ($proceed) {
                     );
         }
         echo '<form action="" method="POST">';
-        echo addCsrfTokenToForm();
+        echo csrf__field();
         echo formhelpers__orderlist("langitem_list", "langitem_order", $listrows, true, lang('add'), "");
         echo '<BR><input class="button" name="save_order" type="submit" value="'.lang('save_order').'"></form>';
     } else {

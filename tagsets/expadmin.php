@@ -5,7 +5,7 @@
 function admin__login_form() {
     global $lang, $settings;
     echo '<form name="login" action="admin_login.php" method=post>
-        ' . addCsrfTokenToForm() . '
+        '.csrf__field().'
         '.lang('username').':
         <input type=text size=20 maxlength=20 name=adminname';
     if (!(isset($settings['disable_admin_login_js']) && $settings['disable_admin_login_js']=='y')) {
@@ -75,6 +75,7 @@ function admin__check_login($username,$password) {
     }
 
     if ($continue) {
+        session_regenerate_id(true); 
         $_SESSION['expadmindata']=$expadmindata;
         $done=admin__track_successful_login($admin);
         return true;

@@ -8,6 +8,9 @@ include("header.php");
 
 if ($proceed) {
     if (isset($_REQUEST['submit']) && $_REQUEST['submit']) {
+        if (!csrf__validate_request_message()) {
+            redirect("public/participant_change_pw.php");
+        }
 
         if (isset($_REQUEST['passold'])) $passold=$_REQUEST['passold']; else $passold="";
         if (isset($_REQUEST['password'])) $password=$_REQUEST['password']; else $password="";
@@ -56,7 +59,7 @@ if ($proceed) {
 
     echo '<TABLE border=0><TR><TD align="center">';
     echo '<form action="participant_change_pw.php" method="POST">';
-    echo addCsrfTokenToForm();
+    echo csrf__field();
     echo '<table class="or_formtable" style="width: 50%;">
             <tr><td>'.lang('old_password').'<BR>
                 <input type="password" autocomplete="off" name="passold" size="20" max-length="30">

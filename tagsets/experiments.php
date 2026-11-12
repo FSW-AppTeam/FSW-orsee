@@ -146,7 +146,7 @@ function experiment__current_experiment_summary($experimenter="",$finished="n",$
         <table class="or_panel">';
     if ($show_filter) {
         echo '<TR><TD colspan=2>
-                    <FORM action="'.thisdoc().'"><TABLE border=0>' . addCsrfTokenToForm(). '<TR><TD>'.
+                    <FORM action="'.thisdoc().'"><TABLE border=0>' . csrf__field(). '<TR><TD>'.
                     lang('restrict_list_to_experiments_of_class').'</TD><TD>';
                     echo experiment__experiment_class_select_field('class_search',$class_arr,true,array('cols'=>30,'picker_maxnumcols'=>3));
         echo '  </TD><TD rowspan=2 valign=middle>
@@ -782,7 +782,7 @@ function experiment__preload_experiments() {
         $result=or_query($query);
         while ($line=pdo_fetch_assoc($result)) { $experiments[$line['experiment_id']]['participated']='y'; }
 
-        $sort_order="time,experiment_name";
+        $sort_order = array("time", "experiment_name");
         multi_array_sort($experiments,$sort_order);
         $preloaded_experiments=$experiments;
         return $experiments;

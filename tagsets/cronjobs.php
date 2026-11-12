@@ -81,6 +81,16 @@ function cron__save_and_log_job($cronjob,$now="",$target="") {
         WHERE job_name= :job_name";
     $done=or_query($query,$pars);
 
+    // Cron log target column is VARCHAR(255); keep logs writable in strict SQL mode.
+    $target=(string)$target;
+    $target_max_length=255;
+    $target_suffix='TRUNC';
+    $target_suffix_length=strlen($target_suffix);
+    $target_length=mb_strlen($target,'UTF-8');
+    if ($target_length>$target_max_length) {
+        $target=mb_substr($target,0,$target_max_length-$target_suffix_length,'UTF-8').$target_suffix;
+    }
+
     $done=log__cron_job($cronjob,$target,$now,$id);
     return $done;
 

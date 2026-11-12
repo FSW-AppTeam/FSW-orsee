@@ -13,8 +13,21 @@ if ($proceed) {
 }
 
 if ($proceed) {
-    if (isset($_REQUEST['betternot']) && $_REQUEST['betternot'])
-        redirect ('admin/lang_item_edit.php?item='.$item.'&id='.$id);
+    if (isset($_REQUEST['betternot']) && $_REQUEST['betternot']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        } else {
+            redirect ('admin/lang_item_edit.php?item='.$item.'&id='.$id);
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['reallydelete']) && $_REQUEST['reallydelete']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
 }
 
 if ($proceed) {
@@ -152,11 +165,11 @@ if ($proceed) {
                         </TR>
                         <TR>
                                 <TD align=left>
-                                        '.button_link('lang_item_delete.php?id='.urlencode($id).'&item='.urlencode($item).'&reallydelete=true',
+                                        '.button_link('lang_item_delete.php?id='.urlencode($id).'&item='.urlencode($item).'&reallydelete=true&csrf_token='.urlencode(csrf__get_token()),
                                         lang('yes_delete'),'check-square biconred').'
                                 </TD>
                                 <TD align=right>
-                                        '.button_link('lang_item_delete.php?id='.urlencode($id).'&item='.urlencode($item).'&betternot=true',
+                                        '.button_link('lang_item_delete.php?id='.urlencode($id).'&item='.urlencode($item).'&betternot=true&csrf_token='.urlencode(csrf__get_token()),
                                         lang('no_sorry'),'undo bicongreen').'
                                 </TD>
                         </TR>

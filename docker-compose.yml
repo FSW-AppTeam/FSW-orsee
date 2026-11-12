@@ -1,4 +1,3 @@
-version: "3.2"
 services:
   orsee.docker:
     container_name: orsee
@@ -20,7 +19,6 @@ services:
     image: "mariadb:latest"
     volumes:
       - ./install/:/docker-entrypoint-initdb.d/:ro
-    restart: 'always'
     ports:
       - "8018:3306"
     environment:

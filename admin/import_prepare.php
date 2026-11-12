@@ -12,6 +12,16 @@ if ($proceed) {
 }
 if ($proceed) {
     $continue=true;
+    if ((isset($_REQUEST['submit1']) && $_REQUEST['submit1']) || (isset($_REQUEST['submit2']) && $_REQUEST['submit2'])) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+            $continue=false;
+        }
+    }
+}
+
+if ($proceed) {
+    $continue=true;
 
     echo '<center>';
 
@@ -30,8 +40,7 @@ if ($proceed) {
             || !isset($_REQUEST['old_database']) || !in_array($_REQUEST['old_database'],$databases)) {
             $continue=false;
 
-            echo '<FORM action="'.thisdoc().'" method="POST">';
-            echo addCsrfTokenToForm();
+            echo '<FORM action="'.thisdoc().'" method="POST">'.csrf__field();
             echo '<TABLE class="or_formtable">';
 
             echo '      <TR><TD>From which ORSEE version do you want to import data?</TD>
@@ -65,8 +74,7 @@ if ($proceed) {
 
 
 
-                echo '<FORM action="'.thisdoc().'" method="POST">';
-                echo addCsrfTokenToForm();
+                echo '<FORM action="'.thisdoc().'" method="POST">'.csrf__field();
                 echo '<INPUT type="hidden" name="old_version" value="'.$old_version.'">';
                 echo '<INPUT type="hidden" name="old_database" value="'.$old_database.'">';
                 echo '<TABLE class="or_formtable" style="max-width: 90%;">';

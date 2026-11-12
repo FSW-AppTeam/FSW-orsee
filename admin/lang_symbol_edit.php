@@ -17,6 +17,16 @@ if ($proceed) {
     $languages=get_languages();
 
     if (isset($_REQUEST['save']) && $_REQUEST['save']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    $languages=get_languages();
+
+    if (isset($_REQUEST['save']) && $_REQUEST['save']) {
 
         $continue=true;
         $_REQUEST['content_type']="lang";
@@ -44,8 +54,8 @@ if ($proceed) {
 
     // form
     echo '  <FORM action="lang_symbol_edit.php" method=post>
-            ' . addCsrfTokenToForm() . '
         <INPUT type=hidden name="lang_id" value="'.$lang_id.'">
+        '.csrf__field().'
 
         <TABLE class="or_formtable">
             <TR><TD colspan="2">
@@ -91,7 +101,7 @@ if ($proceed) {
 
     if ($lang_id && check_allow('lang_symbol_delete')) {
         echo '<BR><BR>
-            '.button_link('lang_symbol_delete.php?lang_id='.urlencode($lang_id),
+            '.button_link('lang_symbol_delete.php?lang_id='.urlencode($lang_id).'&csrf_token='.urlencode(csrf__get_token()),
                             lang('delete'),'trash-o');
     }
     echo '<BR><BR>

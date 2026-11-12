@@ -61,7 +61,7 @@ function downloads__list_files_general($showsize=false,$showtype=false,$showdate
                 }
                 if ($allow_delete) {
                     $out.= '<TD>';
-                    $out.= '<A HREF="download_delete.php?dl='.$upload['upload_id'].
+                    $out.= '<A HREF="download_delete.php?dl='.$upload['upload_id'].'&csrf_token='.urlencode(csrf__get_token()).
                             '"><FONT class="small">['.lang('delete').']</FONT></A>';
                     $out.= '</TD>';
                 }
@@ -157,7 +157,7 @@ function downloads__list_files_experiment($experiment_id,$showsize=false,$showty
                 }
                 if ($allow_delete) {
                     $out.= '    <TD>';
-                    $out.= '    <A HREF="download_delete.php?dl='.$upload['upload_id'].
+                    $out.= '    <A HREF="download_delete.php?dl='.$upload['upload_id'].'&csrf_token='.urlencode(csrf__get_token()).
                                 '"><FONT class="small">['.lang('delete').']</FONT></A>';
                     $out.= '    </TD>';
                 }

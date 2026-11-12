@@ -14,6 +14,17 @@ if ($proceed) {
     if (isset($_REQUEST['deletesel']) && $_REQUEST['deletesel']) $dsel=true; else $dsel=false;
 
     if ( $dall || $dsel ) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['deleteall']) && $_REQUEST['deleteall']) $dall=true; else $dall=false;
+    if (isset($_REQUEST['deletesel']) && $_REQUEST['deletesel']) $dsel=true; else $dsel=false;
+
+    if ( $dall || $dsel ) {
 
         $ok=false;
         if ($dsel) {
@@ -65,7 +76,7 @@ if ($proceed) {
     echo '<center>';
 
     echo '<FORM action="participants_unconfirmed.php" method="POST">';
-        echo addCsrfTokenToForm();
+    echo csrf__field();
 
         $posted_query=array('query'=> array(0=> array("statusids_multiselect"=>array("not"=>"", "ms_status"=>"0"))));
         $query_array=query__get_query_array($posted_query['query']);

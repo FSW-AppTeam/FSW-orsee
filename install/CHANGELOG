@@ -1,4 +1,23 @@
 
+ORSEE 3.3.0
+        Many minor and major bugfixes
+        Security: Added CSRF tokens to all ORSEE forms
+        Security: Session regeneration, redirect hardening,
+                  cookie and email sanitization
+        New feature: Integration of PHPMailer as mail backend
+        New feature: OAuth2 capability for PHPMailer integration
+        Updated PHPlot from version 6.2.1 to version 8.0.0.3
+        Updated jQuery to version 3.7.1 and improved mobile pages
+        Bugfix: Bulk mailing no longer stops when participant uses
+                previously deleted language
+        Bugfix: Permanent query handling fixed
+        Bugfix: Language deletion fixed
+        Bugfix: PHP8 compatibility fixes
+        Bugfix: Replace deprecated jQuery size() with length in textext plugin
+        Bugfix: Truncate cron log target to column size
+        Bugfix: Avoid warnings in multi_array_sort() and uasort() return handling
+        Misc: Fix link to documentation
+
 ORSEE 3.2.0
         Minor and major bugfixes
         Upgrade to PHP8

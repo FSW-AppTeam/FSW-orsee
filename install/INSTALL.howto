@@ -1,4 +1,4 @@
-These are short installation notes for ORSEE 3.1.x
+These are short installation notes for ORSEE 3.3.x
 
 The ORSEE Wiki contains more details on ORSEE installation.
 
@@ -7,8 +7,8 @@ When you upgrade from an older version of ORSEE, please read the UPGRADE.howto
 PREREQUISITES
 
 - a webserver (Apache preferred)
-- PHP >=5 both as apache module (apache2-mod_php5) and on commandline (php5) with modules: php5-gd, php5-mysql, php5-mbstring.
-- MySQL >=5 (I recommend the community-server version from Oracle)
+- PHP >=8 both as apache module (apache2-mod_php8) and on commandline (php8-cli) with modules: gd, mysql, mbstring.
+- MySQL/MariaDB >=8
 - cronjob access
 - webalizer for web traffic analysis, of required.
 
@@ -17,7 +17,7 @@ BASIC INSTALLATION
 1. Unpack ORSEE's tgz file in your webservers path. (Oh, you already did?)
 
 2. Rename the directory if needed
-   % mv orsee-3.1.x yourdirname
+   % mv orsee-3.3.x yourdirname
 
 3. Cd to the 'install' directory.
    % cd yourdirname/install
@@ -25,10 +25,12 @@ BASIC INSTALLATION
 4. Enter mysql and create the mysql database. (You will need the privileges to add a database.)
    % mysql
 
-   mysql> CREATE DATABASE orseedbname DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-   mysql> GRANT ALL PRIVILEGES ON orseedbname.* TO orseedbusername@localhost IDENTIFIED BY 'orseeuserdbpassword';
+   mysql> CREATE DATABASE orseedbname DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   mysql> CREATE USER 'orseedbusername'@'localhost' IDENTIFIED BY 'orseeuserdbpassword';
+   mysql> GRANT ALL PRIVILEGES ON orseedbname.* TO 'orseedbusername'@'localhost';
    mysql> FLUSH PRIVILEGES;
    mysql> quit
+
 
 5. Import the default database structure.
 

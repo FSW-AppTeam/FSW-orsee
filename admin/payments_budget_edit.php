@@ -28,6 +28,9 @@ if ($proceed) {
     $continue=true;
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/payments_budget_edit.php?budget_id=".$budget_id);
+        }
 
         if (!isset($_REQUEST['budget_name']) || !$_REQUEST['budget_name']) {
                     message (lang('error_you_have_to_provide_budget_name'));
@@ -67,8 +70,7 @@ if ($proceed) {
     echo '<CENTER>';
     show_message();
     echo '
-            <FORM action="payments_budget_edit.php">';
-    echo addCsrfTokenToForm();
+            <FORM action="payments_budget_edit.php" method="POST">'.csrf__field();
         if (isset($budget_id)) echo '<INPUT type=hidden name="budget_id" value="'.$budget_id.'">';
 
     echo '

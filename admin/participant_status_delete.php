@@ -50,6 +50,9 @@ if ($proceed) {
     }
 
     if ($reallydelete) {
+        if (!csrf__validate_request_message()) {
+            redirect ('admin/participant_status_delete.php?status_id='.$status_id);
+        }
         $participant_statuses=participant_status__get_statuses();
         if (!isset($_REQUEST['merge_with']) || !isset($participant_statuses[$_REQUEST['merge_with']])) {
             redirect ('admin/participant_status_delete.php?status_id='.$status_id);
@@ -89,9 +92,9 @@ if ($proceed) {
     // form
 
     echo '  <CENTER>
-            <FORM action="participant_status_delete.php">
-            ' . addCsrfTokenToForm() . '
+            <FORM action="participant_status_delete.php" method="POST">
             <INPUT type="hidden" name="status_id" value="'.$status_id.'">
+            '.csrf__field().'
             <TABLE class="or_formtable">
                 <TR><TD colspan="2">
                     <TABLE width="100%" border=0 class="or_panel_title"><TR>

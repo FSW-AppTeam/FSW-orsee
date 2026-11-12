@@ -28,19 +28,27 @@ if ($proceed) {
 
 if ($proceed) {
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        } else {
         $t['item_details']['current_draft']=$_REQUEST['current_draft'];
         $t['item_details']=property_array_to_db_string($t['item_details']);
         $done=orsee_db_save_array($t,"objects",$t['item_id'],"item_id");
         log__admin("pform_templates_edit","item_name:".$t['item_name']);
         message (lang('changes_saved'));
         redirect ('admin/options_profile_template_edit.php?item_name='.$item_name.'&subpool_id='.$subpool_id);
+        }
     } elseif (isset($_REQUEST['activate']) && $_REQUEST['activate']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        } else {
         $t['item_details']['current_template']=$t['item_details']['current_draft'];
         $t['item_details']=property_array_to_db_string($t['item_details']);
         $done=orsee_db_save_array($t,"objects",$t['item_id'],"item_id");
         log__admin("pform_templates_activate","item_name:".$t['item_name']);
         message (lang('template_draft_activated'));
         redirect ('admin/options_profile_template_edit.php?item_name='.$item_name.'&subpool_id='.$subpool_id);
+        }
     }
 }
 
@@ -56,8 +64,8 @@ if ($proceed) {
 
     echo '
         <FORM action="options_profile_template_edit.php" METHOD=POST>
-        ' . addCsrfTokenToForm() . '
         <INPUT type=hidden name="item_name" value="'.$item_name.'">
+        '.csrf__field().'
         <TABLE width="95%" border=0 cellspacing="0">
         <TR><TD>
             '.lang('display_preview_for_subjectpool').subpools__select_field('subpool_id',$subpool_id).
@@ -70,9 +78,9 @@ if ($proceed) {
 
     // form
     echo '  <FORM action="options_profile_template_edit.php" METHOD=POST>
-        ' . addCsrfTokenToForm() . '
         <INPUT type=hidden name="item_name" value="'.$item_name.'">
         <INPUT type=hidden name="subpool_id" value="'.$subpool_id.'">
+        '.csrf__field().'
 
         <TABLE class="or_formtable" style="max-width: 98%; width: 98%; padding: 0px;">
             <TR>

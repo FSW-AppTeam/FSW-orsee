@@ -39,6 +39,9 @@ if ($proceed) {
     $continue=true;
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/participation_status_edit.php?pstatus_id=".$pstatus_id);
+        }
 
         $pstatus_internal_name=$_REQUEST['pstatus_internal_name'];
         foreach ($languages as $language) {
@@ -117,8 +120,7 @@ if ($proceed) {
     show_message();
 
     echo '
-            <FORM action="participation_status_edit.php">';
-    echo addCsrfTokenToForm();
+            <FORM action="participation_status_edit.php" method="POST">'.csrf__field();
     if (isset($pstatus_id)) echo '<INPUT type=hidden name="pstatus_id" value="'.$pstatus_id.'">';
 
     echo '

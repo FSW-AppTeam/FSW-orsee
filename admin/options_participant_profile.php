@@ -40,6 +40,14 @@ if ($proceed) {
 
 if ($proceed) {
     if (isset($_REQUEST['delete_redundant']) && $_REQUEST['delete_redundant']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['delete_redundant']) && $_REQUEST['delete_redundant']) {
         $pars=array(); foreach ($redundant as $r) $pars[]=array(':mysql_column_name'=>$r);
         $query="DELETE FROM ".table('profile_fields')." WHERE mysql_column_name = :mysql_column_name";
         $done=or_query($query,$pars);
@@ -55,7 +63,7 @@ if ($proceed) {
     if (count($redundant)>0) {
         $m=lang('pfields_redundant_configurations_message').'<BR><B>'.implode(", ",$redundant).'</B>';
         $m.='<BR><FORM action="'.thisdoc().'" method="POST">
-                ' . addCsrfTokenToForm() . '
+                '.csrf__field().'
                 <INPUT class="button" type="submit" name="delete_redundant" value="'.lang('yes').'">
                 </FORM>
             </p>';

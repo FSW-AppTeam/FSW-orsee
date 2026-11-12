@@ -34,6 +34,9 @@ if ($proceed) {
     $continue=true;
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/experiment_type_edit.php?exptype_id=".$exptype_id);
+        }
 
         if (!$_REQUEST['exptype_name']) {
             message (lang('name_for_exptype_required'));
@@ -105,9 +108,9 @@ if ($proceed) {
     show_message();
 
     echo '
-            <FORM action="experiment_type_edit.php">
-                ' . addCsrfTokenToForm() . '
+            <FORM action="experiment_type_edit.php" method="POST">
                 <INPUT type=hidden name="exptype_id" value="'.$exptype_id.'">
+                '.csrf__field().'
 
         <TABLE class="or_formtable">
             <TR>

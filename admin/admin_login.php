@@ -18,17 +18,34 @@ if ($proceed) {
     show_message();
 
     if (isset($_REQUEST['adminname']) && isset($_REQUEST['password'])) {
+        if (!csrf__validate_request_message()) {
+            redirect("admin/admin_login.php");
+        }
         $logged_in=admin__check_login($_REQUEST['adminname'],$_REQUEST['password']);
         if ($logged_in) {
             $expadmindata['admin_id']=$_SESSION['expadmindata']['admin_id'];
             log__admin("login");
-            if (isset($_REQUEST['requested_url']) && $_REQUEST['requested_url']) redirect(urldecode($_REQUEST['requested_url']));
-            else redirect("admin/index.php");
+            if (isset($_REQUEST['requested_url']) && $_REQUEST['requested_url']) {
+                $requested_host = parse_url(urldecode($_REQUEST['requested_url']), PHP_URL_HOST);
+                $server_host = $_SERVER['HTTP_HOST'];
+                
+                if (
+                    (!preg_match("/^(http:\/\/|https:\/\/)/i",urldecode($_REQUEST['requested_url']))) || 
+                    $requested_host == $server_host
+                    ) {
+                   redirect(urldecode($_REQUEST['requested_url']));
+                } else {
+                    redirect("admin/index.php");
+                }
+            } else {
+                redirect("admin/index.php");
+            }
         } else {
             message(lang('error_password_or_username'));
             $add="";
-            if (isset($_REQUEST['requested_url']) && $_REQUEST['requested_url'])
-                $add="?requested_url=".$_REQUEST['requested_url'];
+            if (isset($_REQUEST['requested_url']) && $_REQUEST['requested_url']) {
+                    $add="?requested_url=".$_REQUEST['requested_url'];
+            }
             redirect("admin/admin_login.php".$add);
         }
         $proceed=false;

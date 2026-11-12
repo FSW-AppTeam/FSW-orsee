@@ -11,7 +11,21 @@ if ($proceed) {
 }
 
 if ($proceed) {
-    if (isset($_REQUEST['betternot']) && $_REQUEST['betternot']) redirect ('admin/experiment_edit.php?experiment_id='.$experiment_id);
+    if (isset($_REQUEST['betternot']) && $_REQUEST['betternot']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        } else {
+            redirect ('admin/experiment_edit.php?experiment_id='.$experiment_id);
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['reallydelete']) && $_REQUEST['reallydelete']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
 }
 
 if ($proceed) {
@@ -71,11 +85,11 @@ if ($proceed) {
             </TR>
             <TR>
                 <TD align=left>
-                    '.button_link('experiment_delete.php?experiment_id='.$experiment_id.'&reallydelete=true',
+                    '.button_link('experiment_delete.php?experiment_id='.$experiment_id.'&reallydelete=true&csrf_token='.urlencode(csrf__get_token()),
                     lang('yes_delete'),'check-square biconred').'
                 </TD>
                 <TD align=right>
-                    '.button_link('experiment_delete.php?experiment_id='.$experiment_id.'&betternot=true',
+                    '.button_link('experiment_delete.php?experiment_id='.$experiment_id.'&betternot=true&csrf_token='.urlencode(csrf__get_token()),
                     lang('no_sorry'),'undo bicongreen').'
                 </TD>
             </TR>

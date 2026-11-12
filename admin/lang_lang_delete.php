@@ -26,6 +26,9 @@ if ($proceed) {
     $lang_names=lang__get_language_names();
 
     if ($delete || $reallydelete) {
+        if (($delete || $reallydelete) && !csrf__validate_request_message()) {
+            redirect ("admin/lang_lang_delete.php");
+        }
 
         if (!$tlang || !in_array($tlang,$languages)) redirect ("admin/lang_main.php");
 
@@ -54,7 +57,7 @@ if ($proceed) {
             foreach ($tables as $table) {
                 $pars=array(':slang'=>$slang,':tlang'=>$tlang);
                 $query="UPDATE ".table($table)." SET language= :slang WHERE language= :tlang";
-                $done=or_query($query,pars);
+                $done=or_query($query,$pars);
             }
             message(lang('updated_language_settings'));
 
@@ -75,10 +78,10 @@ if ($proceed) {
 
 
             echo '
-                <FORM action="lang_lang_delete.php">
-                ' . addCsrfTokenToForm() . '
+                <FORM action="lang_lang_delete.php" method="POST">
                 <INPUT type=hidden name="elang" value="'.$tlang.'">
                 <INPUT type=hidden name="nlang" value="'.$slang.'">
+                '.csrf__field().'
 
                 <TABLE class="or_formtable">
                     <TR><TD colspan=2>
@@ -96,12 +99,10 @@ if ($proceed) {
                     </TR>
                     <TR>
                         <TD align=left>
-                            '.button_link('lang_lang_delete.php?elang='.urlencode($tlang).'&nlang='.urlencode($slang).'&reallydelete=true',
-                                            lang('yes_delete'),'check-square biconred').'
+                            <INPUT class="button" type="submit" name="reallydelete" value="'.lang('yes_delete').'">
                         </TD>
                         <TD align=right>
-                            '.button_link('lang_lang_delete.php?elang='.urlencode($tlang).'&nlang='.urlencode($slang).'&betternot=true',
-                                            lang('no_sorry'),'undo bicongreen').'
+                            <INPUT class="button" type="submit" name="betternot" value="'.lang('no_sorry').'">
                         </TD>
 
                     </TR>
@@ -117,8 +118,8 @@ if ($proceed) {
 
         echo '  <BR><BR>
                 <center>';
-        echo '  <FORM action="lang_lang_delete.php">
-                ' . addCsrfTokenToForm() . '
+        echo '  <FORM action="lang_lang_delete.php" method="POST">
+                '.csrf__field().'
                 <TABLE class="or_formtable">
                     <TR>
                     <TD align=right>'.lang('delete_language').':</TD>

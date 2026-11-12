@@ -16,7 +16,7 @@ if ($proceed) {
     $settings=load_settings();
     $settings['style']=$settings['orsee_public_style'];
     $color=load_colors();
-    session_set_save_handler("orsee_session_open", "orsee_session_close", "orsee_session_read", "orsee_session_write", "orsee_session_destroy", "orsee_session_gc");
+    orsee_session_register_handler();
     session_start();
     $_REQUEST=strip_tags_array($_REQUEST);
 
@@ -30,32 +30,6 @@ if ($proceed) {
         true,
         true
     );
-}
-
-$createNewCsrfToken = false;
-
-
-// if only csrf security when logging in is wanted, take out commented section in next line
-if( $_SERVER['REQUEST_METHOD'] == 'POST' AND getRefererFileName() == 'participant_login' ) {
-    if(!isset($_REQUEST["csrf_token"])) {
-        exit;
-    }
-    elseif(! hash_equals($_SESSION["csrf_token"], $_REQUEST["csrf_token"])) { //$_REQUEST["csrf_token"] != $_SESSION["csrf_token"]) {
-        exit;
-    }
-    else { // after successful comparison recreate token
-        $createNewCsrfToken = true;
-    }
-}
-
-
-if(!isset($_SESSION['csrf_token']) OR $createNewCsrfToken) {
-    // new token to be taken into each form
-    if (function_exists('mcrypt_create_iv')) {
-        $_SESSION['csrf_token'] = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
-    } else {
-        $_SESSION['csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
-    }
 }
 
 if ($proceed) {
@@ -101,12 +75,10 @@ if ($proceed) {
     $lang=load_language($_SESSION['pauthdata']['language']);
 }
 
-if ($proceed) {
-    if (!in_array(thisdoc(),array('participant_create.php','captcha.php'))) {
-        unset ($_SESSION['subpool_id']);
-        unset ($_SESSION['rules']);
-    }
-}
+// Note: $_SESSION['subpool_id'] and $_SESSION['rules'] are only cleared
+// within participant_create.php itself (on cancel or after successful registration).
+// Clearing them here on every other page caused race conditions when browsers
+// auto-load pages like index.php concurrently with participant_create.php.
 
 if ($proceed) {
     // require participant login for the following pages

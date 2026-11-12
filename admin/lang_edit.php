@@ -26,6 +26,9 @@ if ($proceed) {
     if (isset($_REQUEST['letter']) && $_REQUEST['letter']) $letter=$_REQUEST['letter']; else $letter='a';
 
     if (isset($_REQUEST['alter_lang']) && $_REQUEST['alter_lang'] && isset($_REQUEST['symbols']) && is_array($_REQUEST['symbols'])) {
+        if (!csrf__validate_request_message()) {
+            redirect ('admin/lang_edit.php?el='.$el.'&letter='.$letter.'&search='.$search);
+        }
         $pars=array();
         foreach ($_REQUEST['symbols'] as $symbol => $content) {
             $pars[]=array(':content'=>trim($content),':symbol'=>$symbol);
@@ -66,7 +69,7 @@ if ($proceed) {
     }
 
     echo '<FORM action="lang_edit.php">
-    	' . addCsrfTokenToForm() . '
+    	' . csrf__field() . '
         <INPUT type=hidden name="el" value="'.$el.'">
         <INPUT type=hidden name="letter" value="'.$letter.'">
         <INPUT type=text name="search" size=20 maxlength=200 value="'.$search.'">
@@ -90,10 +93,10 @@ if ($proceed) {
     echo '<BR><BR>'.lang('symbols').': '.$number.'<BR><BR>
 
         <FORM action="lang_edit.php" method=post>
-        ' . addCsrfTokenToForm() . '
         <INPUT type=hidden name="el" value="'.$el.'">
         <INPUT type=hidden name="letter" value="'.$letter.'">
         <INPUT type=hidden name="search" value="'.$search.'">
+        '.csrf__field().'
         <TABLE class="or_listtable" style="width: 95%;"><thead>
             <TR style="background: '.$color['list_header_background'].'; color: '.$color['list_header_textcolor'].';">
                 <TD colspan=4 align=center>

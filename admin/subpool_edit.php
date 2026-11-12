@@ -40,6 +40,9 @@ if ($proceed) {
     $continue=true;
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/subpool_edit.php?subpool_id=".$subpool_id);
+        }
 
         if (!$_REQUEST['subpool_name']) {
             message (lang('name_for_subpool_required'));
@@ -113,9 +116,9 @@ if ($proceed) {
     echo '<CENTER>';
     show_message();
     echo '
-        <FORM action="subpool_edit.php">
-        ' . addCsrfTokenToForm() . '
+        <FORM action="subpool_edit.php" method="POST">
         <INPUT type=hidden name="subpool_id" value="'.$subpool_id.'">
+        '.csrf__field().'
         <TABLE class="or_panel">
             <TR><TD>'.lang('id').':</TD><TD>'.$subpool_id.'</TD></TR>
             <TR><TD>'.lang('name').':</TD>

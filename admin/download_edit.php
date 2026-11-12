@@ -45,6 +45,14 @@ if ($proceed) {
 if ($proceed) {
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
         $continue=true;
         if (!$_REQUEST['upload_name']) {
             $continue=false;
@@ -82,7 +90,7 @@ if ($proceed) {
 
     echo '  <form method="post" action="download_edit.php">
                 <input type="hidden" name="file" value="'.$upload_id.'">
-                ' . addCsrfTokenToForm() . '
+                '.csrf__field().'
 
             <table class="or_formtable">';
     if ($experiment_id) {

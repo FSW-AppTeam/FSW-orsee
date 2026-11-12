@@ -750,7 +750,7 @@ function stats__get_participant_action_data($months_backward=12) {
             WHERE date_format(FROM_UNIXTIME(timestamp),'%Y%m')>=date_format(FROM_UNIXTIME(".$first_date_unixtime."),'%Y%m')
             AND action IN ('".implode("','",$actions)."')
             GROUP BY action, yearmonth
-            ORDER BY timestamp DESC";
+            ORDER BY yearmonth DESC, action";
     $result=or_query($query);
     while ($line=pdo_fetch_assoc($result)) {
         $nums[$line['action']][$line['yearmonth']]=$line['nractions'];

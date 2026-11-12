@@ -102,8 +102,7 @@ if ($proceed) {
             $field_names[$f['mysql_column_name']]=lang($f['name_lang']);
         }
 
-        echo '<FORM action="participants_duplicates.php" method="POST">';
-        echo addCsrfTokenToForm();
+        echo '<FORM action="participants_duplicates.php" method="GET">';
         echo '<B></B>';
 
         echo '<TABLE class="or_formtable"><TR><TD>

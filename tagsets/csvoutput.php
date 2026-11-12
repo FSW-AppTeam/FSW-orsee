@@ -89,13 +89,13 @@ function csvoutput__make_part_list($experiment_id,$session_id="",$pstatus="",$fo
 
     $fp = fopen('php://output', 'w');
     $headers_csv = participant__get_result_table_headcells_pdf($cols);
-    fputcsv($fp, $headers_csv);
+    fputcsv($fp, $headers_csv, ',', '"', '\\');
     $pnr=0;
     foreach ($participants as $p) {
         $pnr++;
         $p['order_number']=$pnr;
         $part_csv = participant__get_result_table_row_pdf($cols,$p);
-        fputcsv($fp, $part_csv);
+        fputcsv($fp, $part_csv, ',', '"', '\\');
     }
     fclose($fp);
 

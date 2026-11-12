@@ -80,6 +80,14 @@ if ($proceed && $allow_check) {
 
 if ($proceed) {
     if (isset($_REQUEST['save_order']) && $_REQUEST['save_order']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['save_order']) && $_REQUEST['save_order']) {
         if(isset($_REQUEST['item_order']) && is_array($_REQUEST['item_order']) && count($_REQUEST['item_order'])>0) {
             $details=array();
             if (isset($_REQUEST['sortby']) && $_REQUEST['sortby']) {
@@ -151,7 +159,7 @@ if ($proceed) {
 
     echo '<center>';
     echo '<form action="" method="POST">';
-    echo addCsrfTokenToForm();
+    echo csrf__field();
     echo '<TABLE class="or_formtable">
             <TR><TD>
                 <TABLE width="100%" border=0 class="or_panel_title"><TR>

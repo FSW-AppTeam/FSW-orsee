@@ -460,6 +460,7 @@ function calendar__display_calendar($admin = false){
         echo '<th colspan="7" class="monthTag"><center>' . $month_names[($month-1)] . ' ' . $year . '</center></td></tr><tr>';
 
             $calendar__weekdays=explode(",",$lang['format_datetime_weekday_abbr']);
+            $calendar__weekday_fallback=array('Su','Mo','Tu','We','Th','Fr','Sa');
             for ($i3 = 1; $i3 <= 7; ++$i3) {
                 if (!isset($lang['format_datetime_firstdayofweek_0:Su_1:Mo']) || (!$lang['format_datetime_firstdayofweek_0:Su_1:Mo'])) {
                     $wdindex = $i3-1;
@@ -467,7 +468,9 @@ function calendar__display_calendar($admin = false){
                     $wdindex = $i3;
                     if ($wdindex==7) $wdindex=0;
                 }
-                echo '<th>' . $calendar__weekdays[$wdindex] . '</th>';
+                $weekday_label = isset($calendar__weekdays[$wdindex]) ? trim($calendar__weekdays[$wdindex]) : '';
+                if ($weekday_label === '') $weekday_label = $calendar__weekday_fallback[$wdindex];
+                echo '<th>' . $weekday_label . '</th>';
             }
         echo '</tr></thead>';
         echo '<tbody>';

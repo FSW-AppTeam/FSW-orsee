@@ -26,7 +26,7 @@ function query__show_form($hide_modules,$experiment=array(),$load_query="",$butt
 
     // display form table
     echo '  <form id="queryForm" action="'.thisdoc().'" method="POST">';
-    echo addCsrfTokenToForm();
+    echo csrf__field();
     if ($formextra) echo $formextra;
     if ($experiment_id) echo '<INPUT type="hidden" name="experiment_id" value="'.$experiment_id.'">';
     echo '  <TABLE border=0 width=100%>
@@ -754,6 +754,7 @@ function query__resulthead_participantsearch() {
     // save query button
     $cgivars=array();
     $cgivars[]="save_query=true";
+    $cgivars[]='csrf_token='.urlencode(csrf__get_token());
     if(isset($_REQUEST['search_sort'])) $cgivars[]='search_sort='.urlencode($_REQUEST['search_sort']);
     if (isset($_REQUEST['active']) && $_REQUEST['active']) $cgivars[]='active=true';
     if (isset($_REQUEST['experiment_id']) && $_REQUEST['experiment_id']) $cgivars[]='experiment_id='.$_REQUEST['experiment_id'];
@@ -863,6 +864,7 @@ function query__apply_permanent_queries() {
         foreach ($ppart as $p) {
             $num_p++;
             foreach ($pqu as $q) {
+                $continue=true;
                 $experiment=orsee_db_load_array("experiments",$q['experiment_id'],"experiment_id");
                 if (!isset($experiment['experiment_id'])) $continue=false;
                 if ($continue) {
@@ -877,9 +879,13 @@ function query__apply_permanent_queries() {
                     $additional_clauses=array($active_clause,$exptype_clause,$notyetassigned_clause);
                     $query=query__get_query($query_array,time(),$additional_clauses,'');
                     $result=or_query($query['query'],$query['pars']);
-                    $p_is_eligibe=false;
-                    while ($pc=pdo_fetch_assoc($result)) if ($pc['participant_id']=$p['participant_id']) $p_is_eligibe=true;
-                    if (!$p_is_eligibe) $continue=false;
+                    $p_is_eligible=false;
+                    while ($pc=pdo_fetch_assoc($result)) {
+                        if ($pc['participant_id']==$p['participant_id']) {
+                            $p_is_eligible=true;
+                        }
+                    }
+                    if (!$p_is_eligible) $continue=false;
                 }
                 if ($continue) {
                     // assign participant

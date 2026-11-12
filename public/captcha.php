@@ -35,5 +35,4 @@ header('Content-type: image/png');
 header('Pragma: no-cache');
 header('Cache-Control: no-store, no-cache, proxy-revalidate');
 imagepng($im);
-imagedestroy($im);
 ?>

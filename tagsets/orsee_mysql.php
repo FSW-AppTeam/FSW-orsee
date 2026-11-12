@@ -77,6 +77,7 @@ function id_array_to_par_array($id_array,$parname='id') {
 function or_query($query,$pars=array()) {
     global $db;
     $id=start_query_timer($query,$pars);
+    $stmt=false;
     try {
         if (is_array($pars) && count($pars)>0) {
             // parametrized query
@@ -92,6 +93,7 @@ function or_query($query,$pars=array()) {
         }
     } catch (PDOException $e) {
         show_message('<pre>Query error: ' . $e->getMessage(). "\nQuery: ".$query."</pre>");
+        $stmt=false;
     }
     $end=stop_query_timer($id);
     return $stmt;
@@ -139,6 +141,7 @@ function stop_query_timer($id) {
 
 
 function pdo_fetch_assoc($stmt) {
+    if (!$stmt) return false;
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 

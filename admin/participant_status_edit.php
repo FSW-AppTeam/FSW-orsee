@@ -40,6 +40,9 @@ if ($proceed) {
     $continue=true;
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/participant_status_edit.php?status_id=".$status_id);
+        }
 
         if ($not_unconfirmed && $_REQUEST['is_default_active']=="y" && $_REQUEST['is_default_inactive']=="y") {
             message(lang('error_participant_status_cannot_be_default_for_both_active_and_inactive'));
@@ -134,8 +137,7 @@ if ($proceed) {
     echo '  <CENTER>';
     show_message();
     echo '
-            <FORM action="participant_status_edit.php">';
-    echo addCsrfTokenToForm();
+            <FORM action="participant_status_edit.php" method="POST">'.csrf__field();
     if (isset($status_id)) echo '<INPUT type=hidden name="status_id" value="'.$status_id.'">';
 
     echo '

@@ -16,9 +16,6 @@ if ($proceed) {
         redirect("errors/error_temporaly_disabled.php");
 }
 
-
-$createNewCsrfToken = false;
-
 $_REQUEST = stripTagsRequestArray($_REQUEST, array('requested_url', 'sign'));
 if(isset($_REQUEST['requested_url'])) {
     $_REQUEST['requested_url'] = strip_tags( $_REQUEST['requested_url']);
@@ -32,7 +29,7 @@ if ($proceed) {
     $settings=load_settings();
     $settings['style']=$settings['orsee_admin_style'];
     $color=load_colors();
-    session_set_save_handler("orsee_session_open", "orsee_session_close", "orsee_session_read", "orsee_session_write", "orsee_session_destroy", "orsee_session_gc");
+    orsee_session_register_handler();
     session_start();
 
     $currentCookieParams = session_get_cookie_params();
@@ -46,19 +43,6 @@ if ($proceed) {
         true
     );
 
-    // if only csrf security when logging in is wanted, take out commented section in next line
-    if( $_SERVER['REQUEST_METHOD'] == 'POST') {// AND getRefererFileName() == 'admin_login' ) {
-        if(!isset($_REQUEST["csrf_token"])) {
-            exit;
-        }
-        elseif(! hash_equals($_SESSION["csrf_token"], $_REQUEST["csrf_token"])) {
-            exit;
-        }
-        else { // after successful comparison recreate token
-            $createNewCsrfToken = true;
-        }
-    }
-
     if (isset($_SESSION['expadmindata'])) $expadmindata=$_SESSION['expadmindata']; else $expadmindata=array();
 
     // Check for login
@@ -69,7 +53,7 @@ if ($proceed) {
 }
 
 if ($proceed) {
-    if(!isset($_SESSION['csrf_token']) OR $createNewCsrfToken) {
+    if(!isset($_SESSION['csrf_token'])) {
         // new token to be taken into each form
         if (function_exists('mcrypt_create_iv')) {
             $_SESSION['csrf_token'] = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));

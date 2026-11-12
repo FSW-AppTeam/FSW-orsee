@@ -17,9 +17,6 @@ if ($proceed) {
         redirect("admin/error_temporarily_disabled.php");
 }
 
-$createNewCsrfToken = false;
-$createRandomString = false;
-
 $_REQUEST = stripTagsRequestArray($_REQUEST, array('requested_url', 'sign', 'experimenter', 'experimenter_mail'));
 if(isset($_REQUEST['requested_url'])) {
     // ruin possible XSS attempts
@@ -33,12 +30,7 @@ if ($proceed) {
     $settings['style']=$settings['orsee_admin_style'];
     $color=load_colors();
 
-    session_set_save_handler("orsee_session_open",
-                 "orsee_session_close",
-                 "orsee_session_read",
-                 "orsee_session_write",
-                 "orsee_session_destroy",
-                 "orsee_session_gc");
+    orsee_session_register_handler();
 
     session_start();
 
@@ -53,24 +45,6 @@ if ($proceed) {
         true
     );
 
-    // if only csrf security when logging in is wanted, take out commented section in next line
-    if( $_SERVER['REQUEST_METHOD'] == 'POST') {// AND getRefererFileName() == 'admin_login' ) {
-        if(!isset($_REQUEST["csrf_token"])) {
-            exit;
-        }
-        elseif(! hash_equals($_SESSION["csrf_token"], $_REQUEST["csrf_token"])) {
-            exit;
-        }
-        else { // after successful comparison recreate token
-            $createNewCsrfToken = true;
-        }
-    }
-    
-    // Added security for GET requests, as those will not trigger a CSRF token update
-    if( $_SERVER['REQUEST_METHOD'] == 'GET' OR !$randomString) {
-    	$createRandomString = true;
-    }
-
     if (isset($_SESSION['expadmindata'])) {
         $expadmindata = $_SESSION['expadmindata'];
     }
@@ -79,7 +53,9 @@ if ($proceed) {
     }
 
     $tmparr=explode("/",$_SERVER['PHP_SELF']); $tmpnum=count($tmparr);
-    $requested_url=$tmparr[$tmpnum-2]."/".$tmparr[$tmpnum-1].'?'.$_SERVER['QUERY_STRING'];
+    if (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING']) $query_string='?'.$_SERVER['QUERY_STRING'];
+    else $query_string='';
+    $requested_url=$tmparr[$tmpnum-2]."/".$tmparr[$tmpnum-1].$query_string;
 
     // Check for login
     if ((!(isset($expadmindata['adminname']) && $expadmindata['adminname'])) && $document!="admin_login.php") {
@@ -89,21 +65,13 @@ if ($proceed) {
 
 if ($proceed) {
 
-    if(!isset($_SESSION['csrf_token']) OR $createNewCsrfToken) {
+    if(!isset($_SESSION['csrf_token'])) {
         // new token to be taken into each form
         if (function_exists('mcrypt_create_iv')) {
             $_SESSION['csrf_token'] = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
         } else {
             $_SESSION['csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
         }
-    }
-    
-    if($createRandomString){
-    
-   		$length = random_int(1, 100);
-   		$alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-   		
-   		$_SESSION['csrf_token'] = substr(str_shuffle(str_repeat($alpha_numeric, $length)), 0, $length);    
     }
 
     if (isset($expadmindata['pw_update_requested']) && $expadmindata['pw_update_requested']  && $document!="admin_pw.php") {

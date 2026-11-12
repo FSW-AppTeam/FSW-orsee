@@ -24,6 +24,14 @@ if ($proceed) {
 
 if ($proceed) {
     if ($send) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if ($send) {
         // checks
         $bulk=$_REQUEST;
         $continue=true;
@@ -73,7 +81,7 @@ if ($proceed) {
 
     // form
     echo '<FORM action="'.thisdoc().'" method="post">
-        ' . addCsrfTokenToForm() . '
+        '.csrf__field().'
         <TABLE class="or_formtable" style="width: 80%">';
 
     foreach ($inv_langs as $inv_lang) {

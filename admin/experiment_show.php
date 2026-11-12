@@ -25,6 +25,9 @@ if ($proceed) {
     // check if we are supposed to deactivate a permanent query
     if ($settings['allow_permanent_queries']=='y' && check_allow('experiment_assign_query_permanent_deactivate')
             && isset($_REQUEST['permanent_deactivate']) && $_REQUEST['permanent_deactivate']) {
+        if (!csrf__validate_request_message()) {
+            redirect('admin/experiment_show.php?experiment_id='.$experiment_id);
+        }
         $done=query__reset_permanent($experiment_id);
         redirect('admin/experiment_show.php?experiment_id='.$experiment_id);
     }
@@ -36,6 +39,9 @@ if ($proceed) {
     if (isset($_REQUEST['bulk_set_session_status']) && $_REQUEST['bulk_set_session_status'] && isset($_REQUEST['session_status']) 
         && isset($_REQUEST['sel']) && is_array($_REQUEST['sel']) && count($_REQUEST['sel'])>0 
         && in_array($_REQUEST['session_status'],array('planned','live','completed','balanced')) ) {
+        if (!csrf__validate_request_message()) {
+            redirect('admin/experiment_show.php?experiment_id='.$experiment_id);
+        }
         $pars=array();
         foreach($_REQUEST['sel'] as $k=>$v) {
             $pars[]=array(':session_id'=>$k,':session_status'=>$_REQUEST['session_status'],':experiment_id'=>$experiment_id);
@@ -184,7 +190,7 @@ if ($proceed) {
     }
 
     if (trim($experiment['experiment_link_to_paper'])) {
-            $conditional_fields[]='<TD colspan=2><A target="_blank" HREF="'.trim($edit['experiment_link_to_paper']).'">'.lang('Link to paper').'</A></TD>';
+            $conditional_fields[]='<TD colspan=2><A target="_blank" HREF="'.trim($experiment['experiment_link_to_paper']).'">'.lang('Link to paper').'</A></TD>';
     }
 
     $i=0;
@@ -228,7 +234,7 @@ if ($proceed) {
     echo '<center>
         <BR>
         <FORM action="'.thisdoc().'" method="POST">
-        ' . addCsrfTokenToForm() . '
+        '.csrf__field().'
         <INPUT type=hidden name="experiment_id" value="'.$experiment_id.'">
         <table class="or_panel">
         <TR>
@@ -371,7 +377,7 @@ if ($proceed) {
                     $pseudo_query_display=query__display_pseudo_query($pseudo_query_array,false);
                     echo '<TR><TD>'.$pseudo_query_display.'</TD><TD>';
                     if (check_allow('experiment_assign_query_permanent_deactivate')) {
-                        echo button_link(thisdoc().'?experiment_id='.$experiment_id.'&permanent_deactivate=true',
+                        echo button_link(thisdoc().'?experiment_id='.$experiment_id.'&permanent_deactivate=true&csrf_token='.urlencode(csrf__get_token()),
                                     lang('deactivate_permanent_query'),'toggle-off');
                     }
                     echo '</TD></TR>';

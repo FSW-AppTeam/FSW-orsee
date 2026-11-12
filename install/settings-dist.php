@@ -52,7 +52,7 @@ $site__database_ssl_ca='/etc/mysql/ssl/ca-cert.pem';
 // List of timezones: http://php.net/manual/en/timezones.php
 date_default_timezone_set("Australia/Sydney");
 
-// EMAIL MODULE
+// INCOMING EMAIL MODULE
 // These settings are only needed when you plan to enable the email module
 // to retrieve emails from an external email account and process them in ORSEE
 $settings__email_server_type="pop3"; // either pop3 or imap
@@ -64,6 +64,8 @@ $settings__email_ssl=FALSE; // whether to use SSL to connect to IMAP/POP3 server
 // E.g. for gmail, use TRUE for ssl setting. You may have to allow 
 // "Access for less secure apps" in your google account settings.
 
+// SECURITY SETTINGS
+session_set_cookie_params(array('httponly'=>true,'samesite'=>'Strict'));
 
 // STOP SITE, TRACKING, DEBUGGING
 // If below is set to "y", the admin part of ORSEE won't be reachable for anybody
@@ -80,5 +82,47 @@ $settings__query_debugging_enabled="n";
 
 // Include path for tagsets. Leave as is, only change when you know what you are doing.
 ini_set("include_path",ini_get("include_path").":./tagsets:./../tagsets:./../../tagsets");
+
+
+// OUTGOING MAIL TRANSPORT
+// mail: use legacy transport (mail() / sendmail wrapper, configured in General Settings).
+// phpmailer: use PHPMailer + SMTP settings below.
+$settings__mail_transport="mail";
+
+// If $settings__mail_transport="mail", ORSEE uses PHP's mail() function to send emails,
+// which in turn relies on whatever is configured for PHP / the server. If this does not
+// work properly, ORSEE can try to send emails directly via the local sendmail program
+// (only on Linux servers). To do this, set "Type of sending emails" to "indirect" in 
+// Options/General settings. ORSEE will look for the local sendmail program in the following path.
+$settings__sendmail_path="/usr/sbin/sendmail";
+
+
+// If $settings__mail_transport="phpmailer", PHPMailer will use the following settings.
+$settings__phpmailer_host="your.smtp.mailserver.com";
+$settings__phpmailer_port=587;
+$settings__phpmailer_smtp_secure="tls"; // "", "tls", or "ssl"
+$settings__phpmailer_smtp_auth_type="password"; // "none", "password", or "oauth2"
+$settings__phpmailer_username="";
+$settings__phpmailer_password="";
+$settings__phpmailer_timeout=15;
+$settings__phpmailer_debug="n"; // y/n
+
+// If $settings__phpmailer_smtp_auth_type="oauth2", then PHPMailer will use OAuth2 authentication.
+// The following array allows to define multiple identities (different sender email addresses, 
+// potentially via different providers such as Google or Microsoft). However, you would typically 
+// just want to set up one identity for the main sender email address used in ORSEE.
+// Keys are sender addresses (or "*" as fallback).
+$settings__phpmailer_smtp_oauth_identities=array(
+    "*"=>array(
+        "provider"=>"google",
+        "identity"=>"",
+        "client_id"=>"",
+        "client_secret"=>"",
+        "refresh_token"=>"",
+        "token_endpoint"=>"", // empty = provider default endpoint
+        "scopes"=>"", // empty = provider defaults
+        "tenant"=>"common" // for Microsoft token endpoint construction
+    )
+);
 
 ?>

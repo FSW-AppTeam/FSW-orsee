@@ -64,6 +64,9 @@ if ($proceed) {
     }
 
     if (check_allow('settings_edit_colors') && isset($_REQUEST['change']) && $_REQUEST['change']) {
+        if (!csrf__validate_request_message()) {
+            redirect ('admin/options_colors.php?style='.$style);
+        }
         $newcolors=$_REQUEST['mycolors']; $now=time();
         $pars_new=array(); $pars_update=array();
         foreach ($newcolors as $oname => $ovalue) {
@@ -105,8 +108,9 @@ if ($proceed) {
 if ($proceed) {
     if (check_allow('settings_edit_colors')) echo '
         <FORM action="options_colors.php" method=post>
-        '.addCsrfTokenToForm().'
-        <INPUT type=hidden name="style" value="'.$style.'">';
+        <INPUT type=hidden name="style" value="'.$style.'">
+        '.csrf__field().'
+        ';
     echo '<TABLE class="or_formtable" style="width: 80%;">';
     if (check_allow('settings_edit_colors')) echo '
             <TR>

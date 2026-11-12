@@ -77,9 +77,10 @@ function expregister__list_invited_for($participant) {
         }
         echo '</TD>';
         if ((!$s['session_full']) && ($s['registration_unixtime'] >= $now)) {
-            echo '<FORM action="participant_show.php">';
+            echo '<FORM action="participant_show.php" method="POST">';
             if ($token_string) echo '<INPUT type=hidden name="p" value="'.$participant['participant_id_crypt'].'">';
             echo '<INPUT type=hidden name="s" value="'.$s['session_id'].'">
+                '.csrf__field().'
                 <TD bgcolor="'.$color['list_shade1'].'">
                 <INPUT class="button small" style="font-size: 8pt;" type=submit name="register" value="'.lang('register').'">
                 </TD>
@@ -173,10 +174,11 @@ function expregister__list_registered_for($participant,$reg_session_id="") {
         if (isset($settings['allow_subject_cancellation']) && $settings['allow_subject_cancellation']=='y') {
             $s['cancellation_deadline']=sessions__get_cancellation_deadline($s);
             if ($s['cancellation_deadline']>time()) {
-                echo '<FORM action="participant_show.php">
+                echo '<FORM action="participant_show.php" method="POST">
                 <TD>';
                 if ($token_string) echo '<INPUT type=hidden name="p" value="'.$participant['participant_id_crypt'].'">';
                 echo '<INPUT type=hidden name="s" value="'.$s['session_id'].'">
+                '.csrf__field().'
                 <INPUT class="button small" style="font-size: 8pt;" type="submit" name="cancel" value="'.lang('cancel_enrolment').'">
                 </td></FORM>';
             } else {

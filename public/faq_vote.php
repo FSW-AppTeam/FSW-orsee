@@ -13,6 +13,9 @@ if ($proceed) {
     if (!isset($_SESSION['vote'][$_REQUEST['id']])) $_SESSION['vote'][$_REQUEST['id']]="";
     if ($_SESSION['vote'][$_REQUEST['id']]) $v_already=true; else $v_already=false;
     if (isset($_REQUEST['eval']) && !($v_already)) {
+        if (!csrf__validate_request()) {
+            exit;
+        }
         $query="UPDATE ".table('faqs')." SET evaluation=evaluation+1 WHERE faq_id=:id";
         $pars=array(':id'=>$_REQUEST['id']);
         $done=or_query($query,$pars);

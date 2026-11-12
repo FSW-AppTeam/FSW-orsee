@@ -44,9 +44,21 @@ if ($proceed) {
 
 if ($proceed) {
     if (isset($_REQUEST['betternot']) && $_REQUEST['betternot']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        } else {
         if ($experiment_id) redirect ('admin/download_main.php?experiment_id='.urlencode($experiment_id));
         else redirect ('admin/download_main.php');
         $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['reallydelete']) && $_REQUEST['reallydelete']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
     }
 }
 
@@ -86,11 +98,11 @@ if ($proceed) {
             </TR>
             <TR>
                 <TD align=left>
-                    '.button_link('download_delete.php?dl='.$upload_id.'&reallydelete=true',
+                    '.button_link('download_delete.php?dl='.$upload_id.'&reallydelete=true&csrf_token='.urlencode(csrf__get_token()),
                     lang('yes_delete'),'check-square biconred').'
                 </TD>
                 <TD align=right>
-                    '.button_link('download_delete.php?dl='.$upload_id.'&betternot=true',
+                    '.button_link('download_delete.php?dl='.$upload_id.'&betternot=true&csrf_token='.urlencode(csrf__get_token()),
                     lang('no_sorry'),'undo bicongreen').'
                 </TD>
             </TR>

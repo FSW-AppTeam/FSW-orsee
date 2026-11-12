@@ -37,6 +37,14 @@ if ($proceed) {
     if (!isset($_REQUEST['session_id'])) $_REQUEST['session_id']=0;
 
     if (isset($_REQUEST['upload']) && $_REQUEST['upload']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['upload']) && $_REQUEST['upload']) {
         $redirect_target="admin/download_upload.php?experiment_id=".urlencode($experiment_id)
                 .'&upload_name='.urlencode($_REQUEST['upload_name'])
                 .'&upload_type='.urlencode($_REQUEST['upload_type']);
@@ -101,7 +109,8 @@ if ($proceed) {
     show_message();
 
     echo '  <form method="post" enctype="multipart/form-data" action="download_upload.php">
-                ' . addCsrfTokenToForm() . '<input type="hidden" name="experiment_id" value="'.$experiment_id.'">
+                <input type="hidden" name="experiment_id" value="'.$experiment_id.'">
+                '.csrf__field().'
             <table class="or_formtable">
             <TR><TD colspan="2">
                 <TABLE width="100%" border=0 class="or_panel_title"><TR>

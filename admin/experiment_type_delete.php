@@ -48,6 +48,9 @@ if ($proceed) {
     echo '<center>';
 
     if ($reallydelete) {
+        if (!csrf__validate_request_message()) {
+            redirect ('admin/experiment_type_delete.php?exptype_id='.$exptype_id);
+        }
 
         if (isset($_REQUEST['merge_with']) && $_REQUEST['merge_with']) $merge_with=$_REQUEST['merge_with']; else $merge_with='';
         if ($merge_with) $merge_with_type=orsee_db_load_array("experiment_types",$merge_with,"exptype_id");
@@ -112,9 +115,9 @@ if ($proceed) {
     // form
 
         echo '  <CENTER>
-                <FORM action="experiment_type_delete.php">
-                ' . addCsrfTokenToForm() . '
+                <FORM action="experiment_type_delete.php" method="POST">
                 <INPUT type=hidden name="exptype_id" value="'.$exptype_id.'">
+                '.csrf__field().'
 
                 <TABLE class="or_formtable">
                     <TR><TD colspan="2">

@@ -17,6 +17,14 @@ if ($proceed) {
 
 if ($proceed) {
     if (isset($_REQUEST['deletesel']) && $_REQUEST['deletesel'] && check_allow('pform_saved_queries_delete')) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['deletesel']) && $_REQUEST['deletesel'] && check_allow('pform_saved_queries_delete')) {
         $dids=array();
         if (isset($_REQUEST['del']) && is_array($_REQUEST['del'])) {
             foreach($_REQUEST['del'] as $k=>$v) {
@@ -69,8 +77,9 @@ if ($proceed) {
 
     if (check_allow('pform_saved_queries_delete')) {
         echo '<FORM action="'.thisdoc().'" method="POST">
-                ' . addCsrfTokenToForm() . '
-                <INPUT type="hidden" name="type" value="'.$type.'">';
+                <INPUT type="hidden" name="type" value="'.$type.'">
+                '.csrf__field().'
+                ';
         echo '<TABLE width=90% border=0>
             <TD align=right>
             <input class="button" type=submit name="deletesel" value="'.lang('delete_selected').'">

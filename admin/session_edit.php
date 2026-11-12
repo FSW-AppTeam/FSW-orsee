@@ -44,6 +44,14 @@ if ($proceed) {
 
 if ($proceed) {
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
 
         if ($settings['enable_payment_module']=='y' ) {
             if (isset($_REQUEST['payment_types']))
@@ -146,9 +154,10 @@ if ($proceed) {
     show_message();
 
     echo '<FORM action="session_edit.php" method="POST">
-        ' . addCsrfTokenToForm() . '
             <INPUT type=hidden name=session_id value="'.$edit['session_id'].'">
-            <INPUT type=hidden name=experiment_id value="'.$edit['experiment_id'].'">';
+            <INPUT type=hidden name=experiment_id value="'.$edit['experiment_id'].'">
+            '.csrf__field().'
+            ';
     if (isset($addit) && $addit) echo '<INPUT type=hidden name="addit" value="true">';
     echo '
         <TABLE class="or_formtable">
@@ -346,7 +355,7 @@ if ($proceed) {
                 <table>
                     <TR>
                         <TD>
-                            '.button_link('session_delete.php?session_id='.$edit['session_id'],
+                            '.button_link('session_delete.php?session_id='.$edit['session_id'].'&csrf_token='.urlencode(csrf__get_token()),
                             lang('delete'),'trash-o').'
                         </TD>
                     </TR>

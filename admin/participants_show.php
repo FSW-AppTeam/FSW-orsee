@@ -19,6 +19,22 @@ if ($proceed) {
     // do decode: json_decode($_SESSION['lastquery'],true);
 
     if (isset($_REQUEST['save_query'])) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    $only_eligible= (isset($_REQUEST['only_eligible']) && $_REQUEST['only_eligible']) ? $_REQUEST['only_eligible'] : false;
+
+    if (isset($_REQUEST['active']) && $_REQUEST['active']) $active=true;
+    else $active=false;
+
+    // to encode: json_encode($_REQUEST['form']).'<BR>';
+    // do decode: json_decode($_SESSION['lastquery'],true);
+
+    if (isset($_REQUEST['save_query'])) {
         // get old query
         if ($active) {
             $posted_query_json=$_SESSION['lastquery_participants_search_active'];
@@ -33,6 +49,14 @@ if ($proceed) {
         if (count($cgivars)>0) $cgivarst='?'.implode("&",$cgivars); else $cgivarst='';
         redirect('admin/'.thisdoc().$cgivarst);
 
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['action']) && $_REQUEST['action']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
     }
 }
 
@@ -260,7 +284,7 @@ if ($proceed) {
         // show list of results
 
         echo '<form id="bulkactionform" action="participants_show.php" method="POST">';
-        echo addCsrfTokenToForm();
+        echo csrf__field();
         if (isset($_REQUEST['search_sort'])) echo '<input type="hidden" name="search_sort" value="'.$_REQUEST['search_sort'].'">';
         if (isset($_REQUEST['active'])) echo '<input type="hidden" name="active" value="'.$_REQUEST['active'].'">';
 

@@ -10,6 +10,9 @@ if ($proceed) {
     $allow=check_allow('admin_edit','options_main.php');
     if (check_allow('admin_edit')) {
         if (isset($_REQUEST['change']) && $_REQUEST['change']) {
+            if (!csrf__validate_request_message()) {
+                redirect("admin/admin_show.php");
+            }
             if (isset($_REQUEST['disabled']) && is_array($_REQUEST['disabled'])) {
                 $pars=array();
                 foreach ($_REQUEST['disabled'] as $a=>$d) {
@@ -55,8 +58,7 @@ if ($proceed) {
 
     echo '<br>
 
-        <FORM action="'.thisdoc().'" method="POST">';
-    echo addCsrfTokenToForm();
+        <FORM action="'.thisdoc().'" method="POST">'.csrf__field();
 
 
     echo '<table class="or_listtable"><thead>';

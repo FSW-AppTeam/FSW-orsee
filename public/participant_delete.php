@@ -11,6 +11,9 @@ if ($proceed) {
 if ($proceed) {
     $form=true;
     if (isset($_REQUEST['reallydelete']) && $_REQUEST['reallydelete']=="12345" && isset($_REQUEST['doit'])) {
+        if (!csrf__validate_request_message()) {
+            redirect("public/participant_delete.php?p=".urlencode($participant['participant_id_crypt']));
+        }
         $default_inactive_status=participant_status__get("is_default_inactive");
         $pars=array(':participant_id'=>$participant_id,':default_inactive_status'=>$default_inactive_status);
         $query="UPDATE ".table('participants')."
@@ -29,12 +32,11 @@ if ($proceed) {
     if ($form) {
         echo '<center>
 
-            <FORM action="participant_delete.php">
-            ' . addCsrfTokenToForm() . '
+            <FORM action="participant_delete.php" method="POST">
             <INPUT type=hidden name="p" value="'.$participant['participant_id_crypt'].'">
             <TABLE class="or_formtable">
             <TR>
-            <TD colspan=2><INPUT name=reallydelete type=hidden value="12345">
+            <TD colspan=2><INPUT name=reallydelete type=hidden value="12345">'.csrf__field().'
             '.lang('do_you_really_want_to_unsubscribe').'<BR></TD>
             </TR>
             <TR><TD>

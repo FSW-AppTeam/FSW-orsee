@@ -25,6 +25,9 @@ if ($proceed) {
     $continue=true;
 
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            redirect ("admin/experiment_edit.php?experiment_id=".$_REQUEST['experiment_id']);
+        }
         $_REQUEST['experiment_class']=id_array_to_db_string(multipicker_json_to_array($_REQUEST['experiment_class']));
         $_REQUEST['experimenter']=id_array_to_db_string(multipicker_json_to_array($_REQUEST['experimenter']));
         $_REQUEST['experimenter_mail']=id_array_to_db_string(multipicker_json_to_array($_REQUEST['experimenter_mail']));
@@ -132,7 +135,8 @@ if ($proceed) {
         $edit['experiment_id']=time();
     }
 
-    echo '<FORM action="experiment_edit.php">
+    echo '<FORM action="experiment_edit.php" method="POST">
+            '.csrf__field().'
             <INPUT type=hidden name="experiment_id" value="'.$edit['experiment_id'].'">';
     echo '<TABLE class="or_formtable" style="max-width: 90%;">';
     echo '      <TR>
@@ -342,8 +346,8 @@ if ($proceed) {
             <table>
                 <TR>
                     <TD>
-                        '.button_link('experiment_delete.php?experiment_id='.$edit['experiment_id'],
-                            lang('delete'),'trash-o').'
+                        '.button_link('experiment_delete.php?experiment_id='.$edit['experiment_id'].'&csrf_token='.urlencode(csrf__get_token()),
+                        lang('delete'),'trash-o').'
                     <TD>
                 </TR>
             </table>';

@@ -28,6 +28,9 @@ if ($proceed) {
     $languages=get_languages();
 
     if ($reallydelete) {
+        if (!csrf__validate_request_message()) {
+            redirect ('admin/faq_delete.php?faq_id='.$faq_id);
+        }
 
         $pars=array(':faq_id'=>$faq_id);
         $query="DELETE FROM ".table('lang')."
@@ -55,9 +58,9 @@ if ($proceed) {
      // form
 
     echo '     <center>
-               <FORM action="faq_delete.php">
-               ' . addCsrfTokenToForm() . '
+               <FORM action="faq_delete.php" method="POST">
                 <INPUT type=hidden name="faq_id" value="'.$faq_id.'">
+                '.csrf__field().'
 
                 <TABLE class="or_formtable">
                     <TR><TD colspan="2">
@@ -95,12 +98,10 @@ if ($proceed) {
                         </TR>
                         <TR>
                                 <TD align=left>
-                                '.button_link('faq_delete.php?faq_id='.$faq_id.'&reallydelete=true',
-                                lang('yes_delete'),'check-square biconred').'
+                                <INPUT class="button" type="submit" name="reallydelete" value="'.lang('yes_delete').'">
                                 </TD>
                                 <TD align=right>
-                                '.button_link('faq_delete.php?faq_id='.$faq_id.'&betternot=true',
-                                lang('no_sorry'),'undo bicongreen').'
+                                <INPUT class="button" type="submit" name="betternot" value="'.lang('no_sorry').'">
                                 </TD>
                         </TR>
                 </TABLE>

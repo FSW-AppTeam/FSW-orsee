@@ -2,13 +2,17 @@
 // part of orsee. see orsee.org
 
 function load_settings() {
-    global $system__options_general, $system__options_defaults;
+    global $system__options_general, $system__options_defaults, $settings__sendmail_path;
 
     $query="SELECT * FROM ".table('options')."
     WHERE option_type='general' OR option_type='default'";
     $result=or_query($query);
     while ($line = pdo_fetch_assoc($result)) {
         $settings[$line['option_name']]=stripslashes($line['option_value']);
+    }
+
+    if (isset($settings__sendmail_path) && $settings__sendmail_path) {
+        $settings['email_sendmail_path']=$settings__sendmail_path;
     }
 
     foreach ($system__options_general as $option) {

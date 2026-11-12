@@ -30,6 +30,9 @@ if ($proceed) {
 if ($proceed) {
 
     if ($reallysend) {
+        if (!csrf__validate_request_message()) {
+            redirect ('admin/session_send_reminder.php?session_id='.$session_id);
+        }
         // send it out to mail queue
         $number=experimentmail__send_session_reminders_to_queue($session);
         message ($number.' '.lang('xxx_session_reminder_emails_sent_out'));
@@ -57,8 +60,11 @@ if ($proceed) {
             </TR>
             <TR>
                 <TD align=left>
-                    '.button_link('session_send_reminder.php?session_id='.$session_id.'&reallysend=true',
-                    lang('yes'),'check-square bicongreen').'
+                    <FORM action="session_send_reminder.php" method="POST">
+                    '.csrf__field().'
+                    <INPUT type="hidden" name="session_id" value="'.$session_id.'">
+                    <INPUT class="button" type="submit" name="reallysend" value="'.lang('yes').'">
+                    </FORM>
                 </TD>
                 <TD align=right>
                     '.button_link('session_send_reminder.php?session_id='.$session_id.'&betternot=true',

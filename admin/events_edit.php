@@ -14,6 +14,14 @@ if ($proceed) {
 
 if ($proceed) {
     if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        }
+    }
+}
+
+if ($proceed) {
+    if (isset($_REQUEST['edit']) && $_REQUEST['edit']) {
 
         $_REQUEST['experimenter']=id_array_to_db_string(multipicker_json_to_array($_REQUEST['experimenter']));
 
@@ -93,8 +101,8 @@ if ($proceed) {
 
 
     echo '<FORM action="events_edit.php" method="POST">
-        ' . addCsrfTokenToForm(). '
-        <INPUT type=hidden name=event_id value="'.$edit['event_id'].'">';
+        <INPUT type=hidden name=event_id value="'.$edit['event_id'].'">
+        '.csrf__field();
     if (isset($addit) && $addit) echo '<INPUT type=hidden name="addit" value="true">';
     echo '
         <TABLE class="or_formtable">
@@ -183,7 +191,7 @@ if ($proceed) {
             <table>
                 <TR>
                     <TD>
-                        '.button_link('events_delete.php?event_id='.$edit['event_id'],lang('delete'),'trash-o').'
+                        '.button_link('events_delete.php?event_id='.$edit['event_id'].'&csrf_token='.urlencode(csrf__get_token()),lang('delete'),'trash-o').'
                     </TD>
                 </TR>
             </table>

@@ -2993,7 +2993,7 @@ class Cpdf
         }
 
         if (mb_detect_encoding($text) != 'UTF-8') {
-            $text = utf8_encode($text);
+            $text = mb_convert_encoding($text, 'UTF-8', 'ISO-8859-1');
         }
 
         $orgWidth = $width;
@@ -3519,7 +3519,6 @@ class Cpdf
                         $tmpfile_alpha = tempnam($this->tempPath, 'ezImg');
 
                         imagepng($imgalpha, $tmpfile_alpha);
-                        imagedestroy($imgalpha);
 
                         $alphaData = file_get_contents($tmpfile_alpha);
                         // nested method call to receive info on alpha image
@@ -3533,7 +3532,6 @@ class Cpdf
                         $imgplain = imagecreatetruecolor($default['info']['width'], $default['info']['height']);
                         imagecopy($imgplain, $img, 0, 0, 0, 0, $default['info']['width'], $default['info']['height']);
                         imagepng($imgplain, $tmpfile_tt);
-                        imagedestroy($imgplain);
 
                         $ttData = file_get_contents($tmpfile_tt);
                         $ttImg = $this->readPngChunks($ttData);

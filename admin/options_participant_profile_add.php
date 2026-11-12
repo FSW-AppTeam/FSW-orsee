@@ -20,6 +20,9 @@ if ($proceed) {
                     3=>'#name#_index (#name#)');
 
     if (isset($_REQUEST['mysql_column_name']) && $_REQUEST['mysql_column_name']) {
+        if (!csrf__validate_request_message()) {
+            $proceed=false;
+        } else {
         $continue=true;
         if ($continue) {
             if (!preg_match("/^[a-z][a-z_]+[a-z]$/",trim($_REQUEST['mysql_column_name']))) {
@@ -58,6 +61,7 @@ if ($proceed) {
                 message(lang('database_error'));
             }
         }
+        }
     }
 }
 
@@ -78,7 +82,7 @@ if ($proceed) {
     javascript__tooltip_prepare();
 
     echo '<FORM id="columnform" action="'.thisdoc().'" method="POST">';
-    echo addCsrfTokenToForm();
+    echo csrf__field();
     echo '<TABLE class="or_formtable">';
 
     echo '<TR class="tooltip" title="Name of the new MySQL column. Name must start and end with a lowercase letter, and can only contain lower case letters and underscore (_).">
