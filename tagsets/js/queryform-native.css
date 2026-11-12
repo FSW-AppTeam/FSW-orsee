@@ -1,0 +1,123 @@
+.orsee .orsee-querytool {
+    width: 100%;
+}
+
+.orsee .orsee-querytool-topline {
+    font-size: var(--font-size-ui-base);
+    font-weight: 700;
+    margin: 0 0 0.35rem 0;
+}
+
+.orsee .orsee-querytool-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.45rem 0;
+}
+
+.orsee .orsee-querytool-toolbar-left {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.orsee #queryTable.orsee-querytable {
+    display: table;
+    width: 100%;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+}
+
+.orsee #queryTable .querybody,
+.orsee #queryTable .queryfoot {
+    display: table-row-group;
+}
+
+.orsee #queryTable .queryrow {
+    display: table-row;
+    background: var(--color-list-shade2);
+}
+
+.orsee #queryTable .queryrow:nth-child(even) {
+    background: var(--color-list-shade1);
+}
+
+.orsee #queryTable .queryrow:hover {
+    background: var(--color-list-row-hover-background);
+}
+
+.orsee #queryTable .orsee-listcell {
+    display: table-cell;
+    padding: 0.24rem 0.45rem;
+    border-bottom: 1px solid var(--color-border-soft);
+    vertical-align: middle;
+    text-align: start;
+    line-height: 1.12;
+    font-size: var(--font-size-ui-base);
+}
+
+.orsee #queryTable .queryControl {
+    white-space: nowrap;
+    width: 2.35rem;
+    padding-left: 0.28rem;
+    padding-right: 0.28rem;
+}
+
+.orsee #queryTable .queryField {
+    width: auto;
+}
+
+.orsee #queryTable .queryField .orsee-query-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.28rem;
+}
+
+.orsee #queryTable .queryrow.queryform_highlight_row .orsee-listcell {
+    background: var(--color-dragdrop-selected-background) !important;
+    color: var(--color-dragdrop-selected-text) !important;
+    transition: background-color 0.2s ease;
+}
+
+.orsee #queryTable .queryrow.queryform_highlight_row .dragHandle {
+    background: var(--color-dragdrop-selected-background);
+    border-color: var(--color-dragdrop-selected-text);
+    color: var(--color-dragdrop-selected-text);
+}
+
+.orsee #queryTable .dragHandle {
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.33rem;
+    background: var(--color-form-element-background);
+}
+
+.orsee #queryTable .orsee-listcell .input,
+.orsee #queryTable .orsee-listcell .textarea,
+.orsee #queryTable .orsee-listcell input[type="text"],
+.orsee #queryTable .orsee-listcell select,
+.orsee #queryTable .orsee-listcell textarea {
+    font-size: var(--font-size-compact);
+    font-family: var(--font-ui);
+}
+
+.orsee #queryTable .orsee-listcell .select,
+.orsee #queryTable .orsee-listcell .select select,
+.orsee #queryTable .orsee-listcell .input,
+.orsee #queryTable .orsee-listcell input[type="text"],
+.orsee #queryTable .orsee-listcell .textarea,
+.orsee #queryTable .orsee-listcell textarea {
+    vertical-align: middle;
+}
+
+.orsee .orsee-querytool-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
+}

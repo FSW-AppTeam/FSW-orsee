@@ -17,7 +17,7 @@ $settings__root_directory="/orsee";
 //$settings__server_url="www.orsee.org";
 $settings__server_url="127.0.0.1";
 
-// servr protocol (either "http://" or "https://"
+// server protocol (either "http://" or "https://")
 $settings__server_protocol="http://";
 
 // Double-check your entries above! The URL to your ORSEE installation will be:
@@ -35,14 +35,14 @@ $site__database_type="mysql";
 $site__database_table_prefix="or_";
 
 // SSL mysql connection. Works with PHP >=5.3.9.
-// Use only if your database is located on a different server 
+// Use only if your database is located on a different server
 // and you want to connect via SSL encrypted connection to it
 $site__database_use_ssl=false;
 // path name of client private key file
-$site__database_ssl_key='/etc/mysql/ssl/client-key.pem'; 
+$site__database_ssl_key='/etc/mysql/ssl/client-key.pem';
 // path name of  client public key certificate file
 $site__database_ssl_cert='/etc/mysql/ssl/client-cert.pem';
-// path name of Certificate Authority (CA) certificate file. 
+// path name of Certificate Authority (CA) certificate file.
 // if used, must be the same on client and server
 $site__database_ssl_ca='/etc/mysql/ssl/ca-cert.pem';
 
@@ -50,7 +50,7 @@ $site__database_ssl_ca='/etc/mysql/ssl/ca-cert.pem';
 // PHP >= 5.1.0 requires the timezone to be explicitely set.
 // If you have not set it in php.ini, then set it here. (Otherwise, you can uncomment.)
 // List of timezones: http://php.net/manual/en/timezones.php
-date_default_timezone_set("Australia/Sydney");
+date_default_timezone_set("Europe/Vienna");
 
 // INCOMING EMAIL MODULE
 // These settings are only needed when you plan to enable the email module
@@ -60,12 +60,15 @@ $settings__email_server_name="mail.foobar.edu";
 $settings__email_server_port=""; // if empty or not set, port is automatically determined by type
 $settings__email_username="orsee@foobar.edu";
 $settings__email_password="orseefoorbar_pw";
-$settings__email_ssl=FALSE; // whether to use SSL to connect to IMAP/POP3 server (for gmail, use TRUE!)
-// E.g. for gmail, use TRUE for ssl setting. You may have to allow 
+$settings__email_ssl=false; // whether to use SSL to connect to IMAP/POP3 server (for gmail, use TRUE!)
+// E.g. for gmail, use TRUE for ssl setting. You may have to allow
 // "Access for less secure apps" in your google account settings.
 
 // SECURITY SETTINGS
+// on a http server, use
 session_set_cookie_params(array('httponly'=>true,'samesite'=>'Strict'));
+// on a https server, use
+// session_set_cookie_params(array('secure' => true,'httponly' => true,'samesite' => 'Strict'));
 
 // STOP SITE, TRACKING, DEBUGGING
 // If below is set to "y", the admin part of ORSEE won't be reachable for anybody
@@ -92,7 +95,7 @@ $settings__mail_transport="mail";
 // If $settings__mail_transport="mail", ORSEE uses PHP's mail() function to send emails,
 // which in turn relies on whatever is configured for PHP / the server. If this does not
 // work properly, ORSEE can try to send emails directly via the local sendmail program
-// (only on Linux servers). To do this, set "Type of sending emails" to "indirect" in 
+// (only on Linux servers). To do this, set "Type of sending emails" to "indirect" in
 // Options/General settings. ORSEE will look for the local sendmail program in the following path.
 $settings__sendmail_path="/usr/sbin/sendmail";
 
@@ -108,8 +111,8 @@ $settings__phpmailer_timeout=15;
 $settings__phpmailer_debug="n"; // y/n
 
 // If $settings__phpmailer_smtp_auth_type="oauth2", then PHPMailer will use OAuth2 authentication.
-// The following array allows to define multiple identities (different sender email addresses, 
-// potentially via different providers such as Google or Microsoft). However, you would typically 
+// The following array allows to define multiple identities (different sender email addresses,
+// potentially via different providers such as Google or Microsoft). However, you would typically
 // just want to set up one identity for the main sender email address used in ORSEE.
 // Keys are sender addresses (or "*" as fallback).
 $settings__phpmailer_smtp_oauth_identities=array(

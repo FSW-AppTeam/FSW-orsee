@@ -1,18 +1,17 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-
 $title="admin_login_page";
 include("header.php");
+
 if ($proceed) {
-
-    echo '<center>';
-
-    if (isset($_REQUEST['logout']) && $_REQUEST['logout']) message(lang('logout'));
+    if (isset($_REQUEST['logout']) && $_REQUEST['logout']) {
+        message(lang('logout'));
+    }
 
     if (isset($_REQUEST['pw']) && $_REQUEST['pw']) {
         message(lang('logout'));
-        message (lang('password_changed_log_in_again'));
+        message(lang('password_changed_log_in_again'));
     }
 
     show_message();
@@ -28,12 +27,12 @@ if ($proceed) {
             if (isset($_REQUEST['requested_url']) && $_REQUEST['requested_url']) {
                 $requested_host = parse_url(urldecode($_REQUEST['requested_url']), PHP_URL_HOST);
                 $server_host = $_SERVER['HTTP_HOST'];
-                
+
                 if (
-                    (!preg_match("/^(http:\/\/|https:\/\/)/i",urldecode($_REQUEST['requested_url']))) || 
+                    (!preg_match("/^(http:\/\/|https:\/\/)/i",urldecode($_REQUEST['requested_url']))) ||
                     $requested_host == $server_host
-                    ) {
-                   redirect(urldecode($_REQUEST['requested_url']));
+                ) {
+                    redirect(urldecode($_REQUEST['requested_url']));
                 } else {
                     redirect("admin/index.php");
                 }
@@ -41,10 +40,10 @@ if ($proceed) {
                 redirect("admin/index.php");
             }
         } else {
-            message(lang('error_password_or_username'));
+            message(lang('error_password_or_username'),'error');
             $add="";
             if (isset($_REQUEST['requested_url']) && $_REQUEST['requested_url']) {
-                    $add="?requested_url=".$_REQUEST['requested_url'];
+                $add="?requested_url=".$_REQUEST['requested_url'];
             }
             redirect("admin/admin_login.php".$add);
         }
@@ -53,10 +52,7 @@ if ($proceed) {
 }
 
 if ($proceed) {
-
     admin__login_form();
-
-    echo '</center>';
 }
 include("footer.php");
 

@@ -4,11 +4,12 @@
 // creates databae connection
 function site__database_config() {
     global $db, $site__database_host, $site__database_admin_username,
-        $site__database_admin_password, $site__database_database, $site__database_port,
-        $site__database_use_ssl, $site__database_ssl_key, $site__database_ssl_cert, $site__database_ssl_ca;
+    $site__database_admin_password, $site__database_database, $site__database_port,
+    $site__database_use_ssl, $site__database_ssl_key, $site__database_ssl_cert, $site__database_ssl_ca;
 
     if (preg_match("/^([^:]+):([0-9]+)$/",trim($site__database_host),$matches)) {
-        $host='host='.$matches[1].';'; $port='port='.$matches[2].';';
+        $host='host='.$matches[1].';';
+        $port='port='.$matches[2].';';
     } else {
         $host='host='.$site__database_host.';';
         if (isset($site__database_port) && $site__database_port) {
@@ -48,11 +49,10 @@ function site__database_config() {
         $db = new PDO($dsn, $site__database_admin_username, $site__database_admin_password,$construct_options);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
+        $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
     } catch (PDOException $e) {
         die('Connection failed: ' . $e->getMessage());
     }
-
 }
 
 // adds prefix to table name
@@ -63,7 +63,9 @@ function table($table) {
 }
 
 function id_array_to_par_array($id_array,$parname='id') {
-    $pars=array(); $keys=array(); $i=0;
+    $pars=array();
+    $keys=array();
+    $i=0;
     foreach ($id_array as $id) {
         $i++;
         $key=':'.$parname.$i;
@@ -83,7 +85,9 @@ function or_query($query,$pars=array()) {
             // parametrized query
             $stmt = $db->prepare($query);
             if (isset($pars[0]) && is_array($pars[0])) {
-                foreach ($pars as $tpars) $stmt->execute($tpars);
+                foreach ($pars as $tpars) {
+                    $stmt->execute($tpars);
+                }
             } else {
                 $stmt->execute($pars);
             }
@@ -104,7 +108,9 @@ function or_nonparam_query($query,$pars=array()) {
     if (isset($pars[0]) && is_array($pars[0])) {
         $query=$query.' with '.count($pars).' sets of parameters';
     } else {
-        foreach($pars as $k=>$v) $query=str_replace($k,pdo_escape_string($v),$query);
+        foreach ($pars as $k=>$v) {
+            $query=str_replace($k,pdo_escape_string($v),$query);
+        }
     }
     return $query;
 }
@@ -113,12 +119,18 @@ function or_nonparam_query($query,$pars=array()) {
 function start_query_timer($query,$params=array()) {
     global $debug__query_time, $debug__query_array, $settings__query_debugging_enabled;
     if (isset($settings__query_debugging_enabled) && $settings__query_debugging_enabled=='y') {
-        if (!isset($debug__query_time)) $debug__query_time=0;
-        if (!isset($debug__query_array)) $debug__query_array=array();
+        if (!isset($debug__query_time)) {
+            $debug__query_time=0;
+        }
+        if (!isset($debug__query_array)) {
+            $debug__query_array=array();
+        }
         $id=uniqid();
         $start=getmicrotime();
         $debug__query_array[$id]['start']=$start;
-        if (count($params)>0) $query='<B>Parametrized: </B>'.or_nonparam_query($query,$params);
+        if (count($params)>0) {
+            $query='<B>Parametrized: </B>'.or_nonparam_query($query,$params);
+        }
         $debug__query_array[$id]['query']=$query;
         //if (count($params)>0) {
         //  $pars=array();
@@ -126,22 +138,28 @@ function start_query_timer($query,$params=array()) {
         //  $debug__query_array[$id]['query'].=' <b>with params:</b> '.implode(", ",$pars);
         //}
         return $id;
-    } else return false;
+    } else {
+        return false;
+    }
 }
 
 function stop_query_timer($id) {
     global $debug__query_time, $debug__query_array, $settings__query_debugging_enabled;
     if (isset($settings__query_debugging_enabled) && $settings__query_debugging_enabled=='y') {
-            $tq_time=getmicrotime()-$debug__query_array[$id]['start'];
-            $debug__query_time+=$tq_time;
-            $debug__query_array[$id]['time']=$tq_time;
-            return true;
-    } else return false;
+        $tq_time=getmicrotime()-$debug__query_array[$id]['start'];
+        $debug__query_time+=$tq_time;
+        $debug__query_array[$id]['time']=$tq_time;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 
 function pdo_fetch_assoc($stmt) {
-    if (!$stmt) return false;
+    if (!$stmt) {
+        return false;
+    }
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
@@ -168,10 +186,12 @@ function pdo_transaction($queries) { // works only with innoDB. Should we move t
     try {
         $db->beginTransaction();
         foreach ($queries as $q) {
-            if(isset($q['pars']) && is_array($q['pars'])) {
+            if (isset($q['pars']) && is_array($q['pars'])) {
                 $stmt = $db->prepare($q['query']);
                 if (isset($q['pars'][0]) && is_array($q['pars'][0])) {
-                    foreach ($q['pars'] as $tpars) $stmt->execute($tpars);
+                    foreach ($q['pars'] as $tpars) {
+                        $stmt->execute($tpars);
+                    }
                 } else {
                     $stmt->execute($q['pars']);
                 }
@@ -180,7 +200,7 @@ function pdo_transaction($queries) { // works only with innoDB. Should we move t
             }
         }
         $db->commit();
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
         //Something went wrong, rollback!
         $db->rollBack();
         die('<pre>Could not complete transaction: ' . $e->getMessage());
@@ -198,10 +218,10 @@ function orsee_query($query,$pars=array()) {
 }
 
 function orsee_db_load_array($table,$key,$keyname) {
-        $query="SELECT * FROM ".table($table)." where ".$keyname."=:key";
-        $pars=array(':key'=>$key);
-        $line=orsee_query($query,$pars);
-        return $line;
+    $query="SELECT * FROM ".table($table)." where ".$keyname."=:key";
+    $pars=array(':key'=>$key);
+    $line=orsee_query($query,$pars);
+    return $line;
 }
 
 
@@ -213,19 +233,28 @@ function orsee_db_save_array($array,$table,$key,$keyname) {
             WHERE table_name= :table
             AND table_schema = :table_schema";
     $pars=array(':table'=>table($table),'table_schema'=>$site__database_database);
-    $result=or_query($query,$pars); $columns=array();
+    $result=or_query($query,$pars);
+    $columns=array();
     while ($line = pdo_fetch_assoc($result)) {
         $columns[]=$line['COLUMN_NAME'];
     }
 
     // delete key
-    if (isset($array[$keyname])) unset($array[$keyname]);
+    if (isset($array[$keyname])) {
+        unset($array[$keyname]);
+    }
     $arraykeys=array_keys($array);
     $fields_to_save=array_intersect($arraykeys,$columns);
     // build set phrase and param array
-    $first=true; $set_phrase=""; $pars=array();
+    $first=true;
+    $set_phrase="";
+    $pars=array();
     foreach ($fields_to_save as $field) {
-        if ($first) $first=false; else $set_phrase=$set_phrase.", ";
+        if ($first) {
+            $first=false;
+        } else {
+            $set_phrase=$set_phrase.", ";
+        }
         $set_phrase=$set_phrase.$field."=:".$field;
         $pars[':'.$field]=$array[$field];
     }
@@ -238,28 +267,39 @@ function orsee_db_save_array($array,$table,$key,$keyname) {
 
     if ($num_rows>0) {
         // update query
-            $query="UPDATE ".table($table)." SET ".$set_phrase." WHERE ".$keyname."=:key";
-         } else {
+        $query="UPDATE ".table($table)." SET ".$set_phrase." WHERE ".$keyname."=:key";
+    } else {
         // insert query
-            $query="INSERT INTO ".table($table)." SET ".$keyname."=:key, ".$set_phrase;
-        }
+        $query="INSERT INTO ".table($table)." SET ".$keyname."=:key, ".$set_phrase;
+    }
     $result=or_query($query,$pars);
     return $result;
 }
 
 function dump_array($array,$title="",$dolang=true) {
     echo '<TABLE border=0>';
-    if ($title) echo '<TR><TD colspan=2 align="center"><B>'.$title.'</B></TD></TR>';
+    if ($title) {
+        echo '<TR><TD colspan=2 align="center"><B>'.$title.'</B></TD></TR>';
+    }
     foreach ($array as $key => $value) {
         echo '<TR><TD align="right" valign="top">';
-        if ($dolang) echo lang($key); else echo stripslashes($key);
+        if ($dolang) {
+            echo lang($key);
+        } else {
+            echo stripslashes($key);
+        }
         echo ':</TD><TD>&nbsp;</TD><TD align=left valign="top">';
-        if (is_array($value)) dump_array($value,$title,$dolang);
-        else {
-            if ($dolang) echo lang($value); else echo stripslashes($value);
+        if (is_array($value)) {
+            dump_array($value,$title,$dolang);
+        } else {
+            if ($dolang) {
+                echo lang($value);
+            } else {
+                echo stripslashes($value);
+            }
         }
         echo "</TD></TR>\n";
-        }
+    }
     echo '</TABLE>';
 }
 
@@ -282,20 +322,24 @@ function upgrade_database_version($new_version) {
     global $settings;
     $settings['database_version']=(int)$new_version;
     $done=orsee_db_save_array(array('option_value'=>$new_version),'options',1,'option_id');
-    if(!$done) log__admin("Database upgrade error. Could not set database version to new version number ".$new_version."!");
+    if (!$done) {
+        log__admin("Database upgrade error. Could not set database version to new version number ".$new_version."!");
+    }
     return $done;
 }
 
 
 function or_upgrade_database() {
     global $settings, $system__database_version, $system__database_upgrades;
-    
+
     if (!isset($system__database_upgrades)) {
         $system__database_upgrades=array();
     }
 
     // check $system__database_upgrades for syntax errors, resort database upgrades by version number
-    $database_upgrades=array(); $i=0; $continue=true;
+    $database_upgrades=array();
+    $i=0;
+    $continue=true;
     foreach ($system__database_upgrades as $upgr) {
         $i++;
         if ($continue) {
@@ -312,14 +356,14 @@ function or_upgrade_database() {
     if ($continue) {
         $done=ksort($database_upgrades,SORT_NUMERIC);
     }
-    
+
     // run the updates, stop if there is an error
     $continue=true;
     foreach ($database_upgrades as $this_version=>$vupgrades) {
         if ((int)$this_version>(int)$settings['database_version']) {
             foreach ($vupgrades as $upgr) {
                 if ($continue) {
-                   if ($upgr['type']=='new_lang_item') {
+                    if ($upgr['type']=='new_lang_item') {
                         $done=lang__upgrade_symbol_if_not_exists($upgr['specs']);
                     } elseif ($upgr['type']=='new_admin_right') {
                         $done=admin__update_admin_rights_if_not_exists($upgr['specs']);
@@ -347,8 +391,9 @@ function or_upgrade_database() {
 
 
 function or_upgrade_check_syntax($upgr) {
-    $continue=true; $error="";
-    
+    $continue=true;
+    $error="";
+
     if ($continue && !isset($upgr['version'])) {
         $continue=false;
         $error="No upgrade version number given.";

@@ -1,36 +1,33 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-
 $title="faq_long";
-$menu__area="options_main";
-include ("header.php");
+$menu__area="options";
+include("header.php");
 
 if ($proceed) {
     $allow=check_allow('faq_edit','options_main.php');
 }
 
 if ($proceed) {
-    echo '<center>';
+    echo '<div class="orsee-panel">';
+    echo '<div class="orsee-options-actions-end">';
     if (check_allow('faq_add')) {
-        echo '
-                <BR>
-                '.button_link('faq_edit.php?addit=true',
-                        lang('create_new'),'plus-circle');
+        echo button_link('faq_edit.php?addit=true',lang('create_new'),'plus-circle');
     }
+    echo '</div>';
 
     // load languages
     $languages=get_languages();
-    echo '<BR><BR>
-        <table class="or_listtable" style="width: 80%;"><thead>
-        <TR style="background: '.$color['list_header_background'].'; color: '.$color['list_header_textcolor'].';">';
+    echo '<div class="orsee-table orsee-table-tablet-2cols orsee-table-mobile">';
+    echo '<div class="orsee-table-row orsee-table-head">';
     foreach ($languages as $language) {
-        echo '<td class="small">'.$language.'</td>';
+        echo '<div class="orsee-table-cell">'.$language.'</div>';
     }
-    echo '<TD>'.lang('this_faq_answered_questions_of_xxx').'</TD>
-            <TD></TD>
-            </TR></thead>
-                <tbody>';
+    echo '<div class="orsee-table-cell">'.lang('this_faq_answered_questions_of_xxx').'</div>';
+    echo '<div class="orsee-table-cell">'.lang('action').'</div>';
+    echo '</div>';
+
     $query="SELECT *
             FROM ".table('faqs').", ".table('lang')."
             WHERE content_type='faq_question'
@@ -40,23 +37,26 @@ if ($proceed) {
 
     $shade=false;
     while ($line=pdo_fetch_assoc($result)) {
-        echo '  <tr class="small"';
-        if ($shade) echo ' bgcolor="'.$color['list_shade1'].'"';
-        else echo ' bgcolor="'.$color['list_shade2'].'"';
-        echo '>';
-        foreach ($languages as $language) {
-            echo '  <td class="small">'.stripslashes($line[$language]).'</td>';
+        $row_class='orsee-table-row';
+        if ($shade) {
+            $row_class.=' is-alt';
+            $shade=false;
+        } else {
+            $shade=true;
         }
-        echo '<TD>'.$line['evaluation'].' '.lang('persons').'</TD>
-                <TD><A HREF="faq_edit.php?faq_id='.$line['faq_id'].'">'.lang('edit').'</A>
-                </TD>
-                </tr>';
-        if ($shade) $shade=false; else $shade=true;
+        echo '<div class="'.$row_class.'">';
+        foreach ($languages as $language) {
+            echo '<div class="orsee-table-cell" data-label="'.$language.'">'.stripslashes($line[$language]).'</div>';
+        }
+        echo '<div class="orsee-table-cell" data-label="'.lang('this_faq_answered_questions_of_xxx').'">'.$line['evaluation'].' '.lang('persons').'</div>';
+        echo '<div class="orsee-table-cell orsee-table-action" data-label="'.lang('action').'">'.button_link('faq_edit.php?faq_id='.$line['faq_id'],lang('edit'),'pencil-square-o').'</div>';
+        echo '</div>';
     }
 
-    echo '</tbody></table>
-           </CENTER>';
-
+    echo '</div>';
+    echo '<div class="orsee-options-actions">'.button_back('options_main.php').'</div>';
+    echo '</div>';
 }
-include ("footer.php");
+include("footer.php");
+
 ?>

@@ -1,3 +1,57 @@
+ORSEE 3.4.1
+
+Security:       Prevent reflected XSS in participant-search sorting and
+                upload-name output.
+Security:       Remove eval() for "func:" expressions in participant
+                profile-field configuration.
+Bugfix:         Correctly extract and store incoming email headers and
+                message bodies, including non-ASCII content.
+Bugfix:         Improve error handling for failed incoming-email retrieval.
+Bugfix:         Make the configurable HTTP session timeout authoritative
+                during session garbage collection.
+Bugfix:         Fix anonymized participant data in participant-list PDFs
+                attached to session emails.
+Bugfix:         Correct email reply permissions for emails assigned to an
+                experiment or session.
+Bugfix:         Restore session-participant suggestions when assigning an
+                incoming email to a participant, without duplicate entries.
+Bugfix:         Avoid some undefined-variable warnings.
+Bugfix:         Correct a typo in the email-retrieval setting description.
+
+
+ORSEE 3.4.0
+
+New feature:    UI migration from legacy table-based layout to responsive
+                CSS/div component styling. New unified ORSEE shell and CSS
+                styling system for admin and public areas. Also has dark mode.
+                Public area designed mobile-first, with responsive tablet/
+                desktop adaptations.
+New feature:    Public content rendered via wiki-like richtext syntax
+New feature:    Configurable menu editor introduced (public + admin) with
+                ordering, item types, visibility rules, and custom pages.
+                Menu modes: vertical, horizontal dynamic submenu,
+                horizontal static submenu.
+New feature:    Comprehensive participant profile layout builder,
+                allowing variants based on form location and subpools,
+                draft and activation. New participant profile field
+                types (yes/no, date variants, phone, checkboxlist_lang).
+New feature:    Full right-to-left (RTL) language support
+New feature:    Support for secondary participant email.
+New feature:    Query module for subscriptions in participant search.
+New feature:    Selected participant fields editable in session
+                participant list.
+New feature:    Configurable session timeout for http sessions
+New feature:    Adding auth migration status to query tool
+New feature:    Convert ORSEE database tables from MyISAM to InnoDB
+Bugfix:         Login js autosubmit removed (interferes with CSRF).
+Bugfix:         Missing viewport meta tag.
+Security:       Whitelisting $_REQUEST data 
+Housekeeping:   jQuery removed. 
+Housekeeping:   Onset UI assets removed. 
+Housekeeping:   Font Awesome upgraded.
+Housekeeping:   Running all files through php-cs-fixer (php)
+                and prettier (js and css)
+Housekeeping:   Update data import functions from v2 and v3.0-3.3
 
 ORSEE 3.3.0
         Many minor and major bugfixes
@@ -15,7 +69,8 @@ ORSEE 3.3.0
         Bugfix: PHP8 compatibility fixes
         Bugfix: Replace deprecated jQuery size() with length in textext plugin
         Bugfix: Truncate cron log target to column size
-        Bugfix: Avoid warnings in multi_array_sort() and uasort() return handling
+        Bugfix: Avoid warnings in multi_array_sort() and uasort()
+                return handling
         Misc: Fix link to documentation
 
 ORSEE 3.2.0
@@ -86,5 +141,3 @@ ORSEE 2.2.0:
     Updated to newest version of PHPlot and ezPDF.
     Updated ORSEE and MySQL database to full unicode/UTF-8 support.
     Added participant form customization support.
-
-

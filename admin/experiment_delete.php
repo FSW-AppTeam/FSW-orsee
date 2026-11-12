@@ -1,13 +1,15 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-
 $title="delete_experiment";
 include("header.php");
 
 if ($proceed) {
-    if (isset($_REQUEST['experiment_id']) && $_REQUEST['experiment_id']) $experiment_id=$_REQUEST['experiment_id'];
-    else redirect ("admin/");
+    if (isset($_REQUEST['experiment_id']) && $_REQUEST['experiment_id']) {
+        $experiment_id=$_REQUEST['experiment_id'];
+    } else {
+        redirect("admin/");
+    }
 }
 
 if ($proceed) {
@@ -15,7 +17,7 @@ if ($proceed) {
         if (!csrf__validate_request_message()) {
             $proceed=false;
         } else {
-            redirect ('admin/experiment_edit.php?experiment_id='.$experiment_id);
+            redirect('admin/experiment_edit.php?experiment_id='.$experiment_id);
         }
     }
 }
@@ -29,18 +31,22 @@ if ($proceed) {
 }
 
 if ($proceed) {
-    if (isset($_REQUEST['reallydelete']) && $_REQUEST['reallydelete']) $reallydelete=true;
-    else $reallydelete=false;
+    if (isset($_REQUEST['reallydelete']) && $_REQUEST['reallydelete']) {
+        $reallydelete=true;
+    } else {
+        $reallydelete=false;
+    }
 
     $allow=check_allow('experiment_delete','experiment_edit.php?experiment_id='.$experiment_id);
-    if (!check_allow('experiment_restriction_override')) check_experiment_allowed($experiment,"admin/experiment_show.php?experiment_id=".$experiment_id);
+    if (!check_allow('experiment_restriction_override')) {
+        check_experiment_allowed($experiment,"admin/experiment_show.php?experiment_id=".$experiment_id);
+    }
 }
 
 if ($proceed) {
     $experiment=orsee_db_load_array("experiments",$experiment_id,"experiment_id");
 
     if ($reallydelete) {
-
         $pars=array(':experiment_id'=>$experiment_id);
         $query="DELETE FROM ".table('experiments')."
                 WHERE experiment_id= :experiment_id";
@@ -59,43 +65,54 @@ if ($proceed) {
                 AND content_name= :experiment_id";
         $result=or_query($query,$pars);
 
-        message (lang('experiment_deleted'));
-        log__admin("experiment_delete","experiment:".$experiment['experiment_name']);
-        redirect ('admin/experiment_main.php');
+        message(lang('experiment_deleted'));
+        log__admin("experiment_delete","experiment:".$experiment['experiment_name'].", experiment_id:".$experiment['experiment_id']);
+        redirect('admin/experiment_main.php');
     }
 }
 
 if ($proceed) {
     // form
-    echo '<center>
-        <TABLE class="or_formtable">
-            <TR><TD colspan="2">
-                <TABLE width="100%" border=0 class="or_panel_title"><TR>
-                        <TD style="background: '.$color['panel_title_background'].'; color: '.$color['panel_title_textcolor'].'" align="center">
-                            '.lang('delete_experiment').' '.$experiment['experiment_name'].'
-                        </TD>
-                </TR></TABLE>
-            </TD></TR>
-            <TR>
-                <TD colspan=2>
+    echo '<div class="orsee-panel orsee-form-shell">
+            <div class="orsee-panel-title">'.lang('delete_experiment').'</div>
+            <div class="orsee-content">
+                <div class="orsee-callout orsee-message-box orsee-callout-warning">
                     '.lang('really_delete_experiment').'
-                    <BR><BR>';
-                    dump_array($experiment); echo '
-                </TD>
-            </TR>
-            <TR>
-                <TD align=left>
-                    '.button_link('experiment_delete.php?experiment_id='.$experiment_id.'&reallydelete=true&csrf_token='.urlencode(csrf__get_token()),
-                    lang('yes_delete'),'check-square biconred').'
-                </TD>
-                <TD align=right>
-                    '.button_link('experiment_delete.php?experiment_id='.$experiment_id.'&betternot=true&csrf_token='.urlencode(csrf__get_token()),
-                    lang('no_sorry'),'undo bicongreen').'
-                </TD>
-            </TR>
-        </TABLE>
-        </center>';
-
+                </div>
+                <div class="field">
+                    <label class="label">'.lang('id').'</label>
+                    <div><span class="orsee-dense-id-tag">'.htmlspecialchars($experiment['experiment_id']).'</span></div>
+                </div>
+                <div class="field">
+                    <label class="label">'.lang('name').'</label>
+                    <div>'.htmlspecialchars($experiment['experiment_name']).'</div>
+                </div>
+                <div class="field">
+                    <label class="label">'.lang('public_name').'</label>
+                    <div>'.htmlspecialchars($experiment['experiment_public_name']).'</div>
+                </div>
+                <div class="field orsee-form-row-grid orsee-form-row-grid--2" style="align-items: center;">
+                    <div class="orsee-form-row-col">
+                        '.button_link(
+        'experiment_delete.php?experiment_id='.$experiment_id.'&reallydelete=true&csrf_token='.urlencode(csrf__get_token()),
+        lang('yes_delete'),
+        'check-square',
+        '',
+        '',
+        'orsee-btn--delete'
+    ).'
+                    </div>
+                    <div class="orsee-form-row-col has-text-right">
+                        '.button_link(
+        'experiment_delete.php?experiment_id='.$experiment_id.'&betternot=true&csrf_token='.urlencode(csrf__get_token()),
+        lang('no_sorry'),
+        'undo'
+    ).'
+                    </div>
+                </div>
+            </div>
+        </div>';
 }
-include ("footer.php");
+include("footer.php");
+
 ?>

@@ -1,11 +1,11 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-
 $menu__area="experiments";
 $title="experiment_recruitment_report";
 $lang_icons_prepare=true;
 include("header.php");
+
 if ($proceed) {
     if (!$_REQUEST['experiment_id']) redirect ("admin/");
     //app-team security update: redirect away if ID is not a number
@@ -20,26 +20,35 @@ if ($proceed) {
 if ($proceed) {
     // load experiment data into array experiment
     $experiment=orsee_db_load_array("experiments",$experiment_id,"experiment_id");
-    if (!check_allow('experiment_restriction_override'))
+    if (!check_allow('experiment_restriction_override')) {
         check_experiment_allowed($experiment,"admin/experiment_show.php?experiment_id=".$experiment_id);
+    }
 }
 
 if ($proceed) {
     $alllangs=get_languages();
     if (isset($_REQUEST['replang']) && in_array($_REQUEST['replang'],$alllangs) && $_REQUEST['replang']!=lang('lang')) {
         $replang=$_REQUEST['replang'];
-    } else $replang=lang('lang');
+    } else {
+        $replang=lang('lang');
+    }
 
     $lang_names=lang__get_language_names();
     $switchlang_text='';
     foreach ($alllangs as $thislang) {
         if ($thislang != $replang) {
             $switchlang_text.='<A HREF="'.thisdoc().'?experiment_id='.$experiment_id.'&replang='.$thislang.'"><span class="languageicon langicon-'.$thislang.'">';
-            if (isset($lang_names[$thislang]) && $lang_names[$thislang]) $switchlang_text.=$lang_names[$thislang]; else $switchlang_text.=$thislang;
+            if (isset($lang_names[$thislang]) && $lang_names[$thislang]) {
+                $switchlang_text.=$lang_names[$thislang];
+            } else {
+                $switchlang_text.=$thislang;
+            }
             $switchlang_text.='</span></A>&nbsp;&nbsp;&nbsp;';
         }
     }
-    if ($switchlang_text) $switchlang_text='<P align="right">'.lang('this_report_in_language').' '.$switchlang_text.'</P>';
+    if ($switchlang_text) {
+        $switchlang_text='<p style="text-align:end;">'.lang('this_report_in_language').' '.$switchlang_text.'</p>';
+    }
     if ($replang!=lang('lang')) {
         $switched_lang=true;
         $mylang=$lang;
@@ -57,15 +66,23 @@ if ($proceed) {
                 FROM ".table('sessions')."
                 WHERE experiment_id= :experiment_id
                 ORDER BY session_start";
-        $result=or_query($query,$pars); $min=0; $max=0; $sids=array();
+        $result=or_query($query,$pars);
+        $min=0;
+        $max=0;
+        $sids=array();
         while ($s=pdo_fetch_assoc($result)) {
             $sessions[$s['session_id']]=$s;
             $sesstime=$s['session_start'];
             if ($min==0) {
-                $min=$sesstime; $max=$sesstime;
+                $min=$sesstime;
+                $max=$sesstime;
             } else {
-                if ($sesstime < $min) $min=$sesstime;
-                if ($sesstime > $max) $max=$sesstime;
+                if ($sesstime < $min) {
+                    $min=$sesstime;
+                }
+                if ($sesstime > $max) {
+                    $max=$sesstime;
+                }
             }
             $sids[]=$s['session_id'];
         }
@@ -92,223 +109,254 @@ if ($proceed) {
     $exptypes=load_external_experiment_types();
     $preloaded_laboratories=laboratories__get_laboratories();
     $pstatuses=expregister__get_participation_statuses();
-
 }
 
 if ($proceed) {
-    if ($switchlang_text) echo '<BR>'.$switchlang_text.'<BR>';
-    echo '<center>';
-    echo '<TABLE class="or_page_subtitle" style="background: '.$color['page_subtitle_background'].'; color: '.$color['page_subtitle_textcolor'].'">
-            <TR><TD align="center">
-            '.$experiment['experiment_name'].'
-            </TD></TR></TABLE><BR>';
-
-    echo '<TABLE width="90%">';
-
+    if ($switchlang_text) {
+        echo $switchlang_text;
+    }
 
     /////////////////////////////
     /// EXPERIMENT
     /////////////////////////////
-    echo '<TR><TD>';
-    echo '<TABLE class="or_orr_section_head"><TR><TD align="center" valign="middle">
-            '.lang('experiment').'
-            </TD></TR></TABLE>';
-    echo '</TD></TR>
-            <TR><TD>';
+    echo '<div class="orsee-panel">';
+    echo '<div class="orsee-panel-title"><div>'.lang('experiment').'</div></div>';
+    echo '<div class="orsee-table orsee-table-no-hover" style="width: 100%; max-width: 100%;">';
+    if (!isset($exptypes[$experiment['experiment_ext_type']]['exptype_name'])) {
+        $exptypes[$experiment['experiment_ext_type']]['exptype_name']='type undefined';
+    }
+    echo '<div class="orsee-table-row">
+            <div class="orsee-table-cell"><strong>'.lang('id').':</strong> '.$experiment['experiment_id'].'</div>
+            <div class="orsee-table-cell"><strong>'.lang('type').':</strong> '.$lang[$experiment['experiment_type']].' ('.$exptypes[$experiment['experiment_ext_type']]['exptype_name'].')</div>
+          </div>';
+    echo '<div class="orsee-table-row is-alt">
+            <div class="orsee-table-cell"><strong>'.lang('name').':</strong> '.$experiment['experiment_name'].'</div>
+            <div class="orsee-table-cell"><strong>'.lang('public_name').':</strong> '.$experiment['experiment_public_name'].'</div>
+          </div>';
+    echo '<div class="orsee-table-row">
+            <div class="orsee-table-cell"><strong>'.lang('class').':</strong> '.experiment__experiment_class_field_to_list($experiment['experiment_class']).'</div>
+            <div class="orsee-table-cell"><strong>'.lang('experimenter').':</strong> '.experiment__list_experimenters($experiment['experimenter'],true,true).'</div>
+          </div>';
 
-    echo '<TABLE class="or_orr_section_content">
-                    <TR>
-                        <TD>'.lang('id').':</TD><TD>'.$experiment['experiment_id'].'</TD>
-                        <TD>'.lang('type').':</TD>';
-    if (!isset($exptypes[$experiment['experiment_ext_type']]['exptype_name']))
-            $exptypes[$experiment['experiment_ext_type']]['exptype_name']='type undefined';
-    echo '<TD>'.$lang[$experiment['experiment_type']].' ('.$exptypes[$experiment['experiment_ext_type']]['exptype_name'].')</TD>
-                    </TR>
-                    <TR>
-                        <TD>'.lang('name').':</TD><TD>'.$experiment['experiment_name'].'</TD>
-                        <TD>'.lang('public_name').':</TD><TD>'.$experiment['experiment_public_name'].'</TD>
-                    </TR>';
-    echo '          <TR>
-                        <TD>'.lang('class').':</TD>
-                        <TD>'.experiment__experiment_class_field_to_list($experiment['experiment_class']).'</TD>
-                        <TD>'.lang('experimenter').':</TD><TD>'.experiment__list_experimenters($experiment['experimenter'],true,true).'</TD>
-                    </TR>';
-
-    // CONDITIONAL EXPERIMENT FIELDS
     $conditional_fields=array();
-
-    if ($experiment['experiment_description'])
-        $conditional_fields[]='<TD>'.lang('internal_description').':</TD><TD>'.$experiment['experiment_description'].'</TD>';
-    if ($experiment['public_experiment_note'])
-        $conditional_fields[]='<TD>'.lang('public_experiment_note').':</TD><TD>'.$experiment['public_experiment_note'].'</TD>';
-    if ($settings['enable_editing_of_experiment_sender_email']=='y')
-        $conditional_fields[]='<TD>'.lang('email_sender_address').':</TD><TD>'.$experiment['sender_mail'].'</TD>';
-
-
-
+    if ($experiment['experiment_description']) {
+        $conditional_fields[]=array('label'=>lang('internal_description').':','value'=>$experiment['experiment_description']);
+    }
+    if ($experiment['public_experiment_note']) {
+        $conditional_fields[]=array('label'=>lang('public_experiment_note').':','value'=>$experiment['public_experiment_note']);
+    }
+    if ($settings['enable_editing_of_experiment_sender_email']=='y') {
+        $conditional_fields[]=array('label'=>lang('email_sender_address').':','value'=>$experiment['sender_mail']);
+    }
     $i=0;
-    foreach ($conditional_fields as $condfield) {
-        if ($i/2 == round($i/2)) {
-            echo '<TR>';
-            echo $condfield;
-            if (isset($conditional_fields[$i+1])) echo $conditional_fields[$i+1];
-            else echo '<TD></TD>';
-            echo '</TR>';
+    foreach ($conditional_fields as $field) {
+        if ($i % 2 == 0) {
+            $row_class='orsee-table-row';
+            if ((int)($i/2) % 2 == 1) {
+                $row_class.=' is-alt';
+            }
+            echo '<div class="'.$row_class.'">';
+            echo '<div class="orsee-table-cell"><strong>'.$field['label'].'</strong> '.$field['value'].'</div>';
+            if (isset($conditional_fields[$i+1])) {
+                echo '<div class="orsee-table-cell"><strong>'.$conditional_fields[$i+1]['label'].'</strong> '.$conditional_fields[$i+1]['value'].'</div>';
+            } else {
+                echo '<div class="orsee-table-cell"></div>';
+            }
+            echo '</div>';
         }
         $i++;
     }
 
-    // ETHICS APPROVAL - IF ENABLED
     if ($settings['enable_ethics_approval_module']=='y') {
         $ethics=experiment__get_ethics_approval_desc($experiment);
-        echo '<TR><TD colspan="4">'.$ethics['text'].'</TD></TR>';
+        echo '<div class="orsee-table-row is-alt">
+                <div class="orsee-table-cell"><strong>'.lang('human_subjects_ethics_approval').':</strong></div>
+                <div class="orsee-table-cell">'.$ethics['text'].'</div>
+              </div>';
     }
-    echo '</TABLE>';
-    echo '</TD></TR>';
+    echo '</div>';
+    echo '</div>';
 
     if ($experiment['experiment_type']=="laboratory") {
-    /////////////////////////////
-    /// SESSIONS
-    /////////////////////////////
-    echo '<TR><TD>';
-    echo '<TABLE class="or_orr_section_head"><TR><TD align="center" valign="middle">
-            '.lang('sessions');
-    if ($min>0) echo ' '.lang('from').' '.ortime__format(ortime__sesstime_to_unixtime($min),'hide_time').'
-                    '.lang('to').' '.ortime__format(ortime__sesstime_to_unixtime($max),'hide_time');
-    echo '  </TD></TR></TABLE>';
-    echo '</TD></TR><TR><TD>';
+        /////////////////////////////
+        /// SESSIONS
+        /////////////////////////////
+        echo '<div class="orsee-panel">';
+        echo '<div class="orsee-panel-title"><div>'.lang('sessions');
+        if ($min>0) {
+            echo ' '.lang('from').' '.ortime__format(ortime__sesstime_to_unixtime($min),'hide_time').' '.lang('to').' '.ortime__format(ortime__sesstime_to_unixtime($max),'hide_time');
+        }
+        echo '</div></div>';
 
-    echo '<table class="or_orr_section_content">';
-    $shade=false;
-    $num_cols=count($pstatuses);
-    foreach ($sessions as $s) {
-        if ($shade) { $rowspec=' class="or_orr_list_shade_even"'; $shade=false; }
-        else { $rowspec=' class="or_orr_list_shade_odd"'; $shade=true; }
-        $session_time=session__build_name($s);
-        $ssicons=array("planned"=>"wrench","live"=>"spinner fa-spin fa-fw","completed"=>"thumbs-o-up","balanced"=>"money");
-        echo '<tr'.$rowspec.'><td colspan="'.$num_cols.'"><B>'.$session_time;
-        echo ', '.$preloaded_laboratories[$s['laboratory_id']]['lab_name'];
-        echo '</B></td>
-                <td colspan=3 align="right">'.lang('session_status').': <B><span class="session_status_'.$s['session_status'].'">'.
-            '<i class="fa fa-'.$ssicons[$s['session_status']].'"></i>&nbsp;'.$lang['session_status_'.$s['session_status']].'</span></B>
-            </td>
-            </tr>';
-        echo '  <TR'.$rowspec.'>
-                <TD>'.lang('subjects').'</TD>
-                <TD>'.lang('needed_participants_abbr').': '.$s['part_needed'].'</TD>
-                <TD>'.lang('reserve_participants_abbr').': '.$s['part_reserve'].'</TD>';
-                foreach ($pstatuses as $pstatus_id=>$pstatus) {
-                    echo '<TD>';
-                    if ($pstatus['participated']) echo '<B>';
-                    echo $pstatus['internal_name'].': ';
-                    if (isset($s['num_status'.$pstatus_id])) echo $s['num_status'.$pstatus_id];
-                    else echo '0';
-                    if ($pstatus['participated']) echo '</B>';
-                    echo '</TD>';
+        echo '<div class="orsee-table" style="width: 100%; max-width: 100%;">';
+        $session_alt=false;
+        foreach ($sessions as $s) {
+            $row_base='orsee-table-row';
+            if ($session_alt) {
+                $row_base.=' is-alt';
+            }
+            $session_time=session__build_name($s);
+            $ssicons=array("planned"=>"wrench","live"=>"spinner fa-spin fa-fw","completed"=>"thumbs-o-up","balanced"=>"money");
+            $has_note=($s['public_session_note'] ? true : false);
+            $has_remarks=($s['session_remarks'] ? true : false);
+
+            $status_text='<span class="session_status_'.$s['session_status'].'"><i class="fa fa-'.$ssicons[$s['session_status']].'"></i>&nbsp;'.$lang['session_status_'.$s['session_status']].'</span>';
+            echo '<div class="'.$row_base.'">
+                <div class="orsee-table-cell" style="border-bottom: 0;"><strong>'.$session_time.', '.$preloaded_laboratories[$s['laboratory_id']]['lab_name'].'</strong></div>
+                <div class="orsee-table-cell" style="border-bottom: 0;">'.lang('session_status').': <strong>'.$status_text.'</strong></div>
+              </div>';
+
+            $status_counts=array();
+            foreach ($pstatuses as $pstatus_id=>$pstatus) {
+                $count=(isset($s['num_status'.$pstatus_id]) ? $s['num_status'.$pstatus_id] : 0);
+                $label=$pstatus['internal_name'].': '.$count;
+                if ($pstatus['participated']) {
+                    $label='<strong>'.$label.'</strong>';
                 }
-        echo '</TR>';
-        if ($s['public_session_note']) {
-            echo '  <TR'.$rowspec.'>
-                    <TD colspan="'.($num_cols+3).'">'.lang('public_session_note').': '.
-                        $s['public_session_note'].'</TD></TR>';
-        }
-        if ($s['session_remarks']) {
-            echo '  <TR'.$rowspec.'>
-                    <TD colspan="'.($num_cols+3).'"><B>'.lang('remarks').': '.
-                        $s['session_remarks'].'</B></TD></TR>';
-        }
-        echo '<TR'.$rowspec.'><TD colspan="'.($num_cols+3).'" class=small>&nbsp;</TD></TR>';
-    }
-    echo '</TABLE>';
+                $status_counts[]=$label;
+            }
 
-    echo '</TD></TR>';
-    }
+            $detail_class='orsee-table-row';
+            if ($session_alt) {
+                $detail_class.=' is-alt';
+            }
+            $detail_cell_style='';
+            if ($has_note || $has_remarks) {
+                $detail_cell_style=' style="border-bottom: 0;"';
+            }
+            echo '<div class="'.$detail_class.'">
+                <div class="orsee-table-cell"'.$detail_cell_style.'>'.lang('subjects').': '.lang('needed_participants_abbr').': '.$s['part_needed'].', '.lang('reserve_participants_abbr').': '.$s['part_reserve'].'</div>
+                <div class="orsee-table-cell"'.$detail_cell_style.'>'.implode(' | ',$status_counts).'</div>
+              </div>';
 
+            if ($has_note) {
+                $note_class='orsee-table-row';
+                if ($session_alt) {
+                    $note_class.=' is-alt';
+                }
+                $note_cell_style='';
+                if ($has_remarks) {
+                    $note_cell_style=' style="border-bottom: 0;"';
+                }
+                echo '<div class="'.$note_class.'">
+                    <div class="orsee-table-cell"'.$note_cell_style.'><strong>'.lang('public_session_note').':</strong></div>
+                    <div class="orsee-table-cell"'.$note_cell_style.'>'.$s['public_session_note'].'</div>
+                  </div>';
+            }
+            if ($has_remarks) {
+                $remarks_class='orsee-table-row';
+                if ($session_alt) {
+                    $remarks_class.=' is-alt';
+                }
+                echo '<div class="'.$remarks_class.'">
+                    <div class="orsee-table-cell"><strong>'.lang('remarks').':</strong></div>
+                    <div class="orsee-table-cell"><strong>'.$s['session_remarks'].'</strong></div>
+                  </div>';
+            }
+            $session_alt=!$session_alt;
+        }
+        echo '</div>';
+        echo '</div>';
+    }
 
     /////////////////////////////
     /// ASSIGNMENTS
     /////////////////////////////
-    echo '<TR><TD>';
-    echo '<TABLE class="or_orr_section_head"><TR><TD align="center" valign="middle">
-            '.lang('recruitment_history').'
-            </TD></TR></TABLE>';
-    echo '</TD></TR>
-            <TR><TD>';
-
-    echo '<table class="or_orr_section_content">';
+    echo '<div class="orsee-panel">';
+    echo '<div class="orsee-panel-title"><div>'.lang('recruitment_history').'</div></div>';
+    echo '<div class="orsee-table" style="width: 100%; max-width: 100%;">';
+    echo '<div class="orsee-table-row orsee-table-head">
+            <div class="orsee-table-cell">'.lang('date_and_time').'</div>
+            <div class="orsee-table-cell">'.lang('query').'</div>
+          </div>';
 
     $queries=query__load_saved_queries('assign,deassign',-1,$experiment_id,true,"query_time ASC");
-
     $shade=false;
     foreach ($queries as $q) {
-        if ($shade) { $rowspec=' class="or_orr_list_shade_even""'; $shade=false; }
-        else { $rowspec=' class="or_orr_list_shade_odd"'; $shade=true; }
-        echo '<TR'.$rowspec.'>';
-        echo '<TD valign="top"><B>'.ortime__format($q['query_time']).'</B><BR>';
+        $row_class='orsee-table-row';
+        if ($shade) {
+            $row_class.=' is-alt';
+        }
+        $shade=!$shade;
+
+        $left='<strong>'.ortime__format($q['query_time']).'</strong><br>';
         if ($q['permanent'] || (isset($q['properties']['is_permanent']) && $q['properties']['is_permanent'])) {
-            echo '<B>';
-            echo lang('report_queries__permanent_query').'</B><BR>';
-            echo lang('from').' '.ortime__format($q['properties']['permanent_start_time']).' ';
-            if (isset($q['properties']['permanent_start_time']) && !$q['permanent']) echo lang('to').' '.ortime__format($q['query_time']);
-            else echo lang('until_now');
-            echo '<BR>'.lang('report_queries__number_of_subjects_added').': <B>';
-            if (isset($q['properties']['assigned_count']))  echo $q['properties']['assigned_count'];
-            else echo 0;
-            echo '</B>';
-        } else {
-            echo '<B>';
-            if ($q['query_type']=='assign') echo lang('report_queries__potential_participants_added');
-            else echo lang('report_queries__potential_participants_removed');
-            echo '</B><BR>';
-            if ($q['admin_id']) echo $q['admin_id'].'<BR>';
-            echo lang('report_queries__subjects_in_result_set').': ';
-            if ($q['properties']['selected']=='n') echo '<B>';
-            echo $q['properties']['totalcount'];
-            if ($q['properties']['selected']=='n') echo '</B>';
-            echo '<BR>';
-            if ($q['query_type']=='assign') {
-                if ($q['properties']['selected']=='y') echo lang('report_queries__assigned_selected_subset_of_size').': <B>'.$q['properties']['assigned_count'].'</B>';
-                else echo lang('report_queries__assigned_all');
+            $left.='<strong>'.lang('report_queries__permanent_query').'</strong><br>';
+            $left.=lang('from').' '.ortime__format($q['properties']['permanent_start_time']).' ';
+            if (isset($q['properties']['permanent_start_time']) && !$q['permanent']) {
+                $left.=lang('to').' '.ortime__format($q['query_time']);
             } else {
-                if ($q['properties']['selected']=='y') echo lang('report_queries__deassigned_selected_subset_of_size').': <B>'.$q['properties']['assigned_count'].'</B>';
-                else echo lang('report_queries__deassigned_all');
+                $left.=lang('until_now');
+            }
+            $left.='<br>'.lang('report_queries__number_of_subjects_added').': <strong>';
+            if (isset($q['properties']['assigned_count'])) {
+                $left.=$q['properties']['assigned_count'];
+            } else {
+                $left.='0';
+            }
+            $left.='</strong>';
+        } else {
+            $left.='<strong>';
+            if ($q['query_type']=='assign') {
+                $left.=lang('report_queries__potential_participants_added');
+            } else {
+                $left.=lang('report_queries__potential_participants_removed');
+            }
+            $left.='</strong><br>';
+            if ($q['admin_id']) {
+                $left.=$q['admin_id'].'<br>';
+            }
+            $left.=lang('report_queries__subjects_in_result_set').': ';
+            if ($q['properties']['selected']=='n') {
+                $left.='<strong>';
+            }
+            $left.=$q['properties']['totalcount'];
+            if ($q['properties']['selected']=='n') {
+                $left.='</strong>';
+            }
+            $left.='<br>';
+            if ($q['query_type']=='assign') {
+                if ($q['properties']['selected']=='y') {
+                    $left.=lang('report_queries__assigned_selected_subset_of_size').': <strong>'.$q['properties']['assigned_count'].'</strong>';
+                } else {
+                    $left.=lang('report_queries__assigned_all');
+                }
+            } else {
+                if ($q['properties']['selected']=='y') {
+                    $left.=lang('report_queries__deassigned_selected_subset_of_size').': <strong>'.$q['properties']['assigned_count'].'</strong>';
+                } else {
+                    $left.=lang('report_queries__deassigned_all');
+                }
             }
         }
-        echo '</TD>';
-        echo '<TD>';
+
         $posted_query=json_decode($q['json_query'],true);
         $pseudo_query_array=query__get_pseudo_query_array($posted_query['query']);
         $pseudo_query_display=query__display_pseudo_query($pseudo_query_array,true);
-        echo $pseudo_query_display;
-        //echo $q['json_query'];
-        echo '</TD>';
-        echo '</TR>';
+
+        echo '<div class="'.$row_class.'">
+                <div class="orsee-table-cell" style="vertical-align: top;">'.$left.'</div>
+                <div class="orsee-table-cell">'.$pseudo_query_display.'</div>
+              </div>';
     }
-    echo '</table>';
-    echo '</TD></TR>';
-
-
+    echo '</div>';
+    echo '</div>';
 
     /////////////////////////////
     /// SUBJECT POOL STATISTICS
     /////////////////////////////
-    echo '<TR><TD>';
-    echo '<TABLE class="or_orr_section_head"><TR><TD align="center" valign="middle">
-            '.lang('subject_pool_statistics').'
-            </TD></TR></TABLE>';
-    echo '</TD></TR>
-            <TR><TD>';
+    echo '<div class="orsee-panel">';
+    echo '<div class="orsee-panel-title"><div>'.lang('subject_pool_statistics').'</div></div>';
 
-	//check if $experiment_id is actually a number
+    //check if $experiment_id is actually a number
     if(is_numeric($experiment_id) == TRUE){
-    
-    	$pars=array(':experiment_id'=>$experiment['experiment_id']);
-    	$query="SELECT max(session_start) as max_time, min(session_start) as min_time
-            	FROM ".table('sessions')."
-            	WHERE experiment_id = :experiment_id";
-    	$line=orsee_query($query,$pars);
-    	$min_session_time=ortime__sesstime_to_unixtime($line['min_time']);
-    	$max_session_time=ortime__sesstime_to_unixtime($line['max_time']);    
+        $pars=array(':experiment_id'=>$experiment['experiment_id']);
+        $query="SELECT max(session_start) as max_time, min(session_start) as min_time
+                FROM ".table('sessions')."
+                WHERE experiment_id = :experiment_id";
+        $line=orsee_query($query,$pars);
+        $min_session_time=ortime__sesstime_to_unixtime($line['min_time']);
+        $max_session_time=ortime__sesstime_to_unixtime($line['max_time']);
     }
 
     $total_data=array();
@@ -336,42 +384,38 @@ if ($proceed) {
                     );
     $total_data['part']=stats__get_data($condition,'report',array(),$options);
 
-    echo '<TABLE class="or_orr_section_content">';
-    $i=0; $cols=2;  $out=array();
+    echo '<div class="orsee-form-row-grid orsee-form-row-grid--2" style="align-items: start; row-gap: 1rem;">';
+    $i=0;
+    $cols=2;
+    $out=array();
     foreach ($total_data['pool'] as $k=>$table1) {
-        if (isset($table1['data']) && is_array($table1['data']) && count($table1['data'])>0) $show=true;
-        else $show=false;
+        if (isset($table1['data']) && is_array($table1['data']) && count($table1['data'])>0) {
+            $show=true;
+        } else {
+            $show=false;
+        }
         if ($show) {
             $out[]=stats__report_display_table($table1,lang('stats_report__pool'),$total_data['exp'][$k],lang('stats_report__assigned'),$total_data['part'][$k],lang('stats_report__participated'));
             if (count($out)==$cols) {
-                echo '<TR><TD valign="top" align="center">'.implode('</TD><TD valign="top" align="center">',$out).'</TD></TR>';
-                echo '<TR><TD colspan="'.$cols.'">&nbsp;</TD></TR>';
+                echo '<div class="orsee-form-row-col">'.$out[0].'</div><div class="orsee-form-row-col">'.$out[1].'</div>';
                 $out=array();
             }
         }
     }
     if (count($out)>0) {
-        echo '<TR><TD valign="top" align="center">'.implode('</TD><TD valign="top" align="center">',$out).'</TD>';
-        for($i=count($out);$i<$cols;$i++) echo '<TD></TD>';
-        echo '</TR>';
+        echo '<div class="orsee-form-row-col">'.$out[0].'</div>';
+        if (count($out)<2) {
+            echo '<div class="orsee-form-row-col"></div>';
+        }
     }
-    echo '</TABLE>';
+    echo '</div>';
+    echo '</div>';
 
-    echo '</TD></TR>';
-
-
-
-    echo '</TABLE>';
-
-//  echo '<pre>';
-//  var_dump($total_data);
-//  echo '</pre>';
-
-    if (isset($switched_lang) && $switched_lang && isset($mylang)) $lang=$mylang;
-
-    echo '<BR><BR><A href="experiment_show.php?experiment_id='.$experiment_id.'">'.icon('back').' '.lang('back').'</A><BR><BR>';
-    echo '</center>';
-
+    if (isset($switched_lang) && $switched_lang && isset($mylang)) {
+        $lang=$mylang;
+    }
+    echo '<div class="orsee-options-actions">'.button_back('experiment_show.php?experiment_id='.$experiment_id).'</div>';
 }
 include("footer.php");
+
 ?>

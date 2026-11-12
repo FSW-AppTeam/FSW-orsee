@@ -9,6 +9,10 @@ error_reporting(0);  // shut down all error reporting
 
 header('X-Frame-Options: SAMEORIGIN');
 
+// Adds the Content-Security-Policy to the HTTP header.
+header("Content-Security-Policy: default-src 'self'; script-src 'self';");
+header("X-Content-Security-Policy: default-src 'self'; script-src 'self';"); 
+
 $proceed=true;
 if ($proceed) {
     $document=thisdoc();
@@ -47,8 +51,8 @@ if ($proceed) {
 
     // Check for login
     if ((!(isset($expadmindata['adminname']) && $expadmindata['adminname'])) && $document!="admin_login.php") {
-            redirect ("admin/admin_login.php");
-            $proceed=false;
+        redirect("admin/admin_login.php");
+        $proceed=false;
     }
 }
 
@@ -67,15 +71,18 @@ if ($proceed) {
         $_SESSION['expadmindata']=$expadmindata;
     }
 
-    if (!isset($expadmindata['language']))
+    if (!isset($expadmindata['language'])) {
         $expadmindata['language']=$settings['admin_standard_language'];
+    }
 
     $authdata['language']=$expadmindata['language'];
     $_SESSION['authdata']=$authdata;
 
     $lang=load_language($expadmindata['language']);
 
-    if (!isset($title)) $title="";
+    if (!isset($title)) {
+        $title="";
+    }
     $pagetitle=$settings['default_area'].': '.$title;
 }
 ?>

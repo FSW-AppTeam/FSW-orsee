@@ -1,7 +1,7 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-include ("nonoutputheader.php");
+include("nonoutputheader.php");
 if ($proceed) {
     if (isset($_REQUEST['experiment_id']) && $_REQUEST['experiment_id']) {
         $experiment_id=$_REQUEST['experiment_id'];
@@ -18,7 +18,7 @@ if ($proceed) {
     }
 
     if (isset($_REQUEST['pstatus'])) {
-        $pstatus=$_REQUEST['pstatus']; 
+        $pstatus=$_REQUEST['pstatus'];
     } else {
         $pstatus='';
     }
@@ -30,7 +30,7 @@ if ($proceed) {
     }
 
     if (isset($_REQUEST['search_sort']) && $_REQUEST['search_sort']) {
-        $sort=$_REQUEST['search_sort'];
+        $sort=query__get_sort('session_participants_list_pdf',$_REQUEST['search_sort']);
     } else {
         $sort='';
     }

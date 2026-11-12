@@ -3,13 +3,13 @@
 ob_start();
 $menu__area="experiment_calendar";
 $title="experiment_calendar";
-include ("header.php");
+include("header.php");
+
 if ($proceed) {
-    echo '<center>';
-
+    echo '<div class="orsee-panel">';
     $done=calendar__display_calendar(true);
-
-    echo '</center>';
+    echo '</div>';
 }
-include ("footer.php");
+include("footer.php");
+
 ?>
