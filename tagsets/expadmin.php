@@ -4,24 +4,27 @@
 // login form
 function admin__login_form() {
     global $lang, $settings;
-    echo '<form name="login" action="admin_login.php" method=post>
-        '.csrf__field().'
-        '.lang('username').':
-        <input type=text size=20 maxlength=20 name=adminname';
-    if (!(isset($settings['disable_admin_login_js']) && $settings['disable_admin_login_js']=='y')) {
-        echo ' onChange="gotoPassword()"';
+    $admin_username_dir=($settings['force_ltr_admin_login_username']==='y' ? ' dir="ltr"' : '');
+    $admin_password_dir=($settings['force_ltr_admin_login_password']==='y' ? ' dir="ltr"' : '');
+    echo '<div class="orsee-panel orsee-login-panel">';
+    echo '<form name="login" action="admin_login.php" method="post" class="orsee-login-form">';
+    echo csrf__field();
+    echo '<div class="field">';
+    echo '<label class="label">'.lang('username').'</label>';
+    echo '<div class="control"><input class="input is-primary orsee-input orsee-input-text" type="text"'.$admin_username_dir.' maxlength="20" name="adminname"></div>';
+    echo '</div>';
+    echo '<div class="field">';
+    echo '<label class="label">'.lang('password').'</label>';
+    echo '<div class="control"><input class="input is-primary orsee-input orsee-input-password" type="password"'.$admin_password_dir.' autocomplete="off" maxlength="20" name="password"></div>';
+    echo '</div>';
+    if (isset($_REQUEST['requested_url']) && $_REQUEST['requested_url']) {
+        echo '<input type="hidden" name="requested_url" value="'.urlencode($_REQUEST['requested_url']).'">';
     }
-    echo '><BR>
-        '.lang('password').':
-        <input type="password" autocomplete="off" size=20 maxlength=20 name=password';
-    if (!(isset($settings['disable_admin_login_js']) && $settings['disable_admin_login_js']=='y')) {
-        echo ' onChange="sendForm()"';
-    }
-    echo '><BR>';
-    if (isset($_REQUEST['requested_url']) && $_REQUEST['requested_url'])
-        echo '<input type=hidden name="requested_url" value="'.urlencode($_REQUEST['requested_url']).'">';
-    echo '<input class="button" type=submit name=login value="'.lang('login').'">
-        </form>';
+    echo '<div class="orsee-form-actions orsee-login-actions">';
+    echo '<button class="button orsee-btn" type="submit" name="login" value="1">'.lang('login').'</button>';
+    echo '</div>';
+    echo '</form>';
+    echo '</div>';
 }
 
 // checks username and password
@@ -34,7 +37,8 @@ function admin__check_login($username,$password) {
     $admin=orsee_query($query,$pars);
 
     $continue=true;
-    $not_allowed=false; $locked=false;
+    $not_allowed=false;
+    $locked=false;
     if ($continue) {
         if (!isset($admin['admin_id'])) {
             $continue=false;
@@ -75,22 +79,26 @@ function admin__check_login($username,$password) {
     }
 
     if ($continue) {
-        session_regenerate_id(true); 
+        session_regenerate_id(true);
         $_SESSION['expadmindata']=$expadmindata;
         $done=admin__track_successful_login($admin);
         return true;
     } else {
         //if ($locked) message(lang('error_locked_out'));
-        if ($not_allowed) message(lang('error_not_allowed_to_login'));
+        if ($not_allowed) {
+            message(lang('error_not_allowed_to_login'),'error');
+        }
         return false;
     }
 }
 
 function admin__check_has_lockout($admin) {
     global $settings;
-    if (isset($settings['lockout_period_minutes_after_failed_logins']) && $settings['lockout_period_minutes_after_failed_logins']>0)
+    if (isset($settings['lockout_period_minutes_after_failed_logins']) && $settings['lockout_period_minutes_after_failed_logins']>0) {
         $lockout_minutes=$settings['lockout_period_minutes_after_failed_logins'];
-    else $lockout_minutes=20;
+    } else {
+        $lockout_minutes=20;
+    }
     if ($admin['locked'] && ($admin['last_login_attempt'] + ($lockout_minutes*60)) < time()) {
         // unlock
         $admin['failed_login_attempts']=0;
@@ -102,12 +110,16 @@ function admin__check_has_lockout($admin) {
 
 function admin__track_unsuccessful_login($admin) {
     global $settings;
-    if (isset($settings['max_number_of_failed_logins_before_lockout']) && $settings['max_number_of_failed_logins_before_lockout']>0)
+    if (isset($settings['max_number_of_failed_logins_before_lockout']) && $settings['max_number_of_failed_logins_before_lockout']>0) {
         $limit=$settings['max_number_of_failed_logins_before_lockout'];
-    else $limit=3;
-    if (isset($settings['lockout_period_minutes_after_failed_logins']) && $settings['lockout_period_minutes_after_failed_logins']>0)
-    $lockout_minutes=$settings['lockout_period_minutes_after_failed_logins'];
-    else $lockout_minutes=20;
+    } else {
+        $limit=3;
+    }
+    if (isset($settings['lockout_period_minutes_after_failed_logins']) && $settings['lockout_period_minutes_after_failed_logins']>0) {
+        $lockout_minutes=$settings['lockout_period_minutes_after_failed_logins'];
+    } else {
+        $lockout_minutes=20;
+    }
 
     $last_login_attempt=time();
     $failed_login_attempts=$admin['failed_login_attempts']+1;
@@ -151,16 +163,19 @@ function admin__load_admin_rights($admin_type) {
     $admin_type=orsee_db_load_array("admin_types",$admin_type,"type_name");
     $trights=explode(",",$admin_type['rights']);
     $rights=array();
-    foreach ($trights as $right) $rights[$right]=true;
+    foreach ($trights as $right) {
+        $rights[$right]=true;
+    }
     return $rights;
 }
 
 function check_allow($right,$redirect="") {
     global $expadmindata, $lang, $proceed;
-    if (isset($expadmindata['rights'][$right]) && $expadmindata['rights'][$right]) return true;
-    else {
+    if (isset($expadmindata['rights'][$right]) && $expadmindata['rights'][$right]) {
+        return true;
+    } else {
         if ($redirect) {
-            message (lang('error_not_authorized_to_access_this_function'));
+            message(lang('error_not_authorized_to_access_this_function'),'error');
             redirect("admin/".$redirect);
             $proceed=false;
         }
@@ -201,16 +216,20 @@ function admin__select_admin_type($fieldname,$selected="",$return_var="type_name
             $preloaded_admintypes[$line['type_name']]=$line;
         }
     }
-    if (!isset($preloaded_admintypes[$selected])) $selected=$settings['default_admin_type'];
-    $out.='<SELECT name="'.$fieldname.'">';
+    if (!isset($preloaded_admintypes[$selected])) {
+        $selected=$settings['default_admin_type'];
+    }
+    $out.='<span class="select is-primary select-compact"><select name="'.$fieldname.'">';
     foreach ($preloaded_admintypes as $line) {
-        if(!in_array($line['type_id'],$hide)) {
+        if (!in_array($line['type_id'],$hide)) {
             $out.='<OPTION value="'.$line[$return_var].'"';
-            if ($line[$return_var]==$selected || $line['type_name']==$selected) $out.=' SELECTED';
+            if ($line[$return_var]==$selected || $line['type_name']==$selected) {
+                $out.=' SELECTED';
+            }
             $out.='>'.$line['type_name'].'</OPTION>';
         }
     }
-    $out.='</SELECT>';
+    $out.='</select></span>';
     return $out;
 }
 
@@ -233,12 +252,8 @@ function admin__admin_type_select_field($postvarname,$selected,$multi=true,$mpop
     // selected - array of pre-selected class ids
     global $lang;
     $out="";
-    if (!is_array($mpoptions)) $mpoptions=array();
-    $default_options=array('cols'=>30,'picker_maxnumcols'=>3);
-    foreach ($default_options as $k=>$v) {
-        if (!isset($mpoptions[$k])) {
-            $mpoptions[$k]=$v;
-        }
+    if (!is_array($mpoptions)) {
+        $mpoptions=array();
     }
     $admin_types=admin__load_admin_types();
     $mylist=array();
@@ -246,14 +261,19 @@ function admin__admin_type_select_field($postvarname,$selected,$multi=true,$mpop
         $mylist[$k]=$k;
     }
     if ($multi) {
-        $out.= get_multi_picker($postvarname,$mylist,$selected,$mpoptions);
+        $out.= get_tag_picker($postvarname,$mylist,$selected,$mpoptions);
     } else {
         $out.= '<SELECT name="'.$postvarname.'">
-                <OPTION value=""'; if (!$selected) $out.= ' SELECTED'; $out.= '>-</OPTION>
+                <OPTION value=""';
+        if (!$selected) {
+            $out.= ' SELECTED';
+        } $out.= '>-</OPTION>
                 ';
         foreach ($mylist as $k=>$v) {
             $out.= '<OPTION value="'.$k.'"';
-                if ($selected==$k) $out.= ' SELECTED'; $out.= '>'.$v.'</OPTION>
+            if ($selected==$k) {
+                $out.= ' SELECTED';
+            } $out.= '>'.$v.'</OPTION>
                 ';
         }
         $out.= '</SELECT>
@@ -265,7 +285,7 @@ function admin__admin_type_select_field($postvarname,$selected,$multi=true,$mpop
 function admin__update_admin_rights_if_not_exists($specs) {
     global $system__admin_rights;
     $done=false;
-    
+
     // is the right defined? If not: ignore.
     $defined_rights=array();
     foreach ($system__admin_rights as $right) {
@@ -275,7 +295,8 @@ function admin__update_admin_rights_if_not_exists($specs) {
 
     if (in_array($specs['right_name'],$defined_rights)) {
         // does the right already exist in >0 admin profiles? If yes: ignore.
-        $exists=false; $trights=array();
+        $exists=false;
+        $trights=array();
         $query="SELECT * FROM ".table('admin_types')." ORDER BY type_name";
         $result=or_query($query);
         while ($type=pdo_fetch_assoc($result)) {
@@ -284,7 +305,7 @@ function admin__update_admin_rights_if_not_exists($specs) {
                 $exists=true;
             }
         }
-        
+
         if ($exists) {
             log__admin('Automatic database upgrade: User privilege "'.$specs['right_name'].'" already exists in at least one admin profile. Not upgraded.');
         } else {

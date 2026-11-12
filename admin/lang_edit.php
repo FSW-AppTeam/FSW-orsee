@@ -1,16 +1,16 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-
 $menu__area="options";
 $title="edit_language";
-include ("header.php");
+include("header.php");
+
 if ($proceed) {
     $allow=check_allow('lang_symbol_edit','lang_main.php');
 }
 
 if ($proceed) {
-    echo '<center>';
+    echo '<div class="orsee-panel">';
 
     // load languages
     $languages=get_languages();
@@ -21,13 +21,21 @@ if ($proceed) {
         $el=$settings['admin_standard_language'];
     }
 
-    if (isset($_REQUEST['search']) && $_REQUEST['search']) $search=$_REQUEST['search']; else $search='';
+    if (isset($_REQUEST['search']) && $_REQUEST['search']) {
+        $search=$_REQUEST['search'];
+    } else {
+        $search='';
+    }
 
-    if (isset($_REQUEST['letter']) && $_REQUEST['letter']) $letter=$_REQUEST['letter']; else $letter='a';
+    if (isset($_REQUEST['letter']) && $_REQUEST['letter']) {
+        $letter=$_REQUEST['letter'];
+    } else {
+        $letter='a';
+    }
 
     if (isset($_REQUEST['alter_lang']) && $_REQUEST['alter_lang'] && isset($_REQUEST['symbols']) && is_array($_REQUEST['symbols'])) {
         if (!csrf__validate_request_message()) {
-            redirect ('admin/lang_edit.php?el='.$el.'&letter='.$letter.'&search='.$search);
+            redirect('admin/lang_edit.php?el='.$el.'&letter='.$letter.'&search='.$search);
         }
         $pars=array();
         foreach ($_REQUEST['symbols'] as $symbol => $content) {
@@ -40,12 +48,11 @@ if ($proceed) {
         $done=or_query($query,$pars);
         message(lang('changes_saved'));
         log__admin("language_edit_symbols","language:".$edlang);
-        redirect ('admin/lang_edit.php?el='.$el.'&letter='.$letter.'&search='.$search);
+        redirect('admin/lang_edit.php?el='.$el.'&letter='.$letter.'&search='.$search);
     }
 }
 
 if ($proceed) {
-
     if ($search) {
         $letter="";
         $lpars=array(':search1'=>'%'.$search.'%',
@@ -56,7 +63,7 @@ if ($proceed) {
                 and (content_name LIKE :search1
                 or ".lang('lang')." LIKE :search2
                 or ".$el." LIKE :search3)
-                AND content_name NOT IN ('lang','lang_name','lang_icon_base64')
+                AND content_name NOT IN ('lang','lang_name','lang_icon_base64','lang_flag_iso2','lang_is_rtl')
                 order by content_name";
     } else {
         $search="";
@@ -64,88 +71,93 @@ if ($proceed) {
         $lquery="select * from ".table('lang')."
                 where content_type='lang'
                 and left(content_name,1)= :letter
-                AND content_name NOT IN ('lang','lang_name','lang_icon_base64')
+                AND content_name NOT IN ('lang','lang_name','lang_icon_base64','lang_flag_iso2','lang_is_rtl')
                 order by content_name";
     }
 
-    echo '<FORM action="lang_edit.php">
-    	' . csrf__field() . '
-        <INPUT type=hidden name="el" value="'.$el.'">
-        <INPUT type=hidden name="letter" value="'.$letter.'">
-        <INPUT type=text name="search" size=20 maxlength=200 value="'.$search.'">
-        <INPUT class="button" type=submit name=dosearch value="'.lang('search').'">
-        </FORM><BR>';
+    echo '<div style="text-align: center; margin-bottom: 0.8rem;">';
+    echo '<FORM action="lang_edit.php" style="display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: center;">';
+    echo csrf__field();
+    echo '<INPUT type="hidden" name="el" value="'.$el.'">';
+    echo '<INPUT type="hidden" name="letter" value="'.$letter.'">';
+    echo '<input class="input is-primary orsee-input" type="text" name="search" maxlength="200" value="'.$search.'">';
+    echo '<INPUT class="button orsee-btn" type="submit" name="dosearch" value="'.lang('search').'">';
+    echo '</FORM>';
+    echo '</div>';
 
 
     $query="select lower(left(content_name,1)) as letter,
             count(lang_id) as number
             from ".table('lang')."
-            where content_type='lang' GROUP BY letter";
+            where content_type='lang' GROUP BY letter ORDER BY letter";
     $result=or_query($query);
+    echo '<div style="text-align: center; margin-bottom: 0.6rem;">';
     while ($line=pdo_fetch_assoc($result)) {
-        if ($line['letter']!=$letter) echo '<A HREF="lang_edit.php?el='.$el.'&letter='.$line['letter'].'">'.$line['letter'].'</A>&nbsp; ';
-        else echo $letter.'&nbsp; ';
+        if ($line['letter']!=$letter) {
+            echo '<A HREF="lang_edit.php?el='.$el.'&letter='.$line['letter'].'">'.$line['letter'].'</A>&nbsp; ';
+        } else {
+            echo $letter.'&nbsp; ';
+        }
     }
+    echo '</div>';
 
     $result=or_query($lquery,$lpars);
     $number=pdo_num_rows($result);
+    $field_dir=(lang__is_rtl($el) ? 'rtl' : 'ltr');
 
-    echo '<BR><BR>'.lang('symbols').': '.$number.'<BR><BR>
+    echo '<div style="text-align: center; margin-bottom: 0.8rem;">'.lang('symbols').': '.$number.'</div>
 
         <FORM action="lang_edit.php" method=post>
         <INPUT type=hidden name="el" value="'.$el.'">
         <INPUT type=hidden name="letter" value="'.$letter.'">
         <INPUT type=hidden name="search" value="'.$search.'">
         '.csrf__field().'
-        <TABLE class="or_listtable" style="width: 95%;"><thead>
-            <TR style="background: '.$color['list_header_background'].'; color: '.$color['list_header_textcolor'].';">
-                <TD colspan=4 align=center>
-                    <INPUT class="button" type=submit name="alter_lang" value="'.lang('change').'">
-                </TD>
-            </TR>
-            <TR  style="background: '.$color['list_header_background'].'; color: '.$color['list_header_textcolor'].';">
-                <TD><B>'.lang('symbol').'</B></TD>
-                <TD><B>'.lang('lang').'</B></TD>
-                <TD><B>'.$el.'</B></TD>
-                <TD></TD>
-            </TR>
-            </thead>
-            <tbody>';
+        <div class="orsee-options-actions-center" style="margin-bottom: 0.42rem;">
+            <INPUT class="button orsee-btn" type=submit name="alter_lang" value="'.lang('change').'">
+        </div>
+        <div class="orsee-table orsee-table-cells-compact orsee-table-tablet-2cols orsee-table-mobile">
+            <div class="orsee-table-row orsee-table-head">
+                <div class="orsee-table-cell"><B>'.lang('symbol').'</B></div>
+                <div class="orsee-table-cell"><B>'.lang('lang').'</B></div>
+                <div class="orsee-table-cell"><B>'.$el.'</B></div>
+                <div class="orsee-table-cell">'.lang('action').'</div>
+            </div>';
 
     $shade=false;
     while ($line=pdo_fetch_assoc($result)) {
-        echo '  <TR';
-        if ($shade) { echo ' bgcolor="'.$color['list_shade1'].'"'; $shade=false; }
-        else { echo ' bgcolor="'.$color['list_shade2'].'"'; $shade=true; }
-        echo '>
-                <TD>'.$line['content_name'].'</TD>
-                <TD>'.$lang[$line['content_name']].'</TD>
-                <TD>
-                    <textarea rows=2 cols=30 wrap=virtual name="symbols['.$line['content_name'].']">'.
+        $row_class='orsee-table-row';
+        if ($shade) {
+            $row_class.=' is-alt';
+            $shade=false;
+        } else {
+            $shade=true;
+        }
+        echo '<div class="'.$row_class.'">
+                <div class="orsee-table-cell" data-label="'.lang('symbol').'" style="white-space: nowrap; vertical-align: top;">'.$line['content_name'].'</div>
+                <div class="orsee-table-cell" data-label="'.lang('lang').'" style="vertical-align: top;">'.$lang[$line['content_name']].'</div>
+                <div class="orsee-table-cell" data-label="'.$el.'" style="vertical-align: top;">
+                    <textarea class="textarea is-primary orsee-textarea orsee-textarea-compact" dir="'.$field_dir.'" style="min-width: 26rem;" rows="3" name="symbols['.$line['content_name'].']">'.
                         trim(stripslashes($line[$el])).'</textarea>
-                </TD>
-                <TD>
-                    <A HREF="lang_symbol_edit.php?lang_id='.$line['lang_id'].'">'.lang('edit').'</A>
-                </TD>
-            </TR>
+                </div>
+                <div class="orsee-table-cell orsee-table-action" data-label="'.lang('action').'" style="vertical-align: top;">'.
+                    button_link('lang_symbol_edit.php?lang_id='.$line['lang_id'],lang('edit'),'pencil-square-o','','','orsee-btn-compact')
+                .'</div>
+            </div>
             ';
     }
 
-    echo '      </tbody>
-                <tfoot><TR>
-                <TD colspan=3 align=center>
-                    <INPUT class="button" type=submit name=alter_lang value="'.lang('change').'">
-                </TD>
-            </TR></tfoot>
-        </TABLE>
+    echo '      </div>
+        <div class="orsee-options-actions-center" style="margin-top: 0.42rem;">
+            <INPUT class="button orsee-btn" type=submit name=alter_lang value="'.lang('change').'">
+        </div>
         </FORM>';
 
-    echo '  <BR><BR>'.button_link('lang_symbol_edit.php?go=true',
-                        lang('add_symbol'),'plus-circle');
+    echo '<div class="orsee-options-actions-center" style="margin-top: 0.84rem;">'.button_link('lang_symbol_edit.php?go=true',
+        lang('add_symbol'),'plus-circle').'</div>';
 
-    echo '<BR><BR>
-                <A href="lang_main.php">'.icon('back').' '.lang('back').'</A><BR><BR>
-                </center>';
+    echo '<div class="orsee-options-actions">'.button_back('lang_main.php').'</div>';
+    echo '</div>';
 }
-include ("footer.php");
+include("footer.php");
+
 ?>

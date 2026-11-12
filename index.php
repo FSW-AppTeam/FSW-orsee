@@ -17,6 +17,10 @@ session_set_cookie_params(
 );
 header('X-Frame-Options: SAMEORIGIN');
 
+// Adds the Content-Security-Policy to the HTTP header.
+header("Content-Security-Policy: default-src 'self'; script-src 'self';");
+header("X-Content-Security-Policy: default-src 'self'; script-src 'self';"); 
+
 error_reporting(0);  // shut down all error reporting
 
 redirect("public/");

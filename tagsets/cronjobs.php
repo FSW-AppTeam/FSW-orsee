@@ -10,10 +10,15 @@ function cron__job_time_select_field($selected) {
     echo '<SELECT name="job_time">';
     foreach ($jobtimes as $jobtime) {
         echo '<OPTION value="'.$jobtime.'"';
-        if ($jobtime == $selected) echo ' SELECTED';
+        if ($jobtime == $selected) {
+            echo ' SELECTED';
+        }
         echo '>';
-        if (isset($lang['cron_job_time_'.$jobtime])) echo $lang['cron_job_time_'.$jobtime];
-            else echo $jobtime;
+        if (isset($lang['cron_job_time_'.$jobtime])) {
+            echo $lang['cron_job_time_'.$jobtime];
+        } else {
+            echo $jobtime;
+        }
         echo '</OPTION>';
     }
     echo '</SELECT>';
@@ -47,12 +52,16 @@ function cron__run_cronjobs() {
         $continue=true;
 
         // properties exist?
-        if (!(isset($cronprop[$cronjob]) && function_exists('cron__'.$cronjob))) $continue=false;
+        if (!(isset($cronprop[$cronjob]) && function_exists('cron__'.$cronjob))) {
+            $continue=false;
+        }
 
         // is due?
         if ($continue) {
             $due=cron__job_is_due($cronprop[$cronjob],$now);
-            if (!$due) $continue=false;
+            if (!$due) {
+                $continue=false;
+            }
         }
 
 
@@ -71,9 +80,15 @@ function cron__run_cronjobs() {
 
 function cron__save_and_log_job($cronjob,$now="",$target="") {
     global $expadmindata;
-    if (isset($expadmindata['admin_id'])) $id=$expadmindata['admin_id']; else $id="";
+    if (isset($expadmindata['admin_id'])) {
+        $id=$expadmindata['admin_id'];
+    } else {
+        $id="";
+    }
 
-    if ($now=="") $now=time();
+    if ($now=="") {
+        $now=time();
+    }
     $pars=array(':job_last_exec'=>$now,
                 ':job_name'=>$cronjob);
     $query="UPDATE ".table('cron_jobs')."
@@ -93,14 +108,14 @@ function cron__save_and_log_job($cronjob,$now="",$target="") {
 
     $done=log__cron_job($cronjob,$target,$now,$id);
     return $done;
-
 }
 
 
 
 function cron__job_is_due($cronjob,$now='') {
-
-    if (!$now) $now=time();
+    if (!$now) {
+        $now=time();
+    }
     //$now=$now+3; // leave some flexibility
     $lexec=$cronjob['job_last_exec'];
     $jtime=$cronjob['job_time'];
@@ -109,71 +124,101 @@ function cron__job_is_due($cronjob,$now='') {
     switch ($jtime) {
         case 'every_5_minutes':
             $jdiff=5*60;
-            if ($lexec + $jdiff < $now+1) $due=true;
+            if ($lexec + $jdiff < $now+1) {
+                $due=true;
+            }
             break;
         case 'every_15_minutes':
             $jdiff=15*60;
-            if ($lexec + $jdiff < $now+1) $due=true;
+            if ($lexec + $jdiff < $now+1) {
+                $due=true;
+            }
             break;
         case 'every_30_minutes':
             $jdiff=30*60;
-            if ($lexec + $jdiff < $now+1) $due=true;
+            if ($lexec + $jdiff < $now+1) {
+                $due=true;
+            }
             break;
         case 'every_hour':
             $jdiff=60*60;
-            if ($lexec + $jdiff < $now+1) $due=true;
+            if ($lexec + $jdiff < $now+1) {
+                $due=true;
+            }
             break;
         case 'every_2_hours':
             $jdiff=2*60*60;
-            if ($lexec + $jdiff < $now+1) $due=true;
+            if ($lexec + $jdiff < $now+1) {
+                $due=true;
+            }
             break;
         case 'every_6_hours':
             $jdiff=6*60*60;
-            if ($lexec + $jdiff < $now+1) $due=true;
+            if ($lexec + $jdiff < $now+1) {
+                $due=true;
+            }
             break;
         case 'every_12_hours':
             $jdiff=12*60*60;
-            if ($lexec + $jdiff < $now+1) $due=true;
+            if ($lexec + $jdiff < $now+1) {
+                $due=true;
+            }
             break;
         case 'every_day_at_3':
             $then=mktime(3,0,0);
-            if ($lexec <= $then && $now > $then) $due=true;
+            if ($lexec <= $then && $now > $then) {
+                $due=true;
+            }
             break;
         case 'every_day_at_8':
             $then=mktime(8,0,0);
-            if ($lexec <= $then && $now > $then) $due=true;
+            if ($lexec <= $then && $now > $then) {
+                $due=true;
+            }
             break;
         case 'every_day_at_15':
             $then=mktime(15,0,0);
-            if ($lexec <= $then && $now > $then) $due=true;
+            if ($lexec <= $then && $now > $then) {
+                $due=true;
+            }
             break;
         case 'every_day_at_22':
             $then=mktime(22,0,0);
-            if ($lexec <= $then && $now > $then) $due=true;
+            if ($lexec <= $then && $now > $then) {
+                $due=true;
+            }
             break;
-        case 'every_monday_at_8';
+        case 'every_monday_at_8':
             $then=mktime(8,0,0);
             $nowarray=getdate($now);
-            if ($nowarray['wday']==1 && $lexec <= $then && $now > $then) $due=true;
+            if ($nowarray['wday']==1 && $lexec <= $then && $now > $then) {
+                $due=true;
+            }
             break;
         case 'every_thursday_at_8':
             $then=mktime(8,0,0);
             $nowarray=getdate($now);
-            if ($nowarray['wday']==4 && $lexec <= $then && $now > $then) $due=true;
+            if ($nowarray['wday']==4 && $lexec <= $then && $now > $then) {
+                $due=true;
+            }
             break;
         case 'every_month_at_1st_at_8':
             $then=mktime(8,0,0);
             $nowarray=getdate($now);
-            if ($nowarray['mday']==1 && $lexec <= $then && $now > $then) $due=true;
+            if ($nowarray['mday']==1 && $lexec <= $then && $now > $then) {
+                $due=true;
+            }
             break;
         case 'every_month_at_15th_at_8':
             $then=mktime(8,0,0);
             $nowarray=getdate($now);
-            if ($nowarray['mday']==15 && $lexec <= $then && $now > $then) $due=true;
+            if ($nowarray['mday']==15 && $lexec <= $then && $now > $then) {
+                $due=true;
+            }
             break;
         default:
             $due=false;
-        }
+    }
     return $due;
 }
 
@@ -183,17 +228,30 @@ function cron__process_mail_queue() {
 
     $result=experimentmail__send_mails_from_queue($settings['mail_queue_number_send_per_time']);
     $target="mails_sent:".$result['mails_sent'];
-    if ($result['mails_errors']>0) $target.=", mail_errors:".$result['mails_errors'];
-    if ($result['mails_invmails_not_sent']>0) $target.=", invmail_not_sent_empty_sesslist:".$result['mails_invmails_not_sent'];
+    if ($result['mails_errors']>0) {
+        $target.=", mail_errors:".$result['mails_errors'];
+    }
+    if ($result['mails_invmails_not_sent']>0) {
+        $target.=", invmail_not_sent_empty_sesslist:".$result['mails_invmails_not_sent'];
+    }
     return $target;
 }
 
 function cron__retrieve_emails() {
     global $settings;
     if ($settings['enable_email_module']=='y') {
-        $result=email__retrieve_incoming();
+        try {
+            $result=email__retrieve_incoming();
+        } catch (Throwable $e) {
+            if (php_sapi_name()=="cli") {
+                throw $e;
+            }
+            return "email_errors: ".$e->getMessage();
+        }
         $target="mails_retrieved:".$result['count'];
-        if (isset($result['errors']) && count($result['errors'])>0) $target.=", email_errors: ".implode(", ",$result['errors']);
+        if (isset($result['errors']) && count($result['errors'])>0) {
+            $target.=", email_errors: ".implode(", ",$result['errors']);
+        }
     } else {
         $target="Email module not enabled. No mails retrieved.";
     }
@@ -201,13 +259,13 @@ function cron__retrieve_emails() {
 }
 
 function cron__send_experiment_calendar() {
-        $target=experimentmail__send_calendar();
-        return $target;
+    $target=experimentmail__send_calendar();
+    return $target;
 }
 
 function cron__send_participant_statistics() {
-        $target=experimentmail__send_participant_statistics();
-        return $target;
+    $target=experimentmail__send_participant_statistics();
+    return $target;
 }
 
 function cron__apply_permanent_queries() {
@@ -220,7 +278,7 @@ function cron__run_webalizer() {
     global $settings, $settings__root_to_server, $settings__root_directory, $settings__server_url, $lang;
     // set webalizer vars
     $web['log_file']=$settings['http_log_file_location'];
-//  $web['output_dir']=$settings__root_to_server.$settings__root_directory."/usage";
+    //  $web['output_dir']=$settings__root_to_server.$settings__root_directory."/usage";
     $web['output_dir']="../usage";
     $web['report_title']=lang('usage_statistics_for');
     $web['host_name']=$settings__server_url;
@@ -230,9 +288,9 @@ function cron__run_webalizer() {
 
     // load webalizer template
     $filename = $web['output_dir']."/webalizer.template";
-    $handle = fopen ($filename, "rb");
-    $template = fread ($handle, filesize ($filename));
-    fclose ($handle);
+    $handle = fopen($filename, "rb");
+    $template = fread($handle, filesize($filename));
+    fclose($handle);
 
     // process webalizer template with vars
     $conffile=process_mail_template($template,$web);
@@ -240,13 +298,13 @@ function cron__run_webalizer() {
     // write webalizer.conf
     $filename = $web['output_dir']."/webalizer.conf";
     if (!$handle = fopen($filename, "w+b")) {
-            print "Cannot open $filename\n";
-            exit;
-        }
+        print "Cannot open $filename\n";
+        exit;
+    }
     if (!fwrite($handle, $conffile)) {
-            print "Cannot write to $filename\n";
-             exit;
-        }
+        print "Cannot write to $filename\n";
+        exit;
+    }
     fclose($handle);
 
     // run webalizer
@@ -296,12 +354,12 @@ function cron__update_participants_history() {
     $logm.="updated participant's number_reg: ".$n."\n";
 
     $noshow_clause=expregister__get_pstatus_query_snippet("noshow");
-    
+
     $restrict_date_clause="";
     if ($settings['restrict_noshow_warnings_to_date']=='y' && $settings['restrict_noshow_warnings_date']>0) {
         $restrict_date_clause=" AND ".table('sessions').".session_start > ".$settings['restrict_noshow_warnings_date']." ";
-    } 
-    
+    }
+
     $query="SELECT ".table('participate_at').".participant_id,
             count(*) as number_noshowup
             FROM ".table('participate_at').", ".table('sessions').", ".table('experiments')."
@@ -395,9 +453,15 @@ function cron__check_for_session_reminders() {
             }
             $done2=experimentmail__set_reminder_checked($line['session_id']);
             $mess.="found session ".session__build_name($line,$settings['admin_standard_language'])."\n";
-            if ($number >=0) $mess.="send ".$number." mails to mail queue\n";
-            if ($disclaimer) $mess.=$disclaimer."\n";
-            if ($done) $mess.="sent notice to experimenter\n";
+            if ($number >=0) {
+                $mess.="send ".$number." mails to mail queue\n";
+            }
+            if ($disclaimer) {
+                $mess.=$disclaimer."\n";
+            }
+            if ($done) {
+                $mess.="sent notice to experimenter\n";
+            }
         }
     }
     return $mess;
@@ -418,8 +482,8 @@ function cron__check_for_noshow_warnings() {
     while ($line=pdo_fetch_assoc($result)) {
         $mess.="found session ".session__build_name($line,$settings['admin_standard_language'])."\n";
         if ($settings['send_noshow_warnings']=='y') {
-        $number=experimentmail__send_noshow_warnings_to_queue($line);
-                $mess.="sent ".$number." noshow warnings\n";
+            $number=experimentmail__send_noshow_warnings_to_queue($line);
+            $mess.="sent ".$number." noshow warnings\n";
         }
         $done2=experimentmail__set_noshow_warnings_checked($line['session_id']);
     }
@@ -436,14 +500,21 @@ function cron__check_for_participant_exclusion() {
                 AND number_noshowup >= '".$settings['automatic_exclusion_noshows']."'";
         $result=or_query($query);
 
-        $excluded=0; $informed=0;
+        $excluded=0;
+        $informed=0;
         while ($line=pdo_fetch_assoc($result)) {
             $done=participant__exclude_participant($line);
-            if ($done=='informed') $informed++;
+            if ($done=='informed') {
+                $informed++;
+            }
             $excluded++;
         }
-        if ($excluded>0) $mess.="participants excluded: ".$excluded;
-        if ($informed>0) $mess.="\nparticipants informed: ".$informed;
+        if ($excluded>0) {
+            $mess.="participants excluded: ".$excluded;
+        }
+        if ($informed>0) {
+            $mess.="\nparticipants informed: ".$informed;
+        }
     }
     return $mess;
 }

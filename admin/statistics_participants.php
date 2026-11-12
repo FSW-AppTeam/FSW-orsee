@@ -1,16 +1,15 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-
 $menu__area="statistics";
 $title="subject_pool_statistics";
 include("header.php");
+
 if ($proceed) {
     $allow=check_allow('statistics_participants_show','statistics_main.php');
 }
 
 if ($proceed) {
-
     if (isset($_REQUEST['all']) && $_REQUEST['all']) {
         $all=true;
         $title_add=lang('for_all_profiles_in_database');
@@ -27,85 +26,108 @@ if ($proceed) {
         foreach ($posted as $s=>$valarr) {
             if (is_array($valarr)) {
                 foreach ($valarr as $k=>$v) {
-                    if ($v=='y') $restrict[$s][$k]=true;
+                    if ($v=='y') {
+                        $restrict[$s][$k]=true;
+                    }
                 }
             }
         }
     }
 
-    if ($all) $condition=array();
-    else $condition=array('clause'=>participant_status__get_pquery_snippet('eligible_for_experiments'),
-                    'pars'=>array()
-                    );
+    if ($all) {
+        $condition=array();
+    } else {
+        $condition=array('clause'=>participant_status__get_pquery_snippet('eligible_for_experiments'),
+                        'pars'=>array()
+                        );
+    }
     $stats_data=stats__get_data($condition,'stats',$restrict);
     $_SESSION['stats_data']=$stats_data;
 
-    echo '<center>';
+    echo '<div class="orsee-options-list-panel">';
 
     if ($browsable) {
-        echo '<FORM action="'.thisdoc().'" METHOD="GET">';
+        echo '<FORM id="orsee-stats-filter-form" action="'.thisdoc().'" METHOD="GET">';
         echo '<INPUT type="hidden" name="all" value="'.urlencode($all).'">';
     }
-    echo '<TABLE border=0 cellspacing="0" width="100%">';
-    echo '<TR><TD align="center">';
-    echo '<TABLE class="or_page_subtitle" style="background: '.$color['page_subtitle_background'].'; color: '.$color['page_subtitle_textcolor'].'"><TR><TD>
-            '.lang('subject_pool_statistics').' '.$title_add.'
-            </TD>';
-    echo '<TD>';
-    if ($all) {
-        echo '<P align="right">'.button_link(thisdoc(),lang('stats_show_for_active'),'dot-circle-o').'</p>';
-    } else {
-        echo '<P align="right">'.button_link(thisdoc().'?all=true',lang('stats_show_for_all'),'circle-o').'</p>';
-    }
-    echo '</TD>';
-    echo '</TR></TABLE>';
-    echo '  </TD></TR>';
 
-    if ($browsable) {
-        echo '<TR><TD align="center"><BR><INPUT class="button" type="submit" name="filter" value="'.lang('apply_filter').'"><BR></TD></TR>';
+    echo '<div class="orsee-panel orsee-option-section">';
+    echo '<div class="orsee-panel-title">';
+    echo '<div>'.$title_add.'</div>';
+    echo '<div class="orsee-panel-actions">';
+    if ($all) {
+        echo button_link(thisdoc(),lang('stats_show_for_active'),'dot-circle-o');
+    } else {
+        echo button_link(thisdoc().'?all=true',lang('stats_show_for_all'),'circle-o','','id="orsee-stats-show-all-btn"');
     }
+    echo '</div>';
+    echo '</div>';
+    if ($browsable) {
+        echo '<div class="orsee-options-actions-center orsee-stat-actions">';
+        echo '<button type="submit" class="button orsee-btn" name="filter" value="1">'.lang('apply_filter').'</button>';
+        echo '</div>';
+    }
+    echo '</div>';
 
     foreach ($stats_data as $k=>$table) {
-        if (isset($table['data']) && is_array($table['data']) && count($table['data'])>0) $show=true;
-        else $show=false;
+        if (isset($table['data']) && is_array($table['data']) && count($table['data'])>0) {
+            $show=true;
+        } else {
+            $show=false;
+        }
         if ($show) {
             $out=stats__stats_display_table($table,$browsable,$restrict);
-            echo '<TR><TD align="center">';
-            echo '<TABLE class="or_formtable" style="width: 90%">
-                    <TR><TD colspan="2">
-                        <TABLE width="100%" border=0 class="or_panel_title"><TR>
-                            <TD style="background: '.$color['panel_title_background'].'; color: '.$color['panel_title_textcolor'].'" align="center">
-                            '.$table['title'].'
-                            </TD>
-                        </TR></TABLE>
-                    </TD></TR>';
+            echo '<div class="orsee-panel orsee-option-section">';
+            echo '<div class="orsee-panel-title"><div>'.$table['title'].'</div></div>';
             if ($table['charttype']=='none') {
-                echo '<TR>';
-                echo '<TD colspan="2" valign="top" align="center">
-                            <TABLE width="50%"><R><TD>'.$out.'</TD></TR></TABLE></TD>';
-                echo '</TR>';
+                echo '<div style="width: min(100%, 860px); margin: 0 auto;">'.$out.'</div>';
             } else {
-                echo '<TR>';
-                echo '<TD valign="top" align="left" style="width: 50%">'.$out.'</TD>';
-                echo '<TD valign="top" align="center" style="width: 50%">';
-                echo '<img border="0" src="statistics_graph.php?stype='.$k.'">';
-                echo '</td>';
-                echo '</TR>';
+                echo '<div class="orsee-panel-split">';
+                echo '<div class="orsee-panel-split-main">'.$out.'</div>';
+                echo '<div class="orsee-panel-split-actions" style="text-align: center;">';
+                echo '<img border="0" src="statistics_graph.php?stype='.$k.'" style="max-width: 100%; height: auto;">';
+                echo '</div>';
+                echo '</div>';
             }
-            echo '</TABLE>';
-            echo '<BR><BR>';
-            echo '</TD><TR>';
+            echo '</div>';
         }
     }
-    echo '</TABLE>';
+
     if ($browsable) {
-        echo '<BR><BR><INPUT class="button" type="submit" name="filter" value="'.lang('apply_filter').'"><BR><BR>';
+        echo '<div class="orsee-options-actions-center orsee-stat-actions">';
+        echo '<button type="submit" class="button orsee-btn" name="filter" value="1">'.lang('apply_filter').'</button>';
+        echo '</div>';
         echo '</FORM>';
+        echo '<script type="text/javascript">
+            (function() {
+                // keep GET URLs short: submit only active (y) restrictions
+                var form=document.getElementById("orsee-stats-filter-form");
+                if (!form) return;
+                form.addEventListener("submit",function(ev) {
+                    ev.preventDefault();
+                    var fd=new FormData(form);
+                    if (ev.submitter && ev.submitter.name) {
+                        fd.append(ev.submitter.name, ev.submitter.value);
+                    }
+                    var params=new URLSearchParams();
+                    fd.forEach(function(value,key) {
+                        if (key.indexOf("restrict[")===0 && value==="n") return;
+                        params.append(key,value);
+                    });
+                    var target=form.action;
+                    var qs=params.toString();
+                    if (qs!=="") target+="?"+qs;
+                    window.location.assign(target);
+                });
+            })();
+            </script>';
     }
 
-    echo '<BR><BR><A href="statistics_main.php">'.icon('back').' '.lang('back').'</A><BR><BR>';
-    echo '</center>';
-
+    echo '<div class="orsee-stat-actions">';
+    echo button_back('statistics_main.php');
+    echo '</div>';
+    echo '</div>';
 }
 include("footer.php");
+
 ?>

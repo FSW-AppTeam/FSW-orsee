@@ -1,29 +1,41 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-
 $menu__area="options";
 $title="delete_participation_status";
-include ("header.php");
+include("header.php");
+
 if ($proceed) {
-    if (isset($_REQUEST['pstatus_id'])) $pstatus_id=$_REQUEST['pstatus_id']; else $pstatus_id="";
+    if (isset($_REQUEST['pstatus_id'])) {
+        $pstatus_id=$_REQUEST['pstatus_id'];
+    } else {
+        $pstatus_id="";
+    }
     if ($pstatus_id!='' && $pstatus_id==0) {
-        redirect ('admin/participation_status_edit.php?pstatus_id='.$pstatus_id);
-    } elseif (!$pstatus_id) redirect ('admin/participation_status_main.php');
+        redirect('admin/participation_status_edit.php?pstatus_id='.$pstatus_id);
+    } elseif (!$pstatus_id) {
+        redirect('admin/participation_status_main.php');
+    }
 }
 if ($proceed) {
     $pstatus=orsee_db_load_array("participation_statuses",$pstatus_id,"pstatus_id");
-    if (!isset($pstatus['pstatus_id'])) redirect ('admin/participation_status_main.php');
+    if (!isset($pstatus['pstatus_id'])) {
+        redirect('admin/participation_status_main.php');
+    }
 }
 
 if ($proceed) {
-    if (isset($_REQUEST['betternot']) && $_REQUEST['betternot'])
-        redirect ('admin/participation_status_edit.php?pstatus_id='.$pstatus_id);
+    if (isset($_REQUEST['betternot']) && $_REQUEST['betternot']) {
+        redirect('admin/participation_status_edit.php?pstatus_id='.$pstatus_id);
+    }
 }
 
 if ($proceed) {
-    if (isset($_REQUEST['reallydelete']) && $_REQUEST['reallydelete']) $reallydelete=true;
-        else $reallydelete=false;
+    if (isset($_REQUEST['reallydelete']) && $_REQUEST['reallydelete']) {
+        $reallydelete=true;
+    } else {
+        $reallydelete=false;
+    }
     $allow=check_allow('participationstatus_delete','participation_status_edit.php?pstatus_id='.$pstatus_id);
 }
 
@@ -45,12 +57,12 @@ if ($proceed) {
 
     if ($reallydelete) {
         if (!csrf__validate_request_message()) {
-            redirect ('admin/participation_status_delete.php?pstatus_id='.$pstatus_id);
+            redirect('admin/participation_status_delete.php?pstatus_id='.$pstatus_id);
         }
 
         $participation_statuses=expregister__get_participation_statuses();
         if (!isset($_REQUEST['merge_with']) || !isset($participation_statuses[$_REQUEST['merge_with']])) {
-            redirect ('admin/participation_status_delete.php?pstatus_id='.$pstatus_id);
+            redirect('admin/participation_status_delete.php?pstatus_id='.$pstatus_id);
         } else {
             $merge_with=$_REQUEST['merge_with'];
 
@@ -80,56 +92,46 @@ if ($proceed) {
 
             log__admin("participation_status_delete","pstatus:".$pstatus_internal_name[lang('lang')].' ('.$pstatus['pstatus_id']."), ".
                         "merged_to:".$participation_statuses[$merge_with]['internal_name'].' ('.$merge_with.")");
-            message (lang('participation_status_deleted_part_moved_to').' "'.$participation_statuses[$merge_with]['internal_name'].'".');
-            redirect ("admin/participation_status_main.php");
+            message(lang('participation_status_deleted_part_moved_to').' "'.$participation_statuses[$merge_with]['internal_name'].'".');
+            redirect("admin/participation_status_main.php");
         }
     }
 }
 
 if ($proceed) {
-        // form
+    // form
 
-        echo '  <CENTER>
-                <FORM action="participation_status_delete.php" method="POST">
-                <INPUT type="hidden" name="pstatus_id" value="'.$pstatus_id.'">
-                '.csrf__field().'
-
-                <TABLE class="or_formtable">
-                    <TR><TD colspan="2">
-                        <TABLE width="100%" border=0 class="or_panel_title"><TR>
-                                <TD style="background: '.$color['panel_title_background'].'; color: '.$color['panel_title_textcolor'].'" align="center">
-                                    '.lang('delete_participation_status').' "'.$pstatus_internal_name[lang('lang')].'"
-                                </TD>
-                        </TR></TABLE>
-                    </TD></TR>
-                    <TR>
-                        <TD colspan=2>
-                                '.lang('really_delete_participation_status?').'<BR><BR>';
-            dump_array($pstatus);
-            echo '
-                        </TD>
-                    </TR>';
-
-            $pstatus_internal_names=lang__load_lang_cat('participation_status_internal_name');
-
-            echo '
-                        <TR>
-                            <TD align=left colspan=2>
-                            <INPUT class="button" type=submit name=reallydelete value="'.lang('yes_delete').'">
-                    <BR>
-                    '.lang('merge_participation_status_with').'
-                    '.expregister__participation_status_select_field('merge_with','',array($pstatus_id)).'
-                    </TD></TR>
-                <TR>
-                                <TD align=center colspan=2><BR><BR>
-                                <INPUT class="button" type=submit name=betternot value="'.lang('no_sorry').'">
-                                </TD>
-                        </TR>
-                </TABLE>
-
-                </FORM>
-                </center>';
-
+    echo '<div class="orsee-panel orsee-form-shell">
+                <div class="orsee-panel-title">'.lang('delete_participation_status').'</div>
+                <div class="orsee-content">
+                    <div class="orsee-callout orsee-message-box orsee-callout-warning">'.lang('really_delete_participation_status?').'</div>
+                    <div class="field">
+                        <label class="label">'.lang('id').'</label>
+                        <div><span class="orsee-dense-id-tag">'.htmlspecialchars($pstatus['pstatus_id']).'</span></div>
+                    </div>
+                    <div class="field">
+                        <label class="label">'.lang('name').'</label>
+                        <div>'.htmlspecialchars($pstatus_internal_name[lang('lang')]).'</div>
+                    </div>
+                    <form action="participation_status_delete.php" method="POST">
+                        <input type="hidden" name="pstatus_id" value="'.$pstatus_id.'">
+                        '.csrf__field().'
+                        <div class="field">
+                            <label class="label">'.lang('merge_participation_status_with').'</label>
+                            <div><span class="select is-primary">'.expregister__participation_status_select_field('merge_with','',array($pstatus_id)).'</span></div>
+                        </div>
+                        <div class="field orsee-form-row-grid orsee-form-row-grid--2" style="align-items: center;">
+                            <div class="orsee-form-row-col">
+                                <button class="button orsee-btn orsee-btn--delete" type="submit" name="reallydelete" value="1"><i class="fa fa-check-square"></i> '.lang('yes_delete').'</button>
+                            </div>
+                            <div class="orsee-form-row-col has-text-right">
+                                <button class="button orsee-btn" type="submit" name="betternot" value="1"><i class="fa fa-undo"></i> '.lang('no_sorry').'</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>';
 }
-include ("footer.php");
+include("footer.php");
+
 ?>

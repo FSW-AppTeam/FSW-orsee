@@ -1,0 +1,93 @@
+/* part of orsee. see orsee.org */
+.orsee .orsee-fa-icon-selector {
+    position: relative;
+    display: inline-block;
+    width: max-content;
+    max-width: min(90vw, 36rem);
+}
+
+.orsee .orsee-fa-icon-selector-toggle {
+    width: max-content;
+    max-width: min(90vw, 36rem);
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.5rem;
+    background: var(--color-form-element-background);
+    padding: 0.45rem 0.7rem;
+}
+
+.orsee .orsee-fa-icon-selector-toggle-main {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.orsee .orsee-fa-icon-selector-preview {
+    display: inline-block;
+    width: 1.1rem;
+    margin-inline-end: 0.6rem;
+}
+
+.orsee .orsee-fa-icon-selector-arrow {
+    margin-inline-start: 0.7rem;
+}
+
+.orsee[dir="rtl"] .orsee-fa-icon-selector-arrow {
+    margin-inline-start: 1rem;
+}
+
+.orsee .orsee-fa-icon-selector-dropdown {
+    display: none;
+    position: absolute;
+    inset-inline-start: 0;
+    top: calc(100% + 0.35rem);
+    z-index: 1100;
+    width: max-content;
+    max-width: min(90vw, 36rem);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.5rem;
+    background: var(--color-form-element-background);
+    box-shadow: 0 8px 20px var(--color-shadow-1);
+}
+
+.orsee .orsee-fa-icon-selector.is-open .orsee-fa-icon-selector-dropdown {
+    display: block;
+}
+
+.orsee .orsee-fa-icon-selector-dropdown-inner {
+    padding: 0.6rem;
+}
+
+.orsee .orsee-fa-icon-selector-list {
+    max-height: 18rem;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.4rem;
+    width: max-content;
+    max-width: 100%;
+}
+
+.orsee .orsee-fa-icon-selector-option {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.35rem 0.55rem;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.orsee .orsee-fa-icon-selector-option:hover,
+.orsee .orsee-fa-icon-selector-option.is-selected {
+    background: var(--color-list-shade1);
+}
+
+.orsee .orsee-fa-icon-selector-option-icon {
+    display: inline-block;
+    width: 1.1rem;
+    margin-inline-end: 0.6rem;
+}

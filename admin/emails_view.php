@@ -1,35 +1,46 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-
 $menu__area="emails";
 $title="view email";
-$jquery=array('popup','arraypicker','textext','switchy');
-
-if (isset($_REQUEST['hide_header']) && $_REQUEST['hide_header']) $hide_header=true; else $hide_header=false;
-if ($hide_header) {
-    include ("nonoutputheader.php");
-    html__header();
-    echo '<basefont face="Arial,Helvetica,sans-serif"><center><BR>';
-    echo '<TABLE width="90%" border="0"><TR><TD style="border-radius: 20px 20px 20px 20px; background: '.$color['content_background_color'].';"><BR>';
+$js_modules=array('switchy');
+if (isset($_REQUEST['hide_header']) && $_REQUEST['hide_header']) {
+    $hide_header=true;
 } else {
-    include ("header.php");
+    $hide_header=false;
+}
+if ($hide_header) {
+    include("nonoutputheader.php");
+    html__header();
+    echo '<div class="orsee"><div class="orsee-panel" style="width: 90%; margin: 1rem auto;"><div class="orsee-content">';
+} else {
+    include("header.php");
 }
 if ($proceed) {
-    if ($settings['enable_email_module']!='y') redirect ('admin/index.php');
+    if ($settings['enable_email_module']!='y') {
+        redirect('admin/index.php');
+    }
 }
 if ($proceed) {
     //$allow=check_allow('emails_show_all','emails_main.php');
 }
 
 if ($proceed) {
-    if (isset($_REQUEST['message_id']) && $_REQUEST['message_id']) $message_id=$_REQUEST['message_id']; else $message_id='';
-    if (!$message_id) redirect('admin/emails_main.php');
+    if (isset($_REQUEST['message_id']) && $_REQUEST['message_id']) {
+        $message_id=$_REQUEST['message_id'];
+    } else {
+        $message_id='';
+    }
+    if (!$message_id) {
+        redirect('admin/emails_main.php');
+    }
 }
 
 if ($proceed) {
     $email=orsee_db_load_array("emails",$message_id,"message_id");
-    if (!isset($email['message_id'])) redirect('admin/emails_main.php');
+    if (!isset($email['message_id'])) {
+        redirect('admin/emails_main.php');
+    }
 }
 
 if ($proceed) {
@@ -43,9 +54,12 @@ if ($proceed) {
         $action='delete';
     } elseif (isset($_REQUEST['undelete']) && $_REQUEST['undelete']) {
         $action='undelete';
-    } else $action=false;
+    } else {
+        $action=false;
+    }
 
-    $open_reply=false; $open_note=false;
+    $open_reply=false;
+    $open_note=false;
     // show email or perform an action
     if ($action) {
         if (!csrf__validate_request_message()) {
@@ -83,25 +97,29 @@ if ($proceed) {
                 break;
             default:
         }
-        if ($redirect) redirect($redirect);
+        if ($redirect) {
+            redirect($redirect);
+        }
     }
 }
 
 if ($proceed) {
     // show email
-    echo '<BR><BR><center><TABLE width="80%" border=0><TR><TD align="center">';
+    if (!$hide_header) {
+        echo '<div class="orsee-panel"><div class="orsee-content">';
+    }
     email__show_email($email,$open_reply,$open_note);
-    echo '</td></tr></table>';
-    echo '<br><br</center>';
+    if (!$hide_header) {
+        echo '</div></div>';
+    }
 }
 
 if ($hide_header) {
-    echo '<BR><BR><BR><BR>';
     debug_output();
-    echo '</TD></TR><TABLE></center><BR>';
+    echo '</div></div></div>';
     html__footer();
 } else {
-    include ("footer.php");
+    include("footer.php");
 }
 if ($hide_header) {
     echo str_ireplace("href=", "target=\"_parent\" href=", ob_get_clean());

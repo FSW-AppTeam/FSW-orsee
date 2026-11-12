@@ -1,0 +1,4401 @@
+/* part of orsee. see orsee.org */
+/* =============================================================================
+   ORSEE CORE CSS (SHARED, USUALLY NOT STYLE-CUSTOMIZED)
+   1) Messaging, overlays, toasts, modals
+   2) Buttons, controls, forms, pickers
+   3) Content containers, options pages, admin/public flow layouts
+   4) Tables, dense lists, query/listtool, logs, email module components
+   5) Calendar/session UI, richtext, FAQ/content shells
+   6) Responsive + print adaptations
+   ============================================================================= */
+/* ==================== CUSTOMIZATION SURFACE: CALLOUTS / MESSAGES / TOAST BASE ==================== */
+/* Used in admin + public; visual system-level messaging styles. */
+.orsee-callout-notice {
+    --color-callout-accent: var(--color-message-border-note);
+}
+
+.orsee-callout-warning {
+    --color-callout-accent: var(--color-message-border-warning);
+}
+
+.orsee-callout-error {
+    --color-callout-accent: var(--color-message-border-error);
+}
+
+.orsee-message-box {
+    --color-callout-border: var(--color-callout-accent);
+    --color-callout-background: color-mix(in srgb, var(--color-callout-accent) 16%, var(--color-message-background));
+    --color-callout-text: color-mix(in srgb, var(--color-callout-accent) 60%, var(--color-message-text));
+    background: var(--color-callout-background);
+    color: var(--color-callout-text);
+    width: min(95%, 1220px);
+    margin: 0.3rem auto 0.9rem auto;
+    padding: 0.72rem 0.72rem 0.58rem;
+    position: relative;
+    overflow: visible;
+    border: 1.2px solid var(--color-callout-border);
+    border-radius: 0.5rem;
+    box-shadow:
+        0 0 0 1px var(--color-inset-highlight-soft) inset,
+        0 0 7px color-mix(in srgb, var(--color-callout-border) 24%, transparent) inset,
+        0 6px 16px var(--color-shadow-1);
+}
+
+.orsee-message-box::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    border: 1px solid color-mix(in srgb, var(--color-callout-border) 72%, var(--color-mix-anchor-light));
+    filter: blur(2px);
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.orsee-message-box-title {
+    font-size: var(--font-size-compact);
+    color: var(--color-callout-border);
+    margin: 0;
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0.76rem;
+    transform: translateY(-100%);
+    background: transparent;
+    padding: 0 0.05rem;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-shadow:
+        0 0 2px var(--color-inset-highlight-strong),
+        0 0 4px var(--color-inset-highlight-strong),
+        0 1px 0 var(--color-inset-highlight-strong);
+}
+
+.orsee-message-box-body {
+    font-size: var(--font-size-ui-base);
+    line-height: 1.25;
+    text-align: start;
+}
+
+/* ==================== PUBLIC MESSAGE HOSTS (INLINE + TOAST) ==================== */
+.orsee #orsee-public-message-host {
+    position: relative;
+    z-index: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    pointer-events: auto;
+    padding: 0;
+}
+
+.orsee .orsee-public-inline-message-buffer {
+    display: none;
+}
+
+.orsee #orsee-public-toast-host {
+    position: fixed;
+    top: 64px;
+    inset-inline: 0;
+    z-index: 1320;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    pointer-events: none;
+    padding: 0.4rem 0.35rem 0;
+}
+
+.orsee #orsee-public-toast-host .orsee-public-toast {
+    width: min(92vw, 36rem);
+    margin: 0;
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+        opacity 220ms ease,
+        transform 220ms ease;
+}
+
+.orsee #orsee-public-toast-host .orsee-public-toast-hide {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+/* ==================== CUSTOMIZATION SURFACE: BUTTON SYSTEM (ADMIN + PUBLIC, ALL VIEWPORTS) ==================== */
+/* Primary/compact/delete button skins used throughout ORSEE and in action bars. */
+.orsee .orsee-btn,
+.orsee .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    text-decoration: none;
+    border-radius: 9px;
+    border: 1px solid var(--color-button-action-border);
+    background: var(--color-button-action-background);
+    color: var(--color-button-action-text) !important;
+    font-family: var(--font-ui);
+    font-size: var(--font-size-button);
+    font-weight: var(--font-weight-button);
+    line-height: 1.2;
+    min-inline-size: calc(7ch + 1.28rem);
+    min-height: 1.75rem;
+    padding: 0.2rem 0.64rem;
+    margin: 0.35em;
+    text-shadow: none;
+    box-shadow:
+        0 0 0 1px var(--color-inset-highlight-soft) inset,
+        0 1px 2px var(--color-shadow-2);
+    transition:
+        background 0.12s ease,
+        box-shadow 0.12s ease,
+        transform 0.08s ease;
+}
+
+.orsee .orsee-btn:link,
+.orsee .orsee-btn:visited,
+.orsee .orsee-btn:active,
+.orsee .button:link,
+.orsee .button:visited,
+.orsee .button:active {
+    color: var(--color-button-action-text) !important;
+}
+
+.orsee .orsee-btn:hover,
+.orsee .button:hover {
+    background: var(--color-button-action-hover-background);
+    border-color: var(--color-button-action-border);
+    color: var(--color-button-action-text) !important;
+    text-decoration: none;
+    box-shadow:
+        0 0 0 1px var(--color-inset-highlight-strong) inset,
+        0 3px 8px var(--color-shadow-3);
+}
+
+.orsee .orsee-btn:focus,
+.orsee .button:focus {
+    outline: 2px solid var(--color-form-element-focus-border);
+    outline-offset: 2px;
+}
+
+.orsee .orsee-btn:active,
+.orsee .button:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 0 1px var(--color-inset-highlight-soft) inset;
+}
+
+.orsee .orsee-btn-compact,
+.orsee .button.orsee-btn-compact {
+    font-size: var(--font-size-compact);
+    min-inline-size: calc(5ch + 0.9rem);
+    min-height: 1.45rem;
+    padding: 0.12rem 0.46rem;
+    border-radius: 8px;
+}
+
+.orsee .orsee-btn--delete,
+.orsee .button.orsee-btn--delete {
+    border-color: var(--color-button-delete-border);
+    background: var(--color-button-delete-background);
+    color: var(--color-button-delete-text) !important;
+    text-shadow: none;
+    box-shadow:
+        0 0 0 1px var(--color-inset-highlight-strong) inset,
+        0 1px 2px var(--color-shadow-2);
+}
+
+.orsee .orsee-btn--delete:hover,
+.orsee .button.orsee-btn--delete:hover {
+    background: var(--color-button-delete-background);
+    box-shadow:
+        0 0 0 1px var(--color-inset-highlight-strong) inset,
+        0 2px 5px var(--color-shadow-3);
+}
+
+/* ==================== MODAL SHELL (ADMIN + PUBLIC, ALL VIEWPORTS) ==================== */
+/* Shared iframe modal frame and modal card/header/footer wiring. */
+.orsee-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 4000;
+}
+
+.orsee .modal-background {
+    background-color: var(--color-modal-overlay-scrim);
+    backdrop-filter: blur(8px) saturate(105%);
+    -webkit-backdrop-filter: blur(8px) saturate(105%);
+}
+
+.orsee-modal .modal-card {
+    width: min(90vw, var(--orsee-modal-max-width, 1200px));
+    max-width: 90vw;
+    max-height: calc(100vh - 2.5rem);
+    margin: 1.25rem auto;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: var(--color-content-background-color);
+}
+
+.orsee-modal .modal-card-head.orsee-panel-title,
+.orsee-modal .modal-card-foot.orsee-panel-title {
+    margin: 0;
+}
+
+.orsee-modal .modal-card-head.orsee-panel-title {
+    border-bottom: 0;
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.orsee-modal .modal-card-foot.orsee-panel-title {
+    border-top: 0;
+    border-radius: 0 0 0.75rem 0.75rem;
+}
+
+.orsee-modal .modal-card-foot .orsee-btn,
+.orsee-modal .modal-card-foot .button {
+    margin: 0;
+}
+
+.orsee-modal .modal-card-title {
+    color: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    line-height: 1.1;
+}
+
+.orsee-modal .modal-card-head .delete {
+    --bulma-delete-background-l: 100%;
+    --bulma-delete-background-alpha: 1;
+    --bulma-delete-color: var(--color-button-action-text);
+    background: var(--color-button-action-background);
+    border: 1px solid var(--color-button-action-border);
+    box-shadow:
+        0 0 0 1px var(--color-inset-highlight-soft) inset,
+        0 1px 2px var(--color-shadow-2);
+}
+
+.orsee-modal .modal-card-head .delete:hover {
+    background: var(--color-button-action-hover-background);
+    border-color: var(--color-button-action-border);
+}
+
+.orsee-modal-body {
+    position: relative;
+    background: var(--color-content-background-color);
+}
+
+.orsee-modal-loader {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-content-background-color);
+    z-index: 2;
+}
+
+.orsee-modal--participant-edit .modal-card-body {
+    padding: 0.35rem;
+    min-height: 70vh;
+    height: calc(100vh - 14rem);
+}
+
+.orsee-modal .orsee-modal-frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--color-content-background-color);
+}
+
+.orsee-modal--participant-edit .orsee-modal-frame {
+    min-height: 20rem;
+}
+
+/* ==================== PUBLIC PAGEBAR (MOBILE-ONLY DISPLAY) ==================== */
+/* Hidden by default; enabled in the <=740px public media block. */
+.orsee.orsee-area-public .orsee-public-pagebar {
+    display: none;
+}
+
+.orsee.orsee-area-public .orsee-public-supportline {
+    font-family: var(--font-ui);
+    font-size: var(--font-size-compact);
+    font-weight: var(--font-weight-ui);
+}
+
+/* ==================== CONTENT CONTAINERS (ADMIN + PUBLIC, ALL VIEWPORTS) ==================== */
+/* Base containers for page content blocks and panel shells. */
+.orsee-content {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.orsee-panel {
+    background: var(--color-content-background-color);
+    border-radius: var(--orsee-radius);
+    padding: var(--orsee-gap);
+    border: 1px solid var(--color-border-soft);
+    box-shadow:
+        0 18px 38px var(--color-shadow-2),
+        0 0 0 1px var(--color-inset-highlight-strong) inset;
+    backdrop-filter: blur(8px) saturate(108%);
+    -webkit-backdrop-filter: blur(8px) saturate(108%);
+}
+
+.orsee-content > .orsee-panel + .orsee-panel {
+    margin-top: var(--orsee-gap);
+}
+
+.orsee-content > .orsee-panel + form,
+.orsee-content > form + .orsee-panel {
+    margin-top: var(--orsee-gap);
+}
+
+.orsee-content > form > .orsee-panel + .orsee-panel {
+    margin-top: var(--orsee-gap);
+}
+
+.orsee-panel-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0 0 0.75rem;
+    padding: 0.35rem 0.55rem;
+    border: 1px solid color-mix(in srgb, var(--color-panel-title-background) 72%, var(--color-mix-anchor-dark));
+    border-radius: 0.75rem;
+    background: var(--color-panel-title-background);
+    color: var(--color-panel-title-text);
+    font-family: var(--font-title);
+    font-weight: var(--font-weight-title);
+    font-size: 1.2rem;
+}
+
+.orsee-panel-title .orsee-panel-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+}
+
+.orsee .orsee-panel-title a,
+.orsee .orsee-panel-title a:link,
+.orsee .orsee-panel-title a:visited,
+.orsee .orsee-panel-title a:active {
+    color: var(--color-panel-title-text);
+    text-decoration: none;
+}
+
+.orsee .orsee-panel-title a:hover:not(.orsee-btn):not(.button) {
+    color: var(--color-panel-title-text);
+    text-decoration: underline;
+}
+
+.orsee .orsee-panel-title .orsee-btn:hover,
+.orsee .orsee-panel-title .button:hover {
+    text-decoration: none;
+    box-shadow:
+        0 0 0 1px var(--color-inset-highlight-strong) inset,
+        0 0 0 1px color-mix(in srgb, var(--color-panel-title-text) 22%, transparent),
+        0 3px 8px var(--color-shadow-3);
+    transform: translateY(-1px);
+}
+
+/* ==================== CALENDAR + FILTER LAYOUT (ADMIN + PUBLIC, ALL VIEWPORTS) ==================== */
+/* Calendar grids and filter-form structure outside mobile overrides. */
+.orsee-filter {
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    margin-bottom: 0;
+    background: transparent;
+}
+
+.orsee-calendar {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.orsee-calendar-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 0.5rem;
+    margin-bottom: 0.55rem;
+}
+
+.orsee-calendar-toolbar-left {
+    text-align: start;
+}
+
+.orsee-calendar-toolbar-center {
+    text-align: center;
+}
+
+.orsee-calendar-toolbar-center .orsee-font-compact {
+    display: block;
+    margin-top: 0.16rem;
+    max-width: 18rem;
+    margin-inline: auto;
+    white-space: normal;
+    line-height: 1.2;
+    font-family: var(--font-ui);
+    font-size: var(--font-size-compact);
+    font-weight: var(--font-weight-ui);
+}
+
+.orsee-calendar-toolbar-right {
+    text-align: end;
+}
+
+.orsee-calendar-labs {
+    font-size: var(--font-size-compact);
+}
+
+.orsee-calendar-month {
+    margin: 0 0 1.1rem 0;
+}
+
+.orsee-calendar-month-head {
+    display: grid;
+    grid-template-columns: 1.4rem 1fr 1.4rem;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    text-align: center;
+    line-height: 1.1;
+    padding: 0.38rem 0.6rem;
+    border-radius: 0.65rem 0.65rem 0 0;
+}
+
+.orsee-calendar-month-title {
+    text-align: center;
+}
+
+.orsee-calendar-month-nav,
+.orsee-calendar-month-nav:link,
+.orsee-calendar-month-nav:visited,
+.orsee-calendar-month-nav:active {
+    color: var(--color-panel-title-text);
+    text-decoration: none;
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.orsee-calendar-month-nav i {
+    color: var(--color-panel-title-text);
+}
+
+.orsee-calendar-month-nav:hover {
+    text-decoration: none;
+    opacity: 0.86;
+}
+
+.orsee-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.orsee-calendar-weekday {
+    background: var(--color-panel-title-background);
+    color: var(--color-panel-title-text);
+    text-align: right;
+    font-weight: 700;
+    font-size: var(--font-size-ui-base);
+    padding-block-start: 0.12rem;
+    padding-block-end: 0.16rem;
+    padding-inline-start: 0.2rem;
+    padding-inline-end: 0.55rem;
+    border-top: 1px solid var(--color-border-soft);
+    border-inline-end: 1px solid var(--color-border);
+}
+
+.orsee-calendar-weekday:last-child {
+    border-inline-end: 0;
+}
+
+.orsee-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.orsee-calendar-day {
+    border: 1px solid var(--color-border);
+    min-height: 6.6rem;
+    background: var(--color-content-background-color);
+}
+
+.orsee-calendar-day.is-today {
+    border: 2px solid var(--color-calendar-today-frame);
+}
+
+.orsee-calendar-daynum {
+    background: var(--color-content-background-color);
+    text-align: right;
+    font-weight: 700;
+    font-size: var(--font-size-ui-base);
+    line-height: 1;
+    padding-block-start: 0.16rem;
+    padding-block-end: 0.12rem;
+    padding-inline-start: 0.2rem;
+    padding-inline-end: 0.35rem;
+}
+
+.orsee-calendar-day.is-empty .orsee-calendar-daynum {
+    color: transparent;
+}
+
+.orsee-calendar-daybody {
+    padding: 0.18rem 0.18rem 0.2rem;
+}
+
+.orsee-calendar-event {
+    --color-calendar-event-color: var(--color-calendar-entry-default-background);
+    margin: 0.12rem 0;
+    border-start-start-radius: 0.32rem;
+    border-start-end-radius: 0.86rem;
+    border-end-end-radius: 0.32rem;
+    border-end-start-radius: 0.32rem;
+    padding: 0.22rem 0.46rem 0.28rem;
+    font-size: var(--font-size-compact);
+    line-height: 1.2;
+    font-weight: 400;
+    background: color-mix(in srgb, var(--color-calendar-event-color) var(--color-calendar-entry-source-strength), var(--color-mix-anchor-dark));
+}
+
+.orsee-calendar-event.is-session .orsee-calendar-event-time,
+.orsee-calendar-event.is-session .orsee-calendar-event-title,
+.orsee-calendar-event.is-session .orsee-calendar-event-status {
+    font-weight: 700;
+}
+
+.orsee-calendar-event.is-reservation .orsee-calendar-event-time,
+.orsee-calendar-event.is-reservation .orsee-calendar-event-title {
+    font-weight: 700;
+}
+
+.orsee-calendar-event-title a,
+.orsee-calendar-event-title a:link,
+.orsee-calendar-event-title a:visited,
+.orsee-calendar-event-title a:active {
+    color: var(--color-body-link);
+    text-decoration: none;
+}
+
+.orsee-calendar-event-title a:hover {
+    text-decoration: underline;
+}
+
+.orsee-calendar-pill {
+    --color-calendar-pill-color: var(--color-calendar-entry-default-background);
+    display: none;
+    border: 0;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-calendar-pill-color) var(--color-calendar-entry-source-strength), var(--color-mix-anchor-dark));
+    margin: 0.09rem 0;
+    padding: 0.08rem 0.3rem;
+    align-items: center;
+    gap: 0.14rem;
+    font-family: var(--font-ui);
+    font-size: var(--font-size-tiny);
+    font-weight: 400;
+    line-height: 1;
+    text-decoration: none;
+    color: var(--color-body-text);
+    cursor: pointer;
+}
+
+.orsee-calendar-pill-time {
+    line-height: 1;
+    font-weight: 400;
+}
+
+.orsee-calendar-pill-dot {
+    width: 0.72rem;
+    height: 0.72rem;
+    border: 1px solid var(--color-border-strong);
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--color-calendar-pill-dot-color);
+}
+
+.orsee-filter-mobilebar {
+    display: none;
+}
+
+.orsee-filter-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.7rem;
+    margin: 0;
+}
+
+.orsee-filter-fields {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.orsee-filter-row {
+    display: grid;
+    grid-template-columns: minmax(170px, 240px) minmax(0, 1fr);
+    gap: 0.35rem 0.42rem;
+    align-items: start;
+    margin-bottom: 0.18rem;
+}
+
+.orsee-filter-row:last-child {
+    margin-bottom: 0;
+}
+
+.orsee-filter-label {
+    font-size: var(--font-size-compact);
+}
+
+.orsee-filter-actions {
+    flex: 0 0 auto;
+}
+
+/* ==================== FORM WRAPPERS + HEADER ID TAGS (ADMIN + PUBLIC, ALL VIEWPORTS) ==================== */
+/* Shared form-shell widths and dense ID badges used in edit/show pages. */
+.orsee-form-shell {
+    --orsee-form-row-gap: 0.75rem;
+    width: min(100%, 44rem);
+    margin: 0 auto;
+    padding-bottom: 1rem;
+}
+
+.orsee-form-shell--participant-edit {
+    width: min(100%, 60rem);
+}
+
+.orsee-dense-id {
+    text-align: start;
+    margin-bottom: 0.14rem;
+}
+
+.orsee-dense-id-tag {
+    display: inline-block;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.1rem 0.34rem;
+    border-radius: 0.28rem;
+    background: var(--color-list-shade2);
+    color: var(--color-body-text);
+    text-decoration: none;
+    border: 1px solid var(--color-border-strong);
+    user-select: all;
+    cursor: text;
+}
+
+.orsee-experiment-status-tag {
+    display: inline-block;
+    margin-inline-start: 0.32rem;
+    padding: 0.1rem 0.34rem;
+    border-radius: 0.28rem;
+    border: 1px solid transparent;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-panel-title-text);
+    text-decoration: none;
+}
+
+.orsee-experiment-status-tag--running {
+    background: var(--color-experiment-running);
+}
+
+.orsee-experiment-status-tag--completed {
+    background: var(--color-experiment-completed);
+}
+
+.orsee-dense-id-tag--verbatim {
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.orsee-form-experiment-id .orsee-dense-id-tag {
+    font-size: 9.4pt;
+    padding: 0.16rem 0.5rem;
+    border-radius: 0.34rem;
+}
+
+.orsee .orsee-input-text {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    display: inline-block;
+}
+
+.orsee .orsee-checkline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.44rem;
+}
+
+.orsee-inline-link {
+    margin-inline-start: 0.35rem;
+    text-decoration: underline;
+    font-size: var(--font-size-compact);
+}
+
+.orsee-ethics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.orsee-ethics-choice-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 0.42rem;
+    flex-wrap: wrap;
+}
+
+.orsee-form-actions {
+    margin-top: 1rem;
+    clear: both;
+}
+
+/* ==================== LOGIN PANELS (PUBLIC + ADMIN, ALL VIEWPORTS) ==================== */
+/* Shared login form shell/fields; responsive behavior comes from existing global media rules. */
+.orsee .orsee-login-panel {
+    width: min(96%, 460px);
+    margin: 0.55rem auto 1rem;
+    padding: 1rem 1rem 0.9rem;
+}
+
+.orsee .orsee-login-form .field {
+    margin-bottom: 0.8rem;
+}
+
+.orsee .orsee-login-form .label {
+    text-align: start;
+}
+
+.orsee .orsee-login-form .control .input {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+}
+
+.orsee .orsee-login-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.orsee .orsee-login-forgot {
+    text-align: center;
+    margin-top: 1.45rem;
+    font-size: var(--font-size-compact);
+    line-height: 1.35;
+    font-family: var(--font-ui);
+    font-weight: 400;
+}
+
+/* ==================== OPTIONS/SETTINGS PAGE COMPOSITION (ADMIN, ALL VIEWPORTS) ==================== */
+/* Surface-card rows, option labels/fields, and color/switch widgets used in options screens. */
+.orsee-options-actions-center {
+    display: flex;
+    justify-content: center;
+}
+
+.orsee-options-actions-end {
+    text-align: end;
+    margin-bottom: 0.42rem;
+}
+
+.orsee-options-list-panel,
+.orsee-stat-log-panel {
+    width: min(95%, 1220px);
+    margin: 0 auto;
+}
+
+.orsee-option-section + .orsee-option-section {
+    margin-top: 0.75rem;
+}
+
+.orsee-options-actions {
+    margin-top: 0.8rem;
+}
+
+.orsee-options-colors-style-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.3rem;
+}
+
+.orsee-options-colors-style-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+}
+
+.orsee-options-colors-style-form .label {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.orsee-options-edit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.42rem;
+}
+
+.orsee-surface-card {
+    border: 1px solid var(--color-border);
+    border-radius: 0.52rem;
+    background: var(--color-list-shade1);
+    padding: 0.08rem 0;
+}
+
+.orsee-preview-surface-card {
+    border: 2px dashed var(--color-body-text);
+    border-radius: 0.52rem;
+    background: transparent;
+}
+
+.orsee-option-item {
+    display: grid;
+    grid-template-columns: minmax(0, 54%) minmax(0, 46%);
+    align-items: center;
+    gap: 0.22rem 0.55rem;
+    border: 0;
+    border-bottom: 1px solid var(--color-border-soft);
+    border-radius: 0;
+    background: transparent;
+    padding: 0.3rem 0.48rem;
+}
+
+.orsee-surface-card .orsee-option-item:last-child {
+    border-bottom: 0;
+}
+
+.orsee-option-item .orsee-option-label {
+    font-size: 0.9rem;
+    color: var(--color-body-text);
+    min-width: 0;
+}
+
+.orsee-option-item .orsee-option-field {
+    min-width: 0;
+}
+
+.orsee-option-row-comment {
+    font-size: 0.92rem;
+    color: var(--color-body-text);
+    font-weight: 600;
+    margin-top: 0.14rem;
+}
+
+.orsee-option-divider-row {
+    display: none;
+}
+
+.orsee-option-divider {
+    margin: 0.1rem 0;
+    border: 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.orsee-option-control {
+    max-width: min(32rem, 100%);
+}
+
+.orsee-option-control.input,
+.orsee-option-control.textarea,
+.orsee-option-control {
+    border-color: var(--color-border-strong);
+    color: var(--color-body-text);
+    -webkit-text-fill-color: var(--color-body-text);
+    caret-color: var(--color-body-text);
+}
+
+.orsee-option-control.input {
+    width: auto;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.orsee-option-control.input:focus,
+.orsee-option-control.textarea:focus,
+.orsee-option-control:focus {
+    border-color: var(--color-form-element-focus-border);
+    box-shadow: var(--color-shadow-focus-ring);
+}
+
+.orsee input.colorpickerinput,
+.orsee input.colorpickerinput:focus {
+    width: 15ch;
+    min-width: 15ch;
+    height: 25px !important;
+    min-height: 25px !important;
+    line-height: 1.2 !important;
+    padding: 0 0.35rem !important;
+}
+
+.orsee .clr-picker {
+    z-index: 10050 !important;
+}
+
+.orsee .clr-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.4rem;
+    overflow: hidden;
+    background: var(--color-form-element-background);
+}
+
+.orsee .clr-field button {
+    width: 24px;
+    min-width: 24px;
+    height: 25px;
+    border: 0;
+    border-start-end-radius: 0.4rem;
+    border-end-end-radius: 0.4rem;
+}
+
+.orsee .clr-field input.colorpickerinput {
+    border: 0;
+    box-shadow: none;
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+    border-start-start-radius: 0.4rem;
+    border-end-start-radius: 0.4rem;
+}
+
+.orsee .switchy-container,
+.orsee .switchy-bar,
+.orsee .switchy-slider,
+.orsee .switchy-labels,
+.orsee .switchy-labels i,
+.orsee .switchy-labels svg {
+    box-sizing: content-box;
+}
+
+.orsee .switchy-labels,
+.orsee .switchy-labels i,
+.orsee .switchy-labels svg {
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.orsee .switchy-labels {
+    font-size: 1em;
+    font-weight: 400;
+    text-transform: none;
+    white-space: nowrap;
+    position: relative;
+    display: inline-block;
+    float: none;
+    margin: 0;
+    vertical-align: middle;
+    height: 15px;
+    padding: 2px 5px 0;
+    cursor: pointer;
+}
+
+.orsee .switchy-labels--off {
+    color: var(--color-yesnoswitch-no);
+}
+
+.orsee .switchy-labels--on {
+    color: var(--color-yesnoswitch-yes);
+}
+
+.orsee .switchy-container {
+    position: relative;
+    display: inline-block;
+    float: none;
+    margin: 0;
+    vertical-align: middle;
+    width: 30px;
+    height: 15px;
+    background: var(--color-content-background-color);
+    border-radius: 8px;
+    padding: 2px 8px;
+    box-shadow: 0 2px 2px var(--color-shadow-2);
+}
+
+.orsee .switchy-bar {
+    position: relative;
+    background: var(--color-border-strong);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px var(--color-shadow-2) inset;
+    width: 30px;
+    height: 100%;
+    cursor: pointer;
+}
+
+.orsee .switchy-slider {
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    background: var(--color-content-background-color);
+    left: 0;
+    top: 0;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 var(--color-shadow-2);
+    margin: 1px;
+}
+
+.orsee-option-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+}
+
+.orsee-option-link-item .option {
+    color: var(--color-body-text);
+    text-decoration: underline;
+    font-size: 0.95rem;
+}
+
+.orsee .optionsicon {
+    color: var(--color-body-text);
+    margin-inline-end: 0.24rem;
+}
+
+.orsee .option {
+    display: inline-block;
+    padding: 0.12rem 0.35rem;
+    margin: -0.12rem -0.35rem;
+    border-radius: 0.35rem;
+}
+
+.orsee .option:hover {
+    background-color: var(--color-list-row-hover-background);
+}
+
+.orsee.orsee-area-public .orsee-public-langswitch {
+    margin-top: 0.9rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.55rem;
+}
+
+.orsee.orsee-area-public .orsee-public-langswitch-links {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.8rem;
+}
+
+.orsee.orsee-area-public .orsee-public-langswitch .languageicon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.orsee.orsee-area-public .orsee-public-langswitch .languageicon:before {
+    margin-inline-end: 0;
+}
+
+.orsee.orsee-area-public .orsee-public-menu-langswitch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.28rem 0.38rem 0.26rem;
+}
+
+.orsee.orsee-area-public .orsee-public-menu-langswitch .orsee-language-switch-compact {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+}
+
+.orsee.orsee-area-public .orsee-public-menu-langswitch .orsee-menu-lang-select {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 4.8rem !important;
+    min-height: 1.25rem;
+    height: 1.25rem;
+    line-height: 0.95;
+    padding-top: 0.02rem;
+    padding-bottom: 0.02rem;
+    padding-inline: 0.18rem;
+    border: 1px solid var(--color-border-soft);
+    border-radius: 0.12rem;
+    background: var(--color-html-header-menu-background);
+    color: var(--color-menu-item);
+    -webkit-text-fill-color: var(--color-menu-item);
+}
+
+.orsee.orsee-area-public .orsee-menu .orsee-menu-horizontal .orsee-public-menu-langswitch-horizontal {
+    justify-content: flex-end;
+    padding: 0.2rem 0.35rem 0.3rem;
+}
+
+.orsee.orsee-area-public .orsee-menu .orsee-menu-vertical .orsee-public-menu-langswitch-vertical {
+    margin-top: 0.22rem;
+}
+
+.orsee .languageicon:before {
+    display: inline-block;
+    height: 11px;
+    width: 16px;
+    margin-inline-end: 0.25rem;
+    vertical-align: middle;
+}
+
+/* ==================== MOBILE VISIBILITY TOGGLES (ADMIN + PUBLIC) ==================== */
+/* Utility toggles used by server-rendered dual mobile/desktop fragments. */
+[data-orsee-mobile="show"] {
+    display: none;
+}
+
+[data-orsee-mobile="hide"] {
+    display: inline;
+}
+
+.orsee.orsee-area-public #orsee-public-tab-history [data-orsee-mobile="show"] {
+    display: none;
+}
+
+.orsee.orsee-area-public #orsee-public-tab-history [data-orsee-mobile="hide"] {
+    display: block;
+}
+
+/* ==================== PUBLIC APP FLOW: TABS, PANES, LISTS, DETAILS (ALL VIEWPORTS) ==================== */
+/* Structural behavior shared by participant_show/edit/create. */
+.orsee.orsee-area-public .orsee-public-tabpages {
+    position: relative;
+    overflow: hidden;
+}
+
+.orsee.orsee-area-public .orsee-public-tabtrack {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    transform: translateX(0);
+    transition: transform 170ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.orsee.orsee-area-public .orsee-public-tabpage {
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.orsee.orsee-area-public .orsee-public-subpane {
+    width: 200%;
+    display: flex;
+    transform: translateX(0);
+    transition: transform 190ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.orsee.orsee-area-public .orsee-public-subpane.is-detail {
+    transform: translateX(-50%);
+}
+
+[dir="rtl"] .orsee.orsee-area-public .orsee-public-subpane.is-detail {
+    transform: translateX(50%);
+}
+
+.orsee.orsee-area-public .orsee-public-subpane-list,
+.orsee.orsee-area-public .orsee-public-subpane-detail {
+    flex: 0 0 50%;
+    max-width: 50%;
+    box-sizing: border-box;
+}
+
+.orsee.orsee-area-public .orsee-public-tablet-mobile-only {
+    display: block;
+}
+
+.orsee.orsee-area-public .orsee-public-desktop-only {
+    display: none;
+}
+
+.orsee.orsee-area-public .orsee-public-session-group,
+.orsee.orsee-area-public .orsee-public-detail-card {
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-content-background-color);
+    overflow: hidden;
+}
+
+.orsee.orsee-area-public .orsee-public-desktop-list {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.orsee.orsee-area-public .orsee-public-session-row-desktop {
+    border-top: 1px solid var(--color-border);
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.5fr) 8rem;
+    gap: 0.55rem;
+    align-items: start;
+    padding: 0.52rem 0.68rem;
+}
+
+.orsee.orsee-area-public .orsee-public-desktop-list > .orsee-public-session-row-desktop:first-child,
+.orsee.orsee-area-public .orsee-public-session-group > .orsee-public-session-row-desktop:first-child {
+    border-top: 0;
+}
+
+.orsee.orsee-area-public .orsee-public-session-group > .orsee-public-session-link:first-child,
+.orsee.orsee-area-public .orsee-public-detail-card > .orsee-public-detail-row:first-child {
+    border-top: 0;
+}
+
+.orsee.orsee-area-public .orsee-public-session-row-cell {
+    min-width: 0;
+    align-self: start;
+}
+
+.orsee.orsee-area-public .orsee-public-session-row-title {
+    font-size: var(--font-size-ui-base);
+    color: var(--color-body-text);
+    line-height: 1.2;
+}
+
+.orsee.orsee-area-public .orsee-public-session-row-sub {
+    margin-top: 0.08rem;
+    font-size: var(--font-size-ui-base);
+    color: var(--color-body-text);
+    line-height: 1.18;
+}
+
+.orsee.orsee-area-public #orsee-public-reg-detail-datetime {
+    font-weight: 700;
+}
+
+.orsee.orsee-area-public .orsee-public-session-row-note {
+    margin-top: 0.2rem;
+    font-size: var(--font-size-compact);
+    color: var(--color-body-text);
+    line-height: 1.18;
+}
+
+.orsee.orsee-area-public .orsee-public-session-row-action {
+    justify-self: end;
+    text-align: end;
+}
+
+.orsee.orsee-area-public .orsee-public-session-row-action form {
+    margin: 0;
+}
+
+.orsee.orsee-area-public .orsee-public-enrolment-row-desktop {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.5fr);
+}
+
+.orsee.orsee-area-public .orsee-public-enrolment-row-desktop.has-cancel-actions {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.5fr) 7rem;
+}
+
+.orsee.orsee-area-public .orsee-public-enrolment-row-session-note {
+    grid-column: 1;
+    font-size: var(--font-size-compact);
+    color: var(--color-body-text);
+    line-height: 1.18;
+    margin-top: 0.2rem;
+}
+
+.orsee.orsee-area-public .orsee-public-enrolment-row-action {
+    grid-column: 3;
+    align-self: start;
+}
+
+.orsee.orsee-area-public .orsee-public-enrolment-row-action .button {
+    margin: 0;
+}
+
+.orsee.orsee-area-public .orsee-public-enrolment-row-desktop.has-session-note .orsee-public-enrolment-row-action {
+    grid-row: 1 / span 2;
+}
+
+.orsee.orsee-area-public .orsee-public-enrolment-row-deadline-label {
+    margin-top: 0.2rem;
+    font-size: var(--font-size-compact);
+    color: var(--color-body-text);
+    line-height: 1.18;
+}
+
+.orsee.orsee-area-public .orsee-public-enrolment-row-deadline {
+    margin-top: 0.08rem;
+    font-size: var(--font-size-compact);
+    color: var(--color-body-text);
+    line-height: 1.18;
+}
+
+/* Public action rows/buttons are centered by default. */
+.orsee.orsee-area-public .orsee-public-detail-row-actions {
+    text-align: center;
+}
+
+.orsee.orsee-area-public .orsee-public-detail-row-actions form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.orsee.orsee-area-public .orsee-public-profile-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.orsee.orsee-area-public #orsee-public-edit-change_pw .control .input {
+    width: min(100%, 30ch);
+}
+
+/* ==================== PUBLIC CONFIRM MODAL (ALL VIEWPORTS) ==================== */
+.orsee .orsee-public-confirm {
+    position: fixed;
+    inset: 0;
+    background: var(--color-modal-overlay-scrim);
+    backdrop-filter: blur(8px) saturate(105%);
+    -webkit-backdrop-filter: blur(8px) saturate(105%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1400;
+    padding: 1rem;
+}
+
+.orsee .orsee-public-confirm.is-hidden {
+    display: none;
+}
+
+.orsee .orsee-public-confirm-card {
+    width: min(28rem, 92vw);
+    border-radius: 0.8rem;
+    background: var(--color-content-background-color);
+    box-shadow: 0 16px 30px var(--color-shadow-3);
+    overflow: hidden;
+}
+
+.orsee .orsee-public-confirm-title {
+    text-align: center;
+    font-size: var(--font-size-ui-base);
+    font-weight: 600;
+    padding: 1rem 0.85rem 0.25rem;
+}
+
+.orsee .orsee-public-confirm-text {
+    text-align: center;
+    font-size: var(--font-size-ui-base);
+    padding: 0.35rem 1rem 1rem;
+    line-height: 1.25;
+}
+
+.orsee .orsee-public-confirm-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--color-border-soft);
+}
+
+.orsee .orsee-public-confirm-action {
+    border: 0;
+    background: transparent;
+    color: var(--color-body-link);
+    font-size: var(--font-size-ui-base);
+    padding: 0.95rem 0.4rem;
+}
+
+.orsee .orsee-public-confirm-action + .orsee-public-confirm-action {
+    border-inline-start: 1px solid var(--color-border-soft);
+}
+
+/* Mobile bottom tabbar is hidden by default and enabled in mobile media block only. */
+.orsee.orsee-area-public #orsee-public-mobile-tabbar {
+    display: none;
+}
+
+/* ==================== PUBLIC TABBAR SHARED PARTS (MOBILE + TABLET) ==================== */
+.orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabbar-inner {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+}
+
+.orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem {
+    text-decoration: none;
+    display: inline-flex;
+}
+
+.orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tab-icon-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tab-badge {
+    position: absolute;
+    min-width: 1.08rem;
+    height: 1.08rem;
+    border-radius: 999px;
+    border: 2px solid var(--color-content-background-color);
+    background: var(--color-tabbar-mobile-font);
+    color: var(--color-content-background-color);
+    font-size: var(--font-size-tiny);
+    font-weight: 700;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.18rem;
+}
+
+.orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tab-badge--hot {
+    background: var(--color-message-border-error);
+}
+
+/* ==================== PUBLIC SESSION/DETAIL SHARED PARTS ==================== */
+.orsee.orsee-area-public .orsee-public-session-group-title,
+.orsee.orsee-area-public .orsee-public-detail-card-head {
+    font-size: var(--font-size-ui-base);
+    font-weight: 600;
+    background: var(--color-panel-title-background);
+    color: var(--color-panel-title-text);
+}
+
+.orsee .orsee-note-preline {
+    white-space: pre-line;
+}
+
+.orsee.orsee-area-public .orsee-public-session-group-note {
+    font-size: var(--font-size-compact);
+}
+
+.orsee.orsee-area-public .orsee-public-session-link {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--color-body-text);
+    text-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.orsee.orsee-area-public .orsee-public-session-link-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.orsee.orsee-area-public .orsee-public-session-link-title {
+    font-size: var(--font-size-ui-base);
+}
+
+.orsee.orsee-area-public .orsee-public-session-link-sub,
+.orsee.orsee-area-public .orsee-public-session-link-status {
+    font-size: var(--font-size-compact);
+}
+
+.orsee.orsee-area-public .notification.is-light {
+    background: var(--color-tabbar-desktop-background-active);
+}
+
+.orsee.orsee-area-public .orsee-public-detail-top {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    background: var(--color-content-background-color);
+}
+
+.orsee.orsee-area-public .orsee-public-detail-back {
+    border: 0;
+    background: none;
+    color: var(--color-body-link);
+    font-size: var(--font-size-ui-base);
+    font-weight: 600;
+}
+
+.orsee.orsee-area-public .orsee-public-detail-title {
+    text-align: center;
+    font-weight: 600;
+    font-size: var(--font-size-ui-base);
+}
+
+.orsee.orsee-area-public .orsee-public-detail-row {
+    font-size: var(--font-size-ui-base);
+    line-height: 1.25;
+}
+
+/* ==================== PUBLIC TABLET/DESKTOP LAYOUT (>=741px) ==================== */
+/* Applies to participant_show / participant_edit / participant_create public shells. */
+@media (min-width: 741px) {
+    .orsee.orsee-area-public #orsee-public-toast-host {
+        position: absolute;
+        top: -2.55rem;
+        inset-inline-end: 0;
+        inset-inline-start: auto;
+        width: auto;
+        z-index: 20;
+        align-items: flex-end;
+        gap: 0.35rem;
+        padding: 0;
+    }
+
+    .orsee.orsee-area-public #orsee-public-toast-host .orsee-public-toast {
+        width: min(34rem, 46vw);
+        margin: 0;
+    }
+
+    .orsee.orsee-area-public .orsee-public-screen {
+        width: min(100%, 66rem);
+        margin: 0.35rem auto 1rem;
+        background: var(--color-content-background-color);
+        border: 1px solid var(--color-border);
+        border-radius: var(--orsee-radius);
+        box-shadow: 0 8px 24px var(--color-shadow-1);
+        overflow: hidden;
+    }
+
+    .orsee.orsee-area-public .orsee-public-screen.has-rail {
+        position: relative;
+        padding-top: 3.05rem;
+    }
+
+    .orsee.orsee-area-public #orsee-public-tabpages {
+        padding: 0 0 0.95rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-tabpage {
+        min-height: var(--orsee-public-panel-min-height);
+    }
+
+    .orsee.orsee-area-public .orsee-public-profile-formwrap {
+        padding: 0.8rem 0.8rem 0;
+    }
+
+    .orsee.orsee-area-public .orsee-public-profile-form {
+        margin: 0;
+        border: 1px solid var(--color-border);
+        border-radius: 0.5rem;
+        background: var(--color-content-background-color);
+        padding: 0.7rem 0.75rem 0.8rem;
+    }
+
+    .orsee.orsee-area-public #orsee-public-edit-tabtrack .orsee-public-profile-form {
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        padding: 0;
+    }
+
+    .orsee.orsee-area-public #orsee-public-create-track .orsee-public-profile-form {
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        padding: 0;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar {
+        display: block;
+        position: absolute;
+        top: 0;
+        inset-inline: 0;
+        margin: 0;
+        z-index: 5;
+        background: var(--color-content-background-color);
+        border-top: 0;
+        border-bottom: 1px solid var(--color-border);
+        padding: 0.32rem 0.4rem;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabbar-inner {
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem {
+        min-height: 2.2rem;
+        border-radius: 0.4rem;
+        color: var(--color-body-text);
+        align-items: center;
+        justify-content: center;
+        gap: 0.42rem;
+        padding: 0.2rem 0.4rem;
+        font-size: var(--font-size-ui-base);
+        line-height: 1.05;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem i {
+        font-size: 1.25rem;
+        line-height: 1;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tab-label {
+        font-size: var(--font-size-ui-base);
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem.is-active {
+        background: var(--color-tabbar-desktop-background-active);
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem--profile {
+        position: relative;
+        padding-inline-start: 0.65rem;
+        color: var(--color-body-link);
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem--profile::before {
+        content: "";
+        position: absolute;
+        inset-inline-start: 0;
+        top: 0.22rem;
+        bottom: 0.22rem;
+        width: 1px;
+        background: var(--color-border-soft);
+        pointer-events: none;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem--profile i,
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem--profile .orsee-public-tab-label {
+        color: var(--color-body-link);
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tab-icon-wrap {
+        min-width: 1.5rem;
+        min-height: 1.5rem;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tab-badge {
+        top: -0.18rem;
+        inset-inline-end: -0.35rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-subpane-list,
+    .orsee.orsee-area-public .orsee-public-subpane-detail {
+        padding: 0.8rem 0.8rem 0;
+    }
+
+    .orsee.orsee-area-public .orsee-public-intro {
+        margin: 0;
+        padding: 0.45rem 0.25rem 0.55rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-group {
+        margin: 0.35rem 0 0.75rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-group-title,
+    .orsee.orsee-area-public .orsee-public-detail-card-head {
+        padding: 0.4rem 0.7rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-group-note,
+    .orsee.orsee-area-public .orsee-public-detail-row {
+        border-top: 1px solid var(--color-border-soft);
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-group-note {
+        padding: 0.38rem 0.7rem 0.52rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-link {
+        border-top: 1px solid var(--color-border);
+        padding: 0.66rem 0.7rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-link-main {
+        gap: 0.08rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-link-title {
+        line-height: 1.18;
+    }
+
+    .orsee.orsee-area-public .orsee-public-detail-top {
+        padding: 0.5rem 0.6rem;
+        margin: 0 0 0.45rem;
+        border: 1px solid var(--color-border);
+        border-radius: 0.45rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-detail-back {
+        padding: 0.22rem 0.1rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-detail-row {
+        padding: 0.66rem 0.75rem;
+    }
+
+    .orsee.orsee-area-public #orsee-public-cancel-btn {
+        border-color: var(--color-button-mobile-delete-background);
+        background: var(--color-button-mobile-delete-background);
+        color: var(--color-button-mobile-delete-text) !important;
+    }
+}
+
+@media (min-width: 1100px) {
+    /* PUBLIC DESKTOP MODE (1100+) */
+    .orsee.orsee-area-public .orsee-public-tablet-mobile-only {
+        display: none;
+    }
+
+    .orsee.orsee-area-public .orsee-public-desktop-only {
+        display: block;
+    }
+}
+
+/* ==================== QUERY PSEUDO-TABLE (ADMIN, ALL VIEWPORTS) ==================== */
+/* Readable pseudo-query rendering; intentionally lightweight table formatting. */
+.orsee .orsee-pseudo-query-table {
+    border-collapse: collapse;
+    width: auto;
+    max-width: 100%;
+    font-family: var(--font-ui);
+    font-size: var(--font-size-compact);
+    font-weight: var(--font-weight-ui);
+    color: var(--color-body-text);
+}
+
+.orsee .orsee-pseudo-query-table .orsee-pseudo-query-cell {
+    padding: 0.08rem 0.36rem;
+    vertical-align: top;
+}
+
+.orsee .orsee-pseudo-query-table .orsee-pseudo-query-title {
+    padding: 0.04rem 0.36rem 0.18rem;
+}
+
+.orsee .orsee-pseudo-query-table .orsee-pseudo-query-indent {
+    padding-inline: 0.2rem;
+}
+
+.orsee .orsee-pseudo-query-table .orsee-pseudo-query-op {
+    white-space: nowrap;
+}
+
+/* ==================== FORM FIELD ERROR STATE (ALL FORMS, ALL VIEWPORTS) ==================== */
+/* Reused for admin forms and public participant forms. */
+.orsee .orsee-field-error .label {
+    color: var(--color-message-border-error);
+}
+
+.orsee .orsee-field-error .input,
+.orsee .orsee-field-error .textarea,
+.orsee .orsee-field-error .select select {
+    border-color: var(--color-message-border-error) !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-message-border-error) 55%, transparent) !important;
+}
+
+.orsee .orsee-field-error > .control {
+    background: color-mix(in srgb, var(--color-message-border-error) 9%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-message-border-error) 28%, transparent);
+    border-radius: 0.38rem;
+    padding: 0.42rem 0.5rem;
+}
+
+/* Shared draft-change markers used across profile editor and preview pages. */
+.orsee .orsee-track-changed-left {
+    position: relative;
+}
+
+.orsee .orsee-track-changed-left::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: -0.3rem;
+    border-inline-start: 3px dotted var(--color-message-border-error);
+    pointer-events: none;
+}
+
+.orsee .orsee-track-changed-underline {
+    text-decoration-line: underline;
+    text-decoration-style: dashed;
+    text-decoration-color: var(--color-message-border-error);
+    text-underline-offset: 0.12em;
+    text-decoration-thickness: 2px;
+}
+
+/* ==================== DATA TABLE SYSTEM (ADMIN + PUBLIC, ALL VIEWPORTS) ==================== */
+/* Div/CSS-table base + modifiers for compact cells, no-hover, log protection and responsive adapters. */
+.orsee-table {
+    display: table;
+    width: auto;
+    max-width: 100%;
+    margin-inline: auto;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+}
+
+.orsee-table-row {
+    display: table-row;
+    font-size: var(--font-size-ui-base);
+    background: var(--color-list-shade2);
+}
+
+.orsee-table .orsee-table-row.is-alt {
+    background: var(--color-list-shade1);
+}
+
+.orsee-table .orsee-table-row:hover {
+    background: var(--color-list-row-hover-background);
+}
+
+.orsee-table .orsee-table-row.orsee-table-head {
+    background: var(--color-list-header-background);
+    color: var(--color-list-header-text);
+    font-size: var(--font-size-ui-base);
+    font-weight: 700;
+    border-bottom: 1px solid var(--color-border-strong);
+}
+
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell,
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell a,
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell span {
+    color: var(--color-list-header-text);
+}
+
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell:first-child {
+    border-start-start-radius: calc(0.5rem - 1px);
+}
+
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell:last-child {
+    border-start-end-radius: calc(0.5rem - 1px);
+}
+
+.orsee-table .orsee-table-row.orsee-table-head + .orsee-table-row.orsee-table-head .orsee-table-cell:first-child,
+.orsee-table .orsee-table-row.orsee-table-head + .orsee-table-row.orsee-table-head .orsee-table-cell:last-child {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+}
+
+.orsee-table .orsee-table-row:last-child .orsee-table-cell {
+    border-bottom: 0;
+}
+
+.orsee-table .orsee-table-row:last-child .orsee-table-cell:first-child {
+    border-end-start-radius: calc(0.5rem - 1px);
+}
+
+.orsee-table .orsee-table-row:last-child .orsee-table-cell:last-child {
+    border-end-end-radius: calc(0.5rem - 1px);
+}
+
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell.is-sorted {
+    background: var(--color-list-header-highlighted-background);
+}
+
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell.is-sorted,
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell.is-sorted a,
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell.is-sorted span,
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell.is-sorted i {
+    color: var(--color-list-header-highlighted-text);
+}
+
+.orsee-table .orsee-table-row.orsee-table-subheader-row {
+    background: var(--color-list-shade-subtitle);
+    color: var(--color-body-text);
+    font-weight: 600;
+}
+
+.orsee-table .orsee-table-row.orsee-table-subheader-row .orsee-table-cell,
+.orsee-table .orsee-table-row.orsee-table-subheader-row .orsee-table-cell a,
+.orsee-table .orsee-table-row.orsee-table-subheader-row .orsee-table-cell span {
+    color: var(--color-body-text);
+}
+
+.orsee-table .orsee-table-row.orsee-table-subheader-row:hover {
+    background: var(--color-list-shade-subtitle);
+}
+
+.orsee-table.orsee-table-no-hover .orsee-table-row:not(.orsee-table-head),
+.orsee-table.orsee-table-no-hover .orsee-table-row.is-alt:not(.orsee-table-head),
+.orsee-table.orsee-table-no-hover .orsee-table-row:hover:not(.orsee-table-head) {
+    background: transparent;
+}
+
+.orsee-table-cell {
+    display: table-cell;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    padding: 0.24rem 0.45rem;
+    border-bottom: 1px solid var(--color-border-soft);
+    font-size: var(--font-size-ui-base);
+    line-height: 1.12;
+    vertical-align: middle;
+}
+
+.orsee-sort-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+}
+
+.orsee-sort-icon {
+    font-size: 0.78em;
+    opacity: 0.7;
+    transform: translateY(0.02em);
+}
+
+.orsee-table .orsee-table-row.orsee-table-head .orsee-table-cell.is-sorted .orsee-sort-icon {
+    opacity: 1;
+}
+
+.orsee-table.orsee-table-cells-compact .orsee-table-cell {
+    font-size: var(--font-size-compact);
+}
+
+.orsee-table.orsee-table-body-cells-compact .orsee-table-row:not(.orsee-table-head) .orsee-table-cell {
+    font-size: var(--font-size-compact);
+}
+
+.orsee-table.orsee-table-log .orsee-table-row .orsee-table-cell:nth-child(1) {
+    white-space: nowrap;
+    min-width: 9rem;
+}
+
+.orsee-table.orsee-table-log .orsee-table-row .orsee-table-cell:nth-child(2) {
+    min-width: 9rem;
+}
+
+.orsee-table.orsee-table-log a:hover {
+    text-decoration: underline;
+}
+
+.orsee-table-action {
+    justify-self: end;
+    text-align: end;
+}
+
+.orsee-data-cols-participants-summary.orsee-table-tablet-2cols .orsee-table-row {
+    grid-template-columns: minmax(220px, 1.2fr) repeat(var(--orsee-participant-status-cols, 1), minmax(90px, 0.7fr));
+    min-width: max-content;
+}
+
+.orsee-data-cols-participants-summary .orsee-table-row.orsee-table-head .orsee-table-cell {
+    white-space: nowrap;
+}
+
+.orsee-data-cols-participants-summary .orsee-table-row .orsee-table-cell:nth-child(n + 2) {
+    text-align: center;
+}
+
+.orsee-table-row-disabled {
+    font-style: italic;
+}
+
+.orsee-table .orsee-table-row.orsee-table-row-spacer,
+.orsee-table .orsee-table-row.orsee-table-row-spacer:hover {
+    background: transparent;
+}
+
+.orsee-table .orsee-table-row.orsee-table-row-spacer .orsee-table-cell {
+    padding: 0;
+    height: 1.5rem;
+    border: 0;
+    background: transparent;
+}
+
+/* ==================== LISTTOOL / QUERYTOOL WIDGETS (ADMIN, ALL VIEWPORTS) ==================== */
+/* Drag-drop list rows, dropdown add menus, and listtable rendering. */
+.orsee .orsee-listtool {
+    width: 100%;
+}
+
+.orsee .orsee-listtool-add {
+    margin: 0 0 0.45rem;
+    text-align: start;
+}
+
+.orsee .query_add,
+.orsee .query_add .dropit-trigger {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    position: relative;
+}
+
+.orsee .query_add {
+    display: inline-block;
+}
+
+.orsee .query_add .query_add_btn {
+    display: inline-flex;
+    align-items: center;
+}
+
+.orsee .query_add ul.dropit-submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    inset-inline-start: 0;
+    z-index: 120;
+    min-width: 18rem;
+    margin: 0;
+    padding: 0.28rem 0;
+    list-style: none;
+    text-align: start;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.45rem;
+    background: var(--color-content-background-color);
+    box-shadow: 0 6px 14px var(--color-shadow-2);
+}
+
+.orsee .query_add .dropit-trigger.dropit-open ul.dropit-submenu {
+    display: block;
+}
+
+.orsee .query_add ul.dropit-submenu a {
+    display: block;
+    margin: 0 0.2rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.25rem;
+    text-align: start;
+    text-decoration: none;
+    font-size: var(--font-size-compact);
+    line-height: 1.3;
+    font-weight: 500;
+    color: var(--color-body-text);
+}
+
+.orsee .query_add ul.dropit-submenu a:hover,
+.orsee .query_add ul.dropit-submenu a:active {
+    background: var(--color-dragdrop-selected-background);
+    color: var(--color-dragdrop-selected-text);
+}
+
+.orsee .orsee-listtable {
+    display: table;
+    width: 100%;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+}
+
+.orsee .orsee-listhead {
+    display: table-header-group;
+    background: var(--color-list-header-background);
+    color: var(--color-list-header-text);
+}
+
+.orsee .orsee-listbody {
+    display: table-row-group;
+}
+
+.orsee .orsee-listrow {
+    display: table-row;
+    background: var(--color-list-shade2);
+}
+
+.orsee .orsee-listrow:nth-child(even) {
+    background: var(--color-list-shade1);
+}
+
+.orsee .orsee-listrow:hover {
+    background: var(--color-list-row-hover-background);
+}
+
+.orsee .orsee-listcell {
+    display: table-cell;
+    padding: 0.24rem 0.45rem;
+    border-bottom: 1px solid var(--color-border-soft);
+    vertical-align: middle;
+    text-align: start;
+    line-height: 1.12;
+    font-size: var(--font-size-ui-base);
+    transition:
+        background-color 0.16s ease,
+        box-shadow 0.16s ease,
+        transform 0.12s ease;
+}
+
+.orsee .orsee-listhead .orsee-listcell {
+    font-weight: 700;
+    color: var(--color-list-header-text);
+}
+
+.orsee .orsee-listrow:last-child .orsee-listcell {
+    border-bottom: 0;
+}
+
+.orsee .orsee-listcell-drag,
+.orsee .orsee-listcell-action,
+.orsee .orsee-listrow .orsee-listcell:nth-child(2) {
+    white-space: nowrap;
+}
+
+.orsee .orsee-listcell-drag,
+.orsee .orsee-listcell-action {
+    width: 2.3rem;
+}
+
+.orsee .orsee-listcell-action {
+    text-align: end;
+}
+
+.orsee .orsee-listcell-center {
+    text-align: center;
+}
+
+.orsee .orsee-listrow.highlight_row .orsee-listcell {
+    background: var(--color-dragdrop-selected-background);
+    color: var(--color-dragdrop-selected-text);
+}
+
+.orsee .orsee-listrow.highlight_row {
+    transform: translateX(2px);
+}
+
+.orsee .orsee-listrow.highlight_row .dragHandle {
+    background: var(--color-dragdrop-selected-background);
+    border-color: var(--color-dragdrop-selected-text);
+    color: var(--color-dragdrop-selected-text);
+}
+
+.orsee .dragHandle {
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.33rem;
+    background: var(--color-form-element-background);
+}
+
+/* ==================== LOG PAGE UTILITIES (ADMIN, ALL VIEWPORTS) ==================== */
+/* Topbars/pagination wrappers on log and mailqueue pages. */
+.orsee-log-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.orsee-log-delete-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    flex-wrap: wrap;
+}
+
+.orsee-log-pagination {
+    margin: 0.5rem 0;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.orsee-log-pagination .button.disabled {
+    opacity: 0.6;
+    cursor: default;
+    pointer-events: none;
+}
+
+.orsee-stat-actions {
+    margin-top: 0.8rem;
+}
+
+/* ==================== FORM PRIMITIVES (ADMIN + PUBLIC, ALL VIEWPORTS) ==================== */
+/* Shared field spacing, labels, control sizes, compact variants, focus states, and pickers. */
+.orsee .field {
+    margin-top: 0;
+    margin-bottom: 0;
+    text-align: start;
+}
+
+.orsee .field + .field {
+    margin-top: var(--orsee-form-row-gap);
+}
+
+.orsee .orsee-profile-layout-fields + .field {
+    margin-top: var(--orsee-form-row-gap);
+}
+
+.orsee .orsee-form-row-grid {
+    display: grid;
+    column-gap: 0.72rem;
+    row-gap: 0;
+}
+
+.orsee .orsee-form-row-grid--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.orsee .orsee-form-row-grid--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.orsee .orsee-form-row-col {
+    min-width: 0;
+}
+
+.orsee .label {
+    margin-bottom: 0.16rem;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.02em;
+    text-align: start;
+    font-size: var(--font-size-ui-base) !important;
+    font-weight: 400 !important;
+    line-height: 1.25;
+}
+
+.orsee .help {
+    margin-top: -0.15rem;
+    margin-bottom: 0.35rem;
+}
+
+.orsee .orsee-status-field {
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-list-shade1);
+    border-radius: 0.4rem;
+    padding: 0.5rem 0.62rem 0.56rem 0.62rem;
+    text-align: start;
+}
+
+.orsee .orsee-status-field > .label {
+    font-weight: 600 !important;
+}
+
+.orsee .orsee-input {
+    font-family: var(--font-ui);
+    font-size: var(--font-size-ui-base);
+    font-weight: var(--font-weight-ui);
+    max-width: 100%;
+    border-color: var(--color-border-strong);
+    background: var(--color-form-element-background);
+    color: var(--color-body-text);
+    -webkit-text-fill-color: var(--color-body-text);
+    caret-color: var(--color-body-text);
+    height: auto;
+    min-height: 2rem;
+    line-height: 1.2;
+    padding-top: 0.32rem;
+    padding-bottom: 0.32rem;
+}
+
+.orsee .orsee-textarea {
+    font-family: var(--font-ui);
+    font-size: var(--font-size-ui-base);
+    font-weight: var(--font-weight-ui);
+    max-width: 100%;
+    width: 100%;
+    border-color: var(--color-border-strong);
+    background: var(--color-form-element-background);
+    color: var(--color-body-text);
+    -webkit-text-fill-color: var(--color-body-text);
+    caret-color: var(--color-body-text);
+    min-height: 2rem;
+    line-height: 1.2;
+    padding-top: 0.32rem;
+    padding-bottom: 0.32rem;
+}
+
+.orsee .select {
+    height: auto;
+    min-height: 2rem;
+}
+
+.orsee .select select {
+    font-family: var(--font-ui);
+    font-size: var(--font-size-ui-base);
+    font-weight: var(--font-weight-ui);
+    max-width: 100%;
+    border-color: var(--color-border-strong);
+    background: var(--color-form-element-background);
+    color: var(--color-body-text);
+    -webkit-text-fill-color: var(--color-body-text);
+    caret-color: var(--color-body-text);
+    height: auto;
+    min-height: 2rem;
+    line-height: 1.2;
+    padding-top: 0.28rem;
+    padding-bottom: 0.28rem;
+}
+
+.orsee .select::after,
+.orsee .select:not(.is-multiple):not(.is-loading)::after {
+    border-color: var(--color-form-element-accent-color);
+}
+
+.orsee .select::after {
+    margin-top: -0.5em;
+}
+
+.orsee .select.select-compact {
+    font-size: var(--font-size-compact);
+    height: 1.9em;
+    min-height: 1.9em;
+}
+
+.orsee .select.select-compact select {
+    font-size: inherit;
+    height: 1.9em;
+    min-height: 1.9em;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-inline-start: 0.55rem;
+    border-radius: 0.2rem;
+}
+
+.orsee .orsee-input.orsee-input-compact,
+.orsee .orsee-input-compact {
+    font-size: var(--font-size-compact);
+    min-height: 1.9em;
+    line-height: 1.2;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-inline-start: 0.55rem;
+}
+
+.orsee .orsee-textarea.orsee-textarea-compact,
+.orsee .orsee-textarea-compact {
+    font-size: var(--font-size-compact);
+    min-height: 1.9em;
+    line-height: 1.2;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-inline-start: 0.55rem;
+    border-radius: 0.2rem;
+}
+
+.orsee .select.select-compact::after {
+    margin-top: -0.5em;
+}
+
+.orsee .orsee-flatpickr-input {
+    display: inline-block;
+    width: auto !important;
+    min-width: 9.2rem;
+    max-width: 12rem;
+    margin: 0;
+    vertical-align: middle;
+}
+
+.orsee .orsee-flatpickr-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline-start: 0.06rem;
+    flex: 0 0 auto;
+    vertical-align: middle;
+}
+
+.orsee .orsee-inline-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.26rem;
+    vertical-align: middle;
+    max-width: 100%;
+}
+
+.orsee .orsee-inline-controls .control.has-icons-right {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+    min-width: 0;
+}
+
+.orsee .orsee-inline-controls .control.has-icons-right > .orsee-flatpickr-input {
+    padding-right: 0.55rem;
+    padding-inline-end: 1.55rem;
+}
+
+.orsee .orsee-inline-controls .control.has-icons-right > .icon.is-right[role="button"] {
+    pointer-events: auto;
+    left: auto;
+    right: auto;
+    inset-inline-end: 0.25rem;
+    width: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.orsee .orsee-inline-controls .control.has-icons-right > .icon.is-right[role="button"] i {
+    font-size: 0.86em;
+    line-height: 1;
+    transform: translateY(-1px) scaleX(0.95);
+}
+
+.orsee .orsee-inline-controls .control.has-icons-right > .icon.is-right[role="button"]:active {
+    transform: translateY(-50%) scale(0.94);
+}
+
+[dir="rtl"] .flatpickr-calendar .dayContainer,
+[dir="rtl"] .flatpickr-calendar .flatpickr-weekdaycontainer {
+    direction: rtl;
+}
+
+[dir="rtl"] .flatpickr-calendar .flatpickr-prev-month {
+    left: auto !important;
+    right: 0 !important;
+}
+
+[dir="rtl"] .flatpickr-calendar .flatpickr-next-month {
+    right: auto !important;
+    left: 0 !important;
+}
+
+[dir="rtl"] .flatpickr-calendar .flatpickr-prev-month svg,
+[dir="rtl"] .flatpickr-calendar .flatpickr-next-month svg {
+    transform: scaleX(-1);
+}
+
+.orsee .orsee-text-input-inline-button,
+.orsee .orsee-text-input-inline-button:link,
+.orsee .orsee-text-input-inline-button:visited,
+.orsee .orsee-text-input-inline-button:active {
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition:
+        color 0.12s ease,
+        transform 0.08s ease;
+}
+
+.orsee .orsee-text-input-inline-button:hover {
+    color: var(--color-body-text);
+}
+
+.orsee .orsee-text-input-inline-button:active {
+    transform: scale(0.96);
+}
+
+.orsee .orsee-text-input-inline-button:focus {
+    outline: none;
+    color: var(--color-text-secondary);
+}
+
+.orsee .orsee-text-input-inline-button--addon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.2rem;
+    padding: 0 0.5rem;
+    border: 1px solid var(--color-border-strong);
+    border-inline-start: 0;
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+    border-start-end-radius: 0.4rem;
+    border-end-end-radius: 0.4rem;
+    background: var(--color-form-element-background);
+}
+
+.orsee .orsee-input:focus,
+.orsee .orsee-textarea:focus,
+.orsee .select select:focus {
+    border-color: var(--color-form-element-focus-border);
+    box-shadow: var(--color-shadow-focus-ring);
+}
+
+.orsee .select:focus-within::after {
+    border-color: var(--color-form-element-focus-border);
+}
+
+.orsee .orsee-input::placeholder,
+.orsee .orsee-textarea::placeholder {
+    color: var(--color-text-placeholder);
+    opacity: 1;
+}
+
+.orsee input.iti__tel-input:placeholder-shown {
+    color: var(--color-text-placeholder) !important;
+    -webkit-text-fill-color: var(--color-text-placeholder) !important;
+}
+
+.orsee input.iti__tel-input:not(:placeholder-shown) {
+    color: var(--color-body-text) !important;
+    -webkit-text-fill-color: var(--color-body-text) !important;
+}
+
+.orsee .iti {
+    width: min(100%, 24rem);
+    max-width: 100%;
+}
+
+.orsee .iti .iti__tel-input {
+    width: 100%;
+}
+
+.orsee input[type="checkbox"],
+.orsee input[type="radio"] {
+    accent-color: var(--color-form-element-accent-color);
+    width: 1.02rem;
+    height: 1.02rem;
+    vertical-align: text-bottom;
+}
+
+.orsee input[type="checkbox"]:focus,
+.orsee input[type="radio"]:focus {
+    outline: none;
+    box-shadow: var(--color-shadow-focus-ring);
+}
+
+.orsee-picker-field {
+    min-width: 0;
+    align-self: start;
+}
+
+.orsee-tag-picker {
+    width: 100%;
+}
+
+.orsee-tag-picker-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.orsee-tag-item {
+    margin: 0;
+}
+
+.orsee-tag-picker .orsee-tag-item.tags:not(:last-child) {
+    margin-bottom: 0;
+}
+
+.orsee-tag-picker .orsee-tag-label {
+    font-size: 0.78rem;
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-tag-picker-bg, var(--color-selector-tag-bg-class));
+    padding: 0.1em 0.48em;
+    height: 1.65em;
+    line-height: 1;
+    color: var(--color-tag-picker-fg, var(--color-body-text));
+}
+
+.orsee-tag-adder {
+    display: inline-flex;
+}
+
+/* ==================== DENSE LIST LAYOUTS (ADMIN, ALL VIEWPORTS) ==================== */
+/* Experiment/session dense rows and related info blocks. */
+.orsee-dense-list {
+    display: grid;
+    gap: 0.42rem;
+}
+
+.orsee-dense-row {
+    border: 1px solid var(--color-border);
+    border-radius: 0.52rem;
+    padding: 0.4rem 0.5rem 0.45rem;
+    background: var(--color-list-shade1);
+}
+
+.orsee-dense-row.is-odd {
+    background: var(--color-list-shade2);
+}
+
+.orsee-dense-row:hover {
+    background: var(--color-list-row-hover-background);
+}
+
+.orsee-dense-row--session.is-ethics-expired {
+    background: var(--color-ethics-approval-expired);
+}
+
+.orsee-dense-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.2fr) minmax(210px, 0.8fr) minmax(330px, 1.2fr);
+    row-gap: 0.1rem;
+    column-gap: 0.6rem;
+    align-items: start;
+}
+
+.orsee-dense-cell {
+    min-width: 0;
+    line-height: 1.2;
+}
+
+.orsee-dense-cell.is-row2 {
+    font-size: var(--font-size-compact);
+}
+
+.orsee-dense-row--experiment.is-all-compact .orsee-dense-cell {
+    font-size: var(--font-size-compact);
+}
+
+.orsee-dense-cell-right {
+    text-align: end;
+}
+
+.orsee-dense-cell.is-col2 {
+    text-align: center;
+}
+
+.orsee-dense-cell-sessions {
+    grid-row: span 2;
+    justify-self: end;
+    text-align: end;
+}
+
+.orsee-dense-row-title {
+    color: var(--color-body-text);
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.orsee-dense-row-type {
+    font-size: inherit;
+}
+
+.orsee-dense-link,
+.orsee-dense-link:link,
+.orsee-dense-link:visited,
+.orsee-dense-link:active {
+    color: var(--color-body-text);
+    text-decoration: none;
+}
+
+.orsee-dense-link:hover {
+    text-decoration: underline;
+}
+
+.orsee-dense-link-muted,
+.orsee-dense-link-muted:link,
+.orsee-dense-link-muted:visited,
+.orsee-dense-link-muted:active {
+    color: var(--color-text-secondary);
+}
+
+.orsee-dense-sessions-list {
+    display: grid;
+    gap: 0.05rem;
+    justify-items: end;
+}
+
+.orsee-dense-session-item {
+    display: grid;
+    grid-template-columns: 1.2rem minmax(0, auto);
+    align-items: baseline;
+    column-gap: 0.2rem;
+    line-height: 1.1;
+}
+
+.orsee-dense-session-status {
+    width: 1.2rem;
+}
+
+.orsee-dense-session-datetime,
+.orsee-dense-session-count {
+    white-space: nowrap;
+}
+
+.orsee-dense-session-main {
+    white-space: nowrap;
+    line-height: 1.1;
+}
+
+.orsee-dense-session-datetime-link,
+.orsee-dense-session-datetime-link:link,
+.orsee-dense-session-datetime-link:visited,
+.orsee-dense-session-datetime-link:active,
+.orsee-dense-session-count-link,
+.orsee-dense-session-count-link:link,
+.orsee-dense-session-count-link:visited,
+.orsee-dense-session-count-link:active {
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: var(--font-size-compact);
+}
+
+.orsee-dense-session-datetime-link:hover,
+.orsee-dense-session-count-link:hover {
+    text-decoration: underline;
+}
+
+.orsee-dense-session-datetime-link.is-planned,
+.orsee-dense-session-datetime-link.is-planned:link,
+.orsee-dense-session-datetime-link.is-planned:visited,
+.orsee-dense-session-datetime-link.is-planned:active {
+    color: var(--color-session-status-planned);
+}
+
+.orsee-dense-session-datetime-link.is-live,
+.orsee-dense-session-datetime-link.is-live:link,
+.orsee-dense-session-datetime-link.is-live:visited,
+.orsee-dense-session-datetime-link.is-live:active {
+    color: var(--color-session-status-live);
+}
+
+.orsee-dense-session-datetime-link.is-completed,
+.orsee-dense-session-datetime-link.is-completed:link,
+.orsee-dense-session-datetime-link.is-completed:visited,
+.orsee-dense-session-datetime-link.is-completed:active {
+    color: var(--color-session-status-completed);
+}
+
+.orsee-dense-session-datetime-link.is-balanced,
+.orsee-dense-session-datetime-link.is-balanced:link,
+.orsee-dense-session-datetime-link.is-balanced:visited,
+.orsee-dense-session-datetime-link.is-balanced:active {
+    color: var(--color-session-status-balanced);
+}
+
+.orsee-dense-session-datetime-link.is-canceled,
+.orsee-dense-session-datetime-link.is-canceled:link,
+.orsee-dense-session-datetime-link.is-canceled:visited,
+.orsee-dense-session-datetime-link.is-canceled:active {
+    color: var(--color-session-status-canceled);
+}
+
+.orsee-dense-row-warning {
+    color: var(--color-important-note-text);
+    font-size: var(--font-size-compact);
+    margin-bottom: 0.1rem;
+}
+
+.orsee-dense-row-class {
+    margin-top: 0.08rem;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-compact);
+}
+
+/* ==================== EXPERIMENT/SESSION DETAIL SUPPORT LAYOUTS (ADMIN, ALL VIEWPORTS) ==================== */
+/* Facts grids, split panels, statistics rows, and action grids. */
+.orsee-panel-title-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.orsee-facts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.42rem 0.65rem;
+    margin-top: 0.5rem;
+}
+
+.orsee-fact {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.orsee-fact--wide {
+    grid-column: span 2;
+}
+
+.orsee-fact-label {
+    font-size: inherit;
+    color: inherit;
+    white-space: nowrap;
+}
+
+.orsee-fact-value {
+    line-height: 1.25;
+    min-width: 0;
+}
+
+.orsee-fact-value-standalone {
+    grid-column: 1 / -1;
+}
+
+.orsee-fact-value--ethics {
+    border-radius: 0.3rem;
+    padding: 0.1rem 0.3rem;
+}
+
+.orsee-session-summary {
+    margin: 0.5rem 0 0.45rem;
+}
+
+.orsee-session-bulk-actions {
+    margin-top: 0.5rem;
+    padding-top: 0.45rem;
+    border-top: 1px dashed var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.orsee-dense-row--session {
+    padding: 0.35rem 0.45rem 0.4rem;
+}
+
+.orsee-dense-session-grid {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(200px, 1.2fr) minmax(200px, 1.2fr) minmax(220px, 1.4fr) auto;
+    column-gap: 0.3rem;
+    row-gap: 0.2rem;
+    align-items: center;
+}
+
+.orsee-dense-session-select {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: center;
+}
+
+.orsee-dense-session-name {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+}
+
+.orsee-dense-session-statusline,
+.orsee-dense-session-regstate,
+.orsee-dense-session-signedup,
+.orsee-dense-session-payment,
+.orsee-dense-session-reminder {
+    font-size: inherit;
+    line-height: 1.05;
+}
+
+.orsee-dense-session-action {
+    grid-column: 5;
+    grid-row: 1 / span 2;
+    align-self: center;
+    text-align: end;
+}
+
+.orsee-dense-session-statusline {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.orsee-dense-session-regstate {
+    grid-column: 4;
+    grid-row: 1;
+}
+
+.orsee-dense-session-signedup {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.orsee-dense-session-payment {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.orsee-dense-session-reminder {
+    grid-column: 4;
+    grid-row: 2;
+}
+
+.orsee-stat-list {
+    display: grid;
+    gap: 0.18rem;
+    margin-top: 0.45rem;
+}
+
+.orsee-stat-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+}
+
+.orsee-stat-row-compact .orsee-stat-label {
+    padding-inline-start: 1rem;
+}
+
+.orsee-stat-value {
+    text-align: end;
+}
+
+.orsee-permanent-query-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.5rem;
+    margin-top: 0.28rem;
+}
+
+.orsee-action-grid {
+    margin-top: 0.6rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.25rem 0.45rem;
+}
+
+.orsee-panel-split {
+    display: grid;
+    grid-template-columns: minmax(320px, max-content) minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+}
+
+.orsee-panel-split-main,
+.orsee-panel-split-actions {
+    min-width: 0;
+}
+
+.orsee-panel-split-actions .orsee-action-grid {
+    margin-top: 0;
+    justify-content: stretch;
+}
+
+.orsee-permanent-query-block {
+    margin-bottom: 1rem;
+}
+
+.orsee-permanent-query-title {
+    margin: 0 0 0.12rem 0;
+    color: var(--color-body-text);
+}
+
+.orsee-permanent-query-text {
+    line-height: 1.25;
+}
+
+.orsee-permanent-query-action {
+    text-align: end;
+}
+
+.orsee-permanent-query-action .orsee-btn {
+    margin-inline-end: 0;
+}
+
+.orsee-panel-split-main .orsee-stat-row {
+    display: contents;
+}
+
+.orsee-panel-split-main .orsee-stat-list {
+    display: inline-grid;
+    grid-template-columns: max-content max-content;
+    column-gap: 1rem;
+    row-gap: 0.18rem;
+}
+
+.orsee-panel-split-main .orsee-stat-value {
+    text-align: end;
+    min-width: 2ch;
+}
+
+/* ==================== TABLET ADAPTATIONS (<=1100px) ==================== */
+/* Admin/public shared responsive reductions for filters, dense rows, and summaries. */
+@media (max-width: 1100px) {
+    .orsee.orsee-area-admin {
+        overflow-x: clip;
+    }
+
+    #orsee-participants-main-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.35rem 0.45rem;
+        justify-content: stretch;
+        max-width: 38rem;
+        margin-inline: auto;
+    }
+
+    #orsee-participants-main-actions .orsee-btn,
+    #orsee-participants-main-actions .button {
+        width: 100%;
+        margin: 0;
+    }
+
+    .orsee-filter-mobilebar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.45rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .orsee-filter-mobiletoggle,
+    .orsee-filter-mobiletoggle:link,
+    .orsee-filter-mobiletoggle:visited,
+    .orsee-filter-mobiletoggle:active {
+        color: var(--color-body-link);
+        text-decoration: underline;
+        font-size: var(--font-size-compact);
+    }
+
+    .orsee-filter-mobilesummary {
+        font-size: var(--font-size-compact);
+        color: var(--color-body-text);
+    }
+
+    .orsee-filter.is-open .orsee-filter-mobilebar {
+        margin-bottom: 0.3rem;
+    }
+
+    .orsee-filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .orsee-filter.is-collapsed .orsee-filter-form {
+        display: none;
+    }
+
+    .orsee-filter-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.18rem;
+    }
+
+    .orsee-ethics-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .orsee-filter-actions {
+        width: 100%;
+        text-align: center;
+    }
+
+    .orsee-dense-row--experiment .orsee-dense-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .orsee-dense-row--experiment .orsee-dense-cell-right,
+    .orsee-dense-row--experiment .orsee-dense-session-count {
+        text-align: start;
+    }
+
+    .orsee-dense-row--experiment .orsee-dense-cell.is-col2 {
+        text-align: end;
+    }
+
+    .orsee-dense-row--experiment .orsee-dense-cell-sessions {
+        grid-row: auto;
+        grid-column: 1 / -1;
+    }
+
+    /* Mobile collapsed dense-row layout:
+     r1c1 r1c3
+     r1c2 (full width)
+     r2c1 r2c2
+     r2c3 (full width) */
+    .orsee-dense-row--experiment .orsee-dense-grid > .orsee-dense-cell:nth-child(1) {
+        order: 1;
+    }
+    .orsee-dense-row--experiment .orsee-dense-grid > .orsee-dense-cell:nth-child(3) {
+        order: 2;
+    }
+    .orsee-dense-row--experiment .orsee-dense-grid > .orsee-dense-cell:nth-child(2) {
+        order: 3;
+    }
+    .orsee-dense-row--experiment .orsee-dense-grid > .orsee-dense-cell:nth-child(4) {
+        order: 4;
+    }
+    .orsee-dense-row--experiment .orsee-dense-grid > .orsee-dense-cell:nth-child(5) {
+        order: 5;
+    }
+    .orsee-dense-row--experiment .orsee-dense-grid > .orsee-dense-cell:nth-child(6) {
+        order: 6;
+    }
+
+    .orsee-dense-row--experiment .orsee-dense-grid > .orsee-dense-cell:nth-child(2) {
+        grid-column: 1 / -1;
+        text-align: center;
+    }
+
+    .orsee-dense-row--experiment .orsee-dense-grid > .orsee-dense-cell:nth-child(3) {
+        text-align: end;
+    }
+
+    .orsee-dense-row--experiment .orsee-dense-cell-sessions {
+        justify-self: center;
+        text-align: center;
+    }
+
+    .orsee-dense-row--experiment .orsee-dense-cell-sessions .orsee-dense-sessions-list {
+        display: inline-grid;
+        justify-items: start;
+        text-align: start;
+    }
+
+    .orsee-dense-row--experiment .orsee-dense-cell-sessions .orsee-dense-session-item,
+    .orsee-dense-row--experiment .orsee-dense-cell-sessions .orsee-dense-session-main {
+        text-align: start;
+    }
+
+    .orsee-dense-session-grid {
+        grid-template-columns: 1.4rem minmax(220px, 1.25fr) minmax(220px, 1.25fr) auto;
+        column-gap: 0.24rem;
+        row-gap: 0.15rem;
+    }
+
+    .orsee-dense-session-select {
+        grid-column: 1;
+        grid-row: 1 / span 3;
+        align-self: center;
+    }
+
+    .orsee-dense-session-name {
+        grid-column: 2;
+        grid-row: 1;
+        min-width: 0;
+        line-height: 1.05;
+    }
+
+    .orsee-dense-session-statusline {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    .orsee-dense-session-regstate {
+        grid-column: 3;
+        grid-row: 1;
+    }
+
+    .orsee-dense-session-action {
+        grid-column: 4;
+        grid-row: 1 / span 3;
+        align-self: center;
+        text-align: end;
+    }
+
+    .orsee-dense-session-signedup {
+        grid-column: 2;
+        grid-row: 3;
+    }
+
+    .orsee-dense-session-payment {
+        grid-column: 3;
+        grid-row: 3;
+    }
+
+    .orsee-dense-session-reminder {
+        grid-column: 3;
+        grid-row: 2;
+    }
+
+    .orsee-panel-split {
+        grid-template-columns: minmax(260px, max-content) minmax(0, 1fr);
+    }
+
+    .orsee-calendar {
+        width: 96%;
+    }
+
+    .orsee-calendar-month-head {
+        font-size: 1.2rem;
+    }
+
+    .orsee-calendar-day {
+        min-height: 5.2rem;
+    }
+
+    .orsee-permanent-query-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.2rem;
+    }
+
+    .orsee-permanent-query-action {
+        text-align: start;
+    }
+}
+
+@media (min-width: 741px) {
+    .orsee .orsee-input-text {
+        width: 30ch;
+    }
+}
+
+/* ==================== PRINT LAYOUT (ALL AREAS) ==================== */
+/* Hide nav chrome, keep main content printable. */
+@media print {
+    .orsee .orsee-burger,
+    .orsee .orsee-menu {
+        display: none !important;
+    }
+
+    .orsee .orsee-shell {
+        display: block !important;
+        padding: var(--orsee-gap) !important;
+    }
+
+    .orsee.orsee-orientation-vertical .orsee-shell {
+        padding-inline-start: var(--orsee-gap) !important;
+    }
+
+    .orsee.orsee-orientation-horizontal .orsee-main {
+        padding-top: 0 !important;
+    }
+}
+
+/* ==================== TABLE MODIFIER RESPONSIVE RULES (<=1100px) ==================== */
+/* Tablet mechanics for .orsee-table-tablet-2cols / .orsee-table-tablet-2rows. */
+@media (max-width: 1100px) {
+    .orsee-table-tablet-2cols .orsee-table-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .orsee-data-cols-participants-summary.orsee-table-tablet-2cols .orsee-table-row {
+        display: grid;
+        grid-template-columns: minmax(220px, 1.2fr) repeat(var(--orsee-participant-status-cols, 1), minmax(90px, 0.7fr));
+    }
+
+    .orsee-table-tablet-2rows {
+        display: block;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .orsee-table-tablet-2rows .orsee-table-row {
+        display: grid;
+        grid-auto-flow: column;
+        grid-template-rows: repeat(2, auto);
+        grid-auto-columns: minmax(max-content, 1fr);
+        gap: 0.08rem 0.6rem;
+        align-items: start;
+    }
+
+    .orsee-table-tablet-2rows .orsee-table-row.orsee-table-head {
+        align-items: center;
+    }
+
+    .orsee-table-tablet-2rows .orsee-table-row .orsee-table-cell.orsee-table-action {
+        grid-row: 1 / span 2;
+        align-self: center;
+    }
+
+    .orsee-table-tablet-2rows .orsee-table-row .orsee-table-cell:empty::before {
+        content: "\00a0";
+    }
+}
+
+/* ==================== RICHTEXT (ALL AREAS) ==================== */
+/* Output formatting for sanitized+parsed content and FAQ/rules public pages. */
+.orsee .orsee-richtext {
+    color: var(--color-body-text);
+    font-size: var(--font-size-ui-base);
+    line-height: 1.58;
+    text-align: start;
+}
+
+.orsee .orsee-richtext p {
+    margin: 0 0 1rem;
+}
+
+.orsee .orsee-richtext ul,
+.orsee .orsee-richtext ol {
+    margin: 0 0 0.95rem 0;
+    padding: 0;
+}
+
+.orsee .orsee-richtext ul {
+    list-style: none;
+}
+
+.orsee .orsee-richtext ol {
+    list-style: decimal outside;
+    margin-inline-start: 1.55rem;
+}
+
+.orsee .orsee-richtext li {
+    margin: 0.22rem 0;
+}
+
+.orsee .orsee-richtext ul li {
+    position: relative;
+    padding-inline-start: 1.05rem;
+}
+
+.orsee .orsee-richtext ul li::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0.58em;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 999px;
+    background: var(--color-form-element-accent-color);
+}
+
+.orsee .orsee-richtext ul ul li::before {
+    width: 0.38rem;
+    height: 0.38rem;
+}
+
+.orsee .orsee-richtext ul ul ul li::before,
+.orsee .orsee-richtext ul ul ul ul li::before {
+    width: 0.32rem;
+    height: 0.32rem;
+}
+
+.orsee .orsee-richtext strong,
+.orsee .orsee-richtext b {
+    font-weight: 700;
+}
+
+.orsee .orsee-richtext em {
+    font-style: italic;
+}
+
+.orsee .orsee-richtext u {
+    text-decoration: underline;
+}
+
+.orsee .orsee-richtext img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0.45rem auto 0.7rem;
+}
+
+.orsee .orsee-richtext h3,
+.orsee .orsee-richtext h4 {
+    margin: 0.2rem 0 0.3rem;
+    font-weight: 600;
+    color: var(--color-body-text);
+    text-transform: none;
+    line-height: 1.22;
+}
+
+.orsee .orsee-richtext h3 {
+    font-size: 1.2rem;
+    letter-spacing: 0.01em;
+}
+
+.orsee .orsee-richtext h4 {
+    font-size: 1.1rem;
+}
+
+.orsee .orsee-richtext blockquote {
+    margin: 0.65rem 0;
+    padding: 0.35rem 0.7rem;
+    border-inline-start: 3px solid var(--color-border-strong);
+    color: var(--color-body-text);
+}
+
+.orsee .orsee-richtext a:hover,
+.orsee .orsee-richtext a:focus-visible {
+    text-decoration: underline;
+}
+
+.orsee .orsee-richtext a.orsee-external-link .fa {
+    margin-inline-start: 0.28em;
+    font-size: 0.85em;
+    vertical-align: baseline;
+}
+
+.orsee .orsee-richtext .orsee-wiki-page {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.orsee .orsee-richtext .orsee-wiki-center {
+    text-align: center;
+}
+
+.orsee .orsee-richtext .orsee-wiki-spacer {
+    width: 100%;
+}
+
+.orsee .orsee-richtext .orsee-wiki-table {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.45rem 0 0.55rem;
+    font-size: var(--font-size-ui-base);
+}
+
+.orsee .orsee-richtext .orsee-wiki-table .orsee-wiki-table-row {
+    display: table-row;
+}
+
+.orsee .orsee-richtext .orsee-wiki-table .orsee-wiki-table-cell {
+    display: table-cell;
+    border: 1px solid var(--color-border);
+    padding: 0.36rem 0.48rem;
+    vertical-align: top;
+    text-align: start;
+}
+
+.orsee .orsee-richtext .orsee-wiki-table .orsee-wiki-table-row.is-head .orsee-wiki-table-cell {
+    background: var(--color-list-shade2);
+    font-weight: 600;
+}
+
+.orsee .orsee-richtext .orsee-wiki-table .is-center {
+    text-align: center;
+}
+
+.orsee .orsee-richtext .orsee-wiki-table .is-right {
+    text-align: right;
+}
+
+/* ==================== PUBLIC FAQ / CONTENT SHELL ==================== */
+/* FAQ accordion cards and answer transitions (public area). */
+.orsee.orsee-area-public .orsee-public-faq-panel {
+    width: min(96%, 1100px);
+    margin: 0.35rem auto 1rem;
+}
+
+.orsee.orsee-area-public .orsee-faq-accordion {
+    display: grid;
+    gap: 0;
+}
+
+.orsee.orsee-area-public .orsee-faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: 0.66rem;
+    background: var(--color-content-background-color);
+    overflow: hidden;
+    padding: 0;
+    box-shadow: 0 2px 8px var(--color-shadow-1);
+}
+
+.orsee.orsee-area-public .orsee-faq-item.box {
+    margin-bottom: 0.5em;
+}
+
+.orsee.orsee-area-public .orsee-faq-summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    padding: 0.62rem 0.85rem;
+    cursor: pointer;
+    background: var(--color-content-background-color);
+    transition: background-color 0.16s ease;
+}
+
+.orsee.orsee-area-public .orsee-faq-summary::-webkit-details-marker {
+    display: none;
+}
+
+.orsee.orsee-area-public .orsee-faq-summary:hover {
+    background: var(--color-list-shade2);
+}
+
+.orsee.orsee-area-public .orsee-faq-question {
+    font-size: var(--font-size-ui-base);
+    line-height: 1.25;
+    color: var(--color-body-text);
+    text-align: start;
+}
+
+.orsee.orsee-area-public .orsee-faq-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    white-space: nowrap;
+}
+
+.orsee.orsee-area-public .orsee-faq-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--color-body-text);
+    font-size: var(--font-size-ui-base);
+}
+
+.orsee.orsee-area-public .orsee-faq-chevron {
+    color: var(--color-body-text);
+    transition: transform 0.15s ease-in-out;
+}
+
+.orsee.orsee-area-public .orsee-faq-item[open] .orsee-faq-chevron {
+    transform: rotate(180deg);
+}
+
+.orsee.orsee-area-public .orsee-faq-answer {
+    border-top: 1px solid var(--color-border-soft);
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+        grid-template-rows 0.26s ease,
+        opacity 0.24s ease;
+}
+
+.orsee.orsee-area-public .orsee-faq-answer-inner {
+    overflow: hidden;
+    padding: 0 0.85rem;
+}
+
+.orsee.orsee-area-public .orsee-faq-item[open] .orsee-faq-answer {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.orsee.orsee-area-public .orsee-faq-item[open] .orsee-faq-answer-inner {
+    padding-top: 0.75rem;
+    padding-bottom: 0.9rem;
+}
+
+.orsee.orsee-area-public .orsee-faq-answer-text {
+    font-size: var(--font-size-ui-base);
+    line-height: 1.48;
+    color: var(--color-body-text);
+    text-align: start;
+}
+
+.orsee.orsee-area-public .orsee-faq-actions {
+    margin-top: 0.4rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ==================== MOBILE OVERRIDES (<=740px) ==================== */
+/* Includes public app-like mobile shell + admin compact mobile adaptations. */
+@media (max-width: 740px) {
+    /* NOTE: Any `.orsee.orsee-area-public ...` rules in this media block are MOBILE-ONLY. */
+    /* Tablet/desktop public layout is controlled outside this block. */
+    /* ==================== GLOBAL MOBILE FORM OVERRIDES ==================== */
+    .orsee .orsee-input,
+    .orsee textarea.orsee-textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .orsee .orsee-form-row-grid--2,
+    .orsee .orsee-form-row-grid--3 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #orsee-participants-main-actions {
+        grid-template-columns: 1fr;
+        max-width: 24rem;
+    }
+
+    [data-orsee-mobile="show"] {
+        display: inline;
+    }
+
+    [data-orsee-mobile="hide"] {
+        display: none;
+    }
+
+    .orsee.orsee-area-public #orsee-public-tab-history [data-orsee-mobile="show"] {
+        display: block;
+    }
+
+    .orsee.orsee-area-public #orsee-public-tab-history [data-orsee-mobile="hide"] {
+        display: none;
+    }
+
+    .orsee #orsee-stats-show-all-btn {
+        font-size: var(--font-size-compact);
+    }
+
+    .orsee .orsee-brand-left,
+    .orsee .orsee-brand-right {
+        flex: 0 0 auto;
+        max-width: none;
+    }
+
+    .orsee .orsee-menu .orsee-menu-vertical {
+        display: block !important;
+    }
+
+    .orsee .orsee-menu .orsee-menu-horizontal {
+        display: none !important;
+    }
+
+    .orsee.orsee-orientation-horizontal .orsee-menu {
+        padding: 0.6rem 0 0.8rem;
+    }
+
+    .orsee.orsee-orientation-horizontal .orsee-menu::before,
+    .orsee.orsee-orientation-horizontal .orsee-menu::after {
+        display: block;
+    }
+
+    .orsee .orsee-burger::before {
+        left: 50%;
+        inset-inline-start: auto;
+    }
+
+    .orsee .orsee-menu::before {
+        left: 0;
+        right: 0;
+        inset-inline-start: auto;
+        inset-inline-end: auto;
+    }
+
+    .orsee .orsee-masthead {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        overflow: visible;
+        z-index: 1300;
+    }
+
+    /* ==================== PUBLIC MOBILE: SHELL / HEADER ==================== */
+    .orsee.orsee-area-public .orsee-masthead,
+    .orsee.orsee-area-public .orsee-burger {
+        background: var(--color-html-header-logo-bar-background);
+    }
+
+    .orsee.orsee-area-public .orsee-brand-left img,
+    .orsee.orsee-area-public .orsee-brand-bar {
+        display: none;
+    }
+
+    .orsee.orsee-area-public .orsee-brand-logo {
+        background: transparent;
+    }
+
+    .orsee.orsee-area-public .orsee-shell {
+        display: block;
+        padding: 0;
+    }
+
+    .orsee.orsee-area-public .orsee-richtext .orsee-wiki-page {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .orsee.orsee-area-public {
+        background: var(--color-shade-around-content);
+    }
+
+    .orsee.orsee-area-public .orsee-brand {
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.65rem;
+    }
+
+    .orsee.orsee-area-public .orsee-brand-left {
+        align-items: center;
+        padding: 0.28rem 0 0.28rem 0.45rem;
+        flex: 1 1 auto;
+    }
+
+    .orsee.orsee-area-public .orsee-brand-right {
+        flex: 0 0 auto;
+        min-width: 0;
+        border-radius: 0;
+        margin-inline-end: 0.45rem;
+        background: transparent;
+    }
+
+    .orsee.orsee-area-public .orsee-burger {
+        display: inline-block;
+        width: 44px;
+        height: 44px;
+        margin: 0 0.45rem 0 0;
+    }
+
+    .orsee .orsee-menu .orsee-menu-vertical .orsee-nav__item {
+        padding: 0.18rem 0.95rem 0.18rem 3rem;
+    }
+
+    .orsee .orsee-menu .menuicon {
+        margin-right: 0.35rem;
+        margin-inline-end: 0;
+    }
+
+    .orsee.orsee-area-public .orsee-brand-logo {
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .orsee.orsee-area-public .orsee-brand-logo img {
+        display: block;
+        height: 36px;
+        width: auto;
+        margin-inline-start: auto;
+        margin-inline-end: 0;
+    }
+
+    .orsee.orsee-area-public .orsee-menu {
+        display: none;
+        position: fixed;
+        top: 62px;
+        inset-inline: 0;
+        max-height: calc(100vh - 62px);
+        overflow-y: auto;
+        border-radius: 0;
+        margin-top: 0;
+        z-index: 1200;
+    }
+
+    .orsee.orsee-area-public.orsee-m-nav-open .orsee-menu {
+        display: block;
+    }
+
+    .orsee.orsee-area-public .orsee-main {
+        margin-top: 0;
+        border-radius: 0;
+        background: var(--color-shade-around-content);
+        padding: 0 0.15rem 0.5rem 0.15rem;
+        max-width: 56rem;
+        margin-inline: auto;
+    }
+
+    .orsee.orsee-area-public .orsee-title {
+        display: none;
+    }
+
+    /* ==================== PUBLIC MOBILE: BOTTOM TAB BAR ==================== */
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar {
+        display: block;
+        position: fixed;
+        inset-inline: 0;
+        bottom: 0;
+        margin: 0;
+        z-index: 1250;
+        background: var(--color-content-background-color);
+        border-top: 1px solid var(--color-border);
+        padding: 0.25rem 0.2rem max(env(safe-area-inset-bottom), 0.25rem);
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabbar-inner {
+        align-items: end;
+        gap: 0.1rem;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem {
+        color: var(--color-tabbar-mobile-font);
+        font-size: var(--font-size-compact);
+        min-height: 3.35rem;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.18rem;
+        padding: 0.1rem 0.2rem 0.08rem;
+        line-height: 1.1;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem i {
+        font-size: 1.55rem;
+        line-height: 1;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tab-label {
+        font-size: var(--font-size-compact);
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem.is-active {
+        color: var(--color-body-text);
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tabitem--profile {
+        border-inline-start: 1px solid var(--color-border);
+        color: var(--color-body-link);
+        padding-inline-start: 0.38rem;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tab-icon-wrap {
+        min-width: 1.65rem;
+        min-height: 1.65rem;
+    }
+
+    .orsee.orsee-area-public #orsee-public-mobile-tabbar .orsee-public-tab-badge {
+        top: -0.32rem;
+        inset-inline-end: -0.5rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-supportline {
+        display: none;
+    }
+
+    .orsee.orsee-area-public .orsee-message-box-title {
+        display: none;
+    }
+
+    /* ==================== PUBLIC MOBILE: PAGEBAR / TOP ACTIONS ==================== */
+    .orsee.orsee-area-public #orsee-public-tabpages {
+        padding: 0 0 5.2rem 0;
+    }
+
+    .orsee.orsee-area-public .orsee-public-pagebar {
+        display: block;
+        width: 100%;
+        margin: 0;
+        min-height: 2.6rem;
+        padding: 0.62rem 0.75rem 0.58rem;
+        text-align: center;
+        font-size: var(--font-size-ui-base);
+        font-weight: 600;
+        color: var(--color-body-text);
+        background: var(--color-content-background-color);
+        border-bottom: 1px solid var(--color-border);
+        box-sizing: border-box;
+    }
+
+    .orsee.orsee-area-public .orsee-public-pagebar.has-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-pagebar-title {
+        display: block;
+        text-align: center;
+    }
+
+    .orsee.orsee-area-public .orsee-public-pagebar-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        justify-self: end;
+        white-space: nowrap;
+    }
+
+    .orsee.orsee-area-public .orsee-public-pagebar-action,
+    .orsee.orsee-area-public .orsee-public-pagebar-action:link,
+    .orsee.orsee-area-public .orsee-public-pagebar-action:visited {
+        color: var(--color-body-link);
+        text-decoration: none;
+        font-size: var(--font-size-ui-base);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        line-height: 1.1;
+    }
+
+    .orsee.orsee-area-public .orsee-public-pagebar-action i {
+        font-size: calc(var(--font-size-ui-base) * 1.18);
+    }
+
+    .orsee.orsee-area-public .orsee-public-pagebar-action i.orsee-public-pagebar-login-icon {
+        font-weight: 700;
+    }
+
+    /* ==================== PUBLIC MOBILE: PROFILE / FORM SHELL ==================== */
+    .orsee.orsee-area-public .orsee-public-profile-formwrap {
+        padding: 0.45rem 0.25rem 0;
+    }
+
+    .orsee.orsee-area-public .orsee-public-profile-form {
+        margin: 0;
+        background: var(--color-content-background-color);
+        border: 1px solid var(--color-border);
+        border-radius: 0.5rem;
+        padding: 0.55rem 0.55rem 0.7rem;
+        box-sizing: border-box;
+    }
+
+    .orsee.orsee-area-public .orsee-public-profile-form table {
+        width: 100%;
+    }
+
+    .orsee.orsee-area-public .orsee-public-profile-form .orsee-form-shell {
+        width: 100%;
+        max-width: none;
+    }
+
+    .orsee.orsee-area-public .orsee-public-profile-shell {
+        --orsee-form-row-gap: 0.75rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-profile-actions {
+        margin-top: 0.6rem;
+        padding: 0;
+    }
+
+    /* ==================== PUBLIC MOBILE: TABS / PANES ==================== */
+    .orsee.orsee-area-public .orsee-public-tabpage {
+        padding-inline-end: 0;
+        will-change: auto;
+    }
+
+    .orsee.orsee-area-public .orsee-public-subpane-list {
+        padding: 0 0.2rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-subpane-detail {
+        padding: 0;
+    }
+
+    /* ==================== PUBLIC MOBILE: SESSION LIST + DETAIL CARD ==================== */
+    .orsee.orsee-area-public .orsee-public-intro {
+        margin: 0;
+        padding: 0.75rem 0.35rem 0.55rem;
+        text-align: center;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-group {
+        margin: 0.45rem 0 0.75rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-group-title {
+        line-height: 1.15;
+        padding: 0.45rem 0.65rem 0.35rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-group-note {
+        padding: 0.38rem 0.7rem 0.52rem;
+        color: var(--color-text-secondary);
+        border-top: 1px solid var(--color-border-soft);
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-link {
+        border-top: 1px solid var(--color-border);
+        padding: 0.68rem 0.65rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-link.is-static {
+        cursor: default;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-link-main {
+        gap: 0.05rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-link-title {
+        line-height: 1.16;
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-link-sub {
+        color: var(--color-body-text);
+    }
+
+    .orsee.orsee-area-public .orsee-public-session-link-chevron {
+        font-size: 1.95rem;
+        color: var(--color-text-secondary);
+        line-height: 1;
+    }
+
+    .orsee.orsee-area-public .orsee-public-detail-top {
+        padding: 0.62rem 0.6rem 0.58rem;
+        margin: 0;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .orsee.orsee-area-public .orsee-public-detail-back {
+        padding: 0.3rem 0.1rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-detail-card {
+        margin: 0.35rem 0.2rem 0;
+    }
+
+    .orsee.orsee-area-public .orsee-public-detail-card-head {
+        padding: 0.38rem 0.8rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-detail-row {
+        padding: 0.72rem 0.8rem;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .orsee.orsee-area-public .orsee-public-detail-label {
+        font-size: var(--font-size-ui-base);
+        margin-bottom: 0.14rem;
+    }
+
+    .orsee.orsee-area-public .orsee-public-detail-note {
+        color: var(--color-text-secondary);
+    }
+
+    /* ==================== PUBLIC MOBILE: PRIMARY/DELETE ACTION BUTTONS ==================== */
+    .orsee.orsee-area-public .orsee-public-btn,
+    .orsee.orsee-area-public .button.orsee-public-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 2.55rem;
+        border-radius: 0.5rem;
+        border: 1px solid color-mix(in srgb, var(--color-button-mobile-action-background) 72%, var(--color-mix-anchor-dark));
+        background: var(--color-button-mobile-action-background);
+        color: var(--color-button-mobile-action-text);
+        font-family: var(--font-ui);
+        font-size: var(--font-size-ui-base);
+        font-weight: 500;
+        text-decoration: none;
+        -webkit-text-fill-color: var(--color-button-mobile-action-text);
+    }
+
+    .orsee.orsee-area-public .orsee-public-btn--delete,
+    .orsee.orsee-area-public .button.orsee-public-btn--delete {
+        border-color: color-mix(in srgb, var(--color-button-mobile-delete-background) 72%, var(--color-mix-anchor-dark));
+        background: var(--color-button-mobile-delete-background);
+        color: var(--color-button-mobile-delete-text);
+        -webkit-text-fill-color: var(--color-button-mobile-delete-text);
+    }
+
+    .orsee.orsee-area-public .button.orsee-public-btn,
+    .orsee.orsee-area-public .button.orsee-public-btn--delete,
+    .orsee.orsee-area-public .button:is(.orsee-public-btn, .orsee-public-btn--delete):is(:link, :visited, :hover, :focus, :active) {
+        color: var(--color-button-mobile-action-text) !important;
+        -webkit-text-fill-color: var(--color-button-mobile-action-text);
+    }
+
+    .orsee.orsee-area-public .button.orsee-public-btn--delete:is(:link, :visited, :hover, :focus, :active) {
+        color: var(--color-button-mobile-delete-text) !important;
+        -webkit-text-fill-color: var(--color-button-mobile-delete-text);
+    }
+
+    /* ADMIN MOBILE/TABLET HEADER + NAV COLLAPSE (<=740) */
+    .orsee.orsee-area-admin .orsee-shell {
+        display: block;
+        padding: 0;
+    }
+
+    .orsee.orsee-area-admin .orsee-brand {
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+
+    .orsee.orsee-area-admin .orsee-brand-left {
+        align-items: center;
+        padding: 0.28rem 0 0.28rem;
+    }
+
+    .orsee.orsee-area-admin .orsee-burger {
+        display: inline-block;
+    }
+
+    .orsee.orsee-area-admin .orsee-brand-left img {
+        height: 56px;
+        width: auto;
+        margin-inline-start: 0;
+    }
+
+    .orsee.orsee-area-admin .orsee-brand-right {
+        min-width: 0;
+        border-start-start-radius: 0;
+        border-start-end-radius: 0;
+        border-end-end-radius: 0;
+        border-end-start-radius: var(--orsee-radius);
+        margin-inline-end: 0;
+        overflow: hidden;
+    }
+
+    .orsee.orsee-area-admin .orsee-brand-bar {
+        display: none;
+    }
+
+    .orsee.orsee-area-admin .orsee-brand-logo {
+        display: block;
+        padding: 0.35rem 0.55rem 0.35rem;
+    }
+
+    .orsee.orsee-area-admin .orsee-brand-logo img {
+        display: block;
+        max-height: 45px;
+        width: auto;
+        height: 45px;
+        margin-inline-start: auto;
+    }
+
+    .orsee.orsee-area-admin .orsee-menu {
+        display: none;
+        border-radius: 0;
+        margin-top: 0;
+        position: static;
+    }
+
+    .orsee.orsee-area-admin.orsee-m-nav-open .orsee-menu {
+        display: block;
+    }
+
+    .orsee.orsee-area-admin .orsee-main {
+        margin-top: 0;
+        border-radius: 0.8rem;
+        padding: var(--orsee-gap);
+    }
+
+    .orsee-dense-session-grid {
+        display: block;
+    }
+
+    .orsee-dense-session-select {
+        display: inline-block;
+        vertical-align: middle;
+        margin-inline-end: 0.35rem;
+    }
+
+    .orsee-dense-session-name {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .orsee-dense-session-statusline {
+        margin-top: 0.14rem;
+    }
+
+    .orsee-dense-session-regstate {
+        margin-top: 0.14rem;
+    }
+
+    .orsee-dense-session-signedup,
+    .orsee-dense-session-reminder,
+    .orsee-dense-session-payment {
+        margin-top: 0.14rem;
+    }
+
+    .orsee-dense-session-action {
+        margin-top: 0.18rem;
+        text-align: end;
+    }
+
+    .orsee-panel-title {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
+    }
+
+    .orsee-calendar-month-head.orsee-panel-title {
+        grid-template-columns: 1.4rem 1fr 1.4rem;
+        align-items: center;
+    }
+
+    .orsee-panel-title .orsee-panel-actions {
+        display: grid;
+        grid-template-columns: repeat(2, max-content);
+        gap: 0.28rem 0.35rem;
+        justify-content: end;
+        align-items: start;
+    }
+
+    .orsee-facts-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .orsee-fact--wide {
+        grid-column: auto;
+    }
+
+    .orsee-panel-split {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .orsee-panel-split-actions .orsee-action-grid {
+        grid-template-columns: minmax(0, 1fr);
+        justify-content: start;
+        margin-top: 0.4rem;
+    }
+
+    .orsee-option-item {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.12rem;
+    }
+
+    .orsee-log-topbar {
+        justify-content: flex-start;
+    }
+
+    .orsee-table-mobile .orsee-table-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-auto-flow: row;
+        grid-template-rows: none;
+        grid-auto-columns: auto;
+    }
+
+    .orsee-table-mobile .orsee-table-row.orsee-table-head {
+        display: none;
+    }
+
+    .orsee-data-cols-participants-summary.orsee-table-mobile .orsee-table-row {
+        grid-template-columns: minmax(120px, 1.15fr) repeat(var(--orsee-participant-status-cols, 1), minmax(32px, 0.42fr));
+        gap: 0.08rem 0.2rem;
+        padding: 0.2rem 0.28rem;
+        font-size: var(--font-size-compact);
+    }
+
+    .orsee-data-cols-participants-summary.orsee-table-mobile .orsee-table-row.orsee-table-head {
+        display: grid;
+        gap: 0;
+    }
+
+    .orsee-table-mobile .orsee-table-cell::before {
+        content: attr(data-label) ": ";
+        display: inline;
+        font-size: var(--font-size-compact);
+        color: var(--color-text-secondary);
+        font-weight: 600;
+    }
+
+    .orsee-table-mobile .orsee-table-cell.orsee-table-action::before {
+        content: "";
+        display: none;
+    }
+
+    .orsee-table-mobile .orsee-table-row.orsee-table-subheader-row {
+        grid-template-columns: 1fr;
+    }
+
+    .orsee-table-mobile .orsee-table-row.orsee-table-subheader-row .orsee-table-cell:not(:first-child) {
+        display: none;
+    }
+
+    .orsee-table-mobile .orsee-table-row.orsee-table-subheader-row .orsee-table-cell:first-child::before {
+        content: "";
+        display: none;
+    }
+
+    .orsee-data-cols-participants-summary .orsee-table-cell::before {
+        content: "";
+        display: none;
+    }
+
+    .orsee-data-cols-participants-summary .orsee-table-row .orsee-table-cell:nth-child(n + 2) {
+        text-align: center;
+    }
+
+    .orsee-table-action {
+        justify-self: start;
+        text-align: start;
+    }
+
+    .orsee-log-delete-form {
+        width: 100%;
+    }
+
+    .orsee-log-pagination {
+        justify-content: space-between;
+    }
+
+    .orsee-calendar {
+        width: 100%;
+    }
+
+    .orsee-calendar-toolbar {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.28rem;
+        margin-bottom: 0.18rem;
+    }
+
+    .orsee-calendar-toolbar-left,
+    .orsee-calendar-toolbar-center,
+    .orsee-calendar-toolbar-right {
+        text-align: center;
+    }
+
+    .orsee-calendar > .orsee-calendar-toolbar:first-of-type .orsee-calendar-toolbar-left,
+    .orsee-calendar > .orsee-calendar-toolbar:first-of-type .orsee-calendar-toolbar-right,
+    .orsee-calendar > .orsee-calendar-toolbar:first-of-type .orsee-calendar-toolbar-center .orsee-font-compact {
+        display: none;
+    }
+
+    .orsee-calendar > .orsee-calendar-toolbar:first-of-type {
+        grid-template-columns: minmax(0, 1fr);
+        margin-bottom: 0.1rem;
+    }
+
+    .orsee-calendar > .orsee-calendar-toolbar:nth-of-type(2) {
+        margin-bottom: 0.08rem;
+    }
+
+    .orsee-calendar-month {
+        margin-bottom: 0.7rem;
+    }
+
+    .orsee-calendar-month-head {
+        font-size: 1.05rem;
+        padding-top: 0.28rem;
+        padding-bottom: 0.3rem;
+    }
+
+    .orsee-calendar-weekday {
+        padding-inline-end: 0.3rem;
+    }
+
+    .orsee-calendar-day {
+        min-height: 4.1rem;
+    }
+
+    .orsee-calendar-daynum {
+        padding-top: 0.1rem;
+        padding-bottom: 0.1rem;
+    }
+
+    .orsee-calendar-daybody {
+        padding-top: 0.08rem;
+        padding-inline-start: 0.06rem;
+        padding-inline-end: 0.06rem;
+    }
+
+    .orsee-calendar-event {
+        margin: 0.08rem 0;
+        padding: 0;
+        border-radius: 0;
+        background: transparent !important;
+    }
+
+    .orsee-calendar-event > :not(.orsee-calendar-pill) {
+        display: none;
+    }
+
+    .orsee-calendar-pill {
+        display: inline-flex;
+    }
+
+    .orsee-calendar-popover {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 120;
+        pointer-events: none;
+    }
+
+    .orsee-calendar-popover.is-open {
+        display: block;
+    }
+
+    .orsee-calendar-popover-card {
+        position: fixed;
+        max-width: min(88vw, 24rem);
+        pointer-events: auto;
+        border-start-start-radius: 0.32rem;
+        border-start-end-radius: 0.86rem;
+        border-end-end-radius: 0.32rem;
+        border-end-start-radius: 0.32rem;
+        overflow: hidden;
+    }
+
+    .orsee-calendar-popover-body {
+        background: transparent;
+        padding: 0;
+        box-shadow: 0 12px 30px var(--color-shadow-3);
+        border-radius: inherit;
+        overflow: hidden;
+    }
+
+    .orsee-calendar-popover .orsee-calendar-event {
+        margin: 0;
+        border-start-start-radius: 0.32rem;
+        border-start-end-radius: 0.86rem;
+        border-end-end-radius: 0.32rem;
+        border-end-start-radius: 0.32rem;
+        padding: 0.22rem 0.46rem 0.28rem;
+        font-size: var(--font-size-compact, 0.8rem);
+        line-height: 1.2;
+        font-weight: 400;
+        background: color-mix(
+            in srgb,
+            var(--color-calendar-event-color, var(--color-calendar-entry-default-background)) var(--color-calendar-entry-source-strength),
+            var(--color-mix-anchor-dark)
+        ) !important;
+        border: 1px solid var(--color-border-strong);
+    }
+
+    .orsee-calendar-popover .orsee-calendar-event > * {
+        display: block;
+    }
+
+    .orsee-calendar-popover .orsee-calendar-event .orsee-calendar-pill {
+        display: none;
+    }
+
+    .orsee .orsee-panel-title [data-orsee-mobile-hide="exp-switch"] {
+        display: none;
+    }
+}

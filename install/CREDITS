@@ -1,0 +1,34 @@
+
+This software uses the following third-party components:
+
+Font Awesome (https://fontawesome.com)
+Icons licensed under CC BY 4.0
+Fonts licensed under SIL Open Font License 1.1
+Code licensed under MIT License
+
+Inter (https://rsms.me/inter/)
+Fonts licensed under the SIL Open Font License 1.1
+
+Coloris (https://github.com/mdbassit/Coloris)
+Licensed under the MIT License
+
+flatpickr (https://flatpickr.js.org/)
+Licensed under the MIT License
+
+intl-tel-input (https://github.com/jackocnr/intl-tel-input)
+Licensed under the MIT License
+
+Bulma (https://bulma.io/)
+Licensed under the MIT License
+
+PHPMailer (https://github.com/PHPMailer/PHPMailer)
+Licensed under the LGPL 2.1 License
+
+PHPlot (http://phplot.sourceforge.net/)
+Licensed under the LGPL License
+
+ezPDF / Cezpdf (http://www.ros.co.nz/pdf/)
+Licensed under the GNU LGPL License
+
+fMailbox (https://github.com/daveismyname/fMailbox)
+Licensed under the MIT License

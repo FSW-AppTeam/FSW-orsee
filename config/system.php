@@ -1,8 +1,8 @@
 <?php
 // part of orsee. see orsee.org
 // THIS FILE WILL CHANGE FROM VERSION TO VERSION. BETTER NOT EDIT.
-$system__version="3.3.0";
-$system__database_version=2026031100;
+$system__version="3.4.1";
+$system__database_version=2026042603;
 
 // implemented experiment types
 $system__experiment_types=array('laboratory','online-survey','internet');
@@ -26,9 +26,6 @@ $system__admin_rights=array(
 "datetime_format_add:add new datetime format string - dev!:datetime_format_edit",
 "datetime_format_delete:delete datetime format string - dev!:datetime_format_edit",
 "datetime_format_edit:edit datetime format string",
-"default_text_add:add new default text item - dev!:default_text_edit",
-"default_text_delete:delete default text item - dev!:default_text_edit",
-"default_text_edit:edit system's default texts",
 "emails_change_all:change properties of all emails in system  - if email module enabled:emails_read_all",
 "emails_change_assigned:change properties of emails assigned to me  - if email module enabled:emails_read_assigned",
 "emails_change_experiments:change properties of emails assigned to my experiments  - if email module enabled:emails_read_experiments",
@@ -199,7 +196,8 @@ $system__options_general=array();
 $system__options_general[]=array('type'=>'comment',
             'text'=>'ORSEE version: '.$system__version);
 
-$system__options_general[]=array('type'=>'line');
+$system__options_general[]=array('type'=>'comment',
+            'text'=>'DB version: '.$system__database_version);
 
 $system__options_general[]=array('type'=>'comment',
             'text'=>'Languages');
@@ -209,7 +207,7 @@ $system__options_general[]=array(
 'option_text'=>'Administrator Standard Language',
 'type'=>'plain',
 'field'=>'func:lang__select_lang("options[admin_standard_language]",
-                    $options["admin_standard_language"],"all")'
+                    $options["admin_standard_language"],"all","select is-primary",true)'
 );
 
 $system__options_general[]=array(
@@ -217,9 +215,112 @@ $system__options_general[]=array(
 'option_text'=>'Public Standard Language',
 'type'=>'plain',
 'field'=>'func:lang__select_lang("options[public_standard_language]",
-                    $options["public_standard_language"],"part")'
+                    $options["public_standard_language"],"part","select is-primary",true)'
 );
 
+$system__options_general[]=array('type'=>'line');
+
+$system__options_general[]=array('type'=>'comment',
+            'text'=>'Display settings');
+
+$system__options_general[]=array(
+'option_name'=>'stop_public_site',
+'option_text'=>'Stop public site (might be useful if installing/upgrading)?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'orsee_public_style',
+'option_text'=>'Style for Public Area',
+'type'=>'select_list',
+'option_values'=>'func:options__get_styles()',
+'option_values_lang'=>'func:options__get_styles()',
+'default_value'=>'orsee',
+'include_none_option'=>'n'
+);
+
+
+$system__options_general[]=array(
+'option_name'=>'public_menu_mode',
+'option_text'=>'Menu mode for Public Area',
+'type'=>'select_list',
+'option_values'=>'vertical,horizontal_dynamic_submenu,horizontal_static_submenu',
+'option_values_lang'=>'vertical,horizontal_dynamic_submenu,horizontal_static_submenu',
+'default_value'=>'vertical',
+'include_none_option'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'orsee_admin_style',
+'option_text'=>'Style for Administration Area',
+'type'=>'select_list',
+'option_values'=>'func:options__get_styles()',
+'option_values_lang'=>'func:options__get_styles()',
+'default_value'=>'orsee',
+'include_none_option'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'admin_menu_mode',
+'option_text'=>'Menu mode for Administration Area',
+'type'=>'select_list',
+'option_values'=>'vertical,horizontal_dynamic_submenu,horizontal_static_submenu',
+'option_values_lang'=>'vertical,horizontal_dynamic_submenu,horizontal_static_submenu',
+'default_value'=>'vertical',
+'include_none_option'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'participant_profile_render_mode',
+'option_text'=>'Participant profile rendering mode',
+'type'=>'select_list',
+'option_values'=>'legacy_template,structured_layout',
+'option_values_lang'=>'legacy_template,structured_layout',
+'default_value'=>'legacy_template',
+'include_none_option'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'enable_header_glimmer_effect',
+'option_text'=>'Enable shimmer glimmer effect on header hover?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'y'
+);
+
+$system__options_general[]=array(
+'option_name'=>'default_area',
+'option_text'=>'First part of each page\'s title tag (and footer title for mobile pages)?',
+'type'=>'textline',
+'default_value'=>'ORSEE',
+'size'=>'20',
+'maxlength'=>'30',
+);
+
+
+$system__options_general[]=array(
+'option_name'=>'public_mobile_toast_duration_ms',
+'option_text'=>'Duration of toast messages (milliseconds):',
+'type'=>'textline',
+'default_value'=>'3200',
+'size'=>'6',
+'maxlength'=>'6',
+'force_ltr'=>'y'
+);
+
+$system__options_general[]=array(
+'option_name'=>'hide_public_index_language_flags',
+'option_text'=>'Hide language flag icons on public main page language switch?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'y'
+);
+
+$system__options_general[]=array(
+'option_name'=>'display_language_select_in_public_menu',
+'option_text'=>'Display language selector in public menu?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'y'
+);
 
 $system__options_general[]=array('type'=>'line');
 
@@ -233,6 +334,7 @@ $system__options_general[]=array(
 'default_value'=>'change_this_address@orsee.org',
 'size'=>'30',
 'maxlength'=>'200',
+'force_ltr'=>'y',
 );
 
 $system__options_general[]=array(
@@ -260,6 +362,7 @@ $system__options_general[]=array(
 'default_value'=>'50',
 'size'=>'3',
 'maxlength'=>'6',
+'force_ltr'=>'y',
 );
 
 
@@ -277,25 +380,39 @@ $system__options_general[]=array(
 'default_value'=>'',
 'size'=>'30',
 'maxlength'=>'200',
+'force_ltr'=>'y',
+);
+
+$system__options_general[]=array('type'=>'line');
+
+
+$system__options_general[]=array('type'=>'comment',
+            'text'=>'Participant system registration settings');
+
+$system__options_general[]=array(
+'option_name'=>'subpool_default_registration_id',
+'option_text'=>'Default registration subject pool?',
+'type'=>'plain',
+'field'=>'func:subpools__select_field("options[subpool_default_registration_id]",$options["subpool_default_registration_id"],array(),"","select is-primary",true)'
 );
 
 $system__options_general[]=array(
-'option_name'=>'enable_email_module',
-'option_text'=>'Enable module to receive emails within ORSEE?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'n'
-);
-
-$system__options_general[]=array(
-'option_name'=>'email_module_delete_emails_from_server',
-'option_text'=>'Email module: Delete emails from server after retrieval (strong recommendaion: yes)?',
+'option_name'=>'registration__require_rules_acceptance',
+'option_text'=>'Do subjects have to accept the lab rules when enroling?',
 'type'=>'select_yesno_switchy',
 'default_value'=>'y'
 );
 
 $system__options_general[]=array(
-'option_name'=>'email_module_allow_assign_emails',
-'option_text'=>'Email module: Allow to assign emails to experimenters?',
+'option_name'=>'registration__require_privacy_policy_acceptance',
+'option_text'=>'Do subjects have to accept the privacy policy when enroling?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'y'
+);
+
+$system__options_general[]=array(
+'option_name'=>'hide_subscriptions_if_single_exptype',
+'option_text'=>'Hide subscriptions field in participant form if only one experiment type is available?',
 'type'=>'select_yesno_switchy',
 'default_value'=>'n'
 );
@@ -303,102 +420,29 @@ $system__options_general[]=array(
 $system__options_general[]=array('type'=>'line');
 
 $system__options_general[]=array('type'=>'comment',
-            'text'=>'Display settings');
+            'text'=>'Experiment enrolment settings');
 
 $system__options_general[]=array(
-'option_name'=>'stop_public_site',
-'option_text'=>'Stop public site (might be useful if installing/upgrading)?',
+'option_name'=>'enable_enrolment_only_on_invite',
+'option_text'=>'Eligible assigned subjects can only enrol after having received an invitation email?',
 'type'=>'select_yesno_switchy',
 'default_value'=>'n'
 );
 
-$system__options_general[]=array(
-'option_name'=>'orsee_public_style',
-'option_text'=>'Style for Public Area',
-'type'=>'select_list',
-'option_values'=>'func:options__get_styles()',
-'option_values_lang'=>'func:options__get_styles()',
-'default_value'=>'orsee',
-'include_none_option'=>'n'
-);
-
 
 $system__options_general[]=array(
-'option_name'=>'orsee_admin_style',
-'option_text'=>'Style for Administration Area',
-'type'=>'select_list',
-'option_values'=>'func:options__get_styles()',
-'option_values_lang'=>'func:options__get_styles()',
-'default_value'=>'orsee',
-'include_none_option'=>'n'
-);
-
-$system__options_general[]=array(
-'option_name'=>'default_area',
-'option_text'=>'First part of each page\'s title tag (and footer title for mobile pages)?',
-'type'=>'textline',
-'default_value'=>'ORSEE',
-'size'=>'20',
-'maxlength'=>'30',
-);
-
-
-$system__options_general[]=array(
-'option_name'=>'public_calendar_hide_exp_name',
-'option_text'=>'Participant calendar: Hide public experiment name?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'n'
-);
-
-$system__options_general[]=array(
-'option_name'=>'hide_planned_sessions_in_public_calendar',
-'option_text'=>'Participant calendar: Hide "planned" sessions?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'n'
-);
-
-$system__options_general[]=array(
-'option_name'=>'show_public_rules_page',
-'option_text'=>'Should ORSEE show the rules page in the public section?',
+'option_name'=>'show_expired_in_session_list',
+'option_text'=>'Show expired sessions in sessions list of experiment?',
 'type'=>'select_yesno_switchy',
 'default_value'=>'y'
 );
 
 $system__options_general[]=array(
-'option_name'=>'show_public_privacy_policy',
-'option_text'=>'Should ORSEE show the privacy policy page in the public section?',
+'option_name'=>'show_full_in_session_list',
+'option_text'=>'Show full sessions in sessions list of experiment?',
 'type'=>'select_yesno_switchy',
 'default_value'=>'y'
 );
-
-$system__options_general[]=array(
-'option_name'=>'show_public_calendar',
-'option_text'=>'Should ORSEE show the calendar page in the public section?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'y'
-);
-
-$system__options_general[]=array(
-'option_name'=>'show_public_faqs',
-'option_text'=>'Should ORSEE show the FAQ page in the public section?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'y'
-);
-
-$system__options_general[]=array(
-'option_name'=>'show_public_legal_notice',
-'option_text'=>'Should ORSEE show the legal notice/impressum page in the public section?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'y'
-);
-
-$system__options_general[]=array(
-'option_name'=>'show_public_contact',
-'option_text'=>'Should ORSEE show the contact page in the public section?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'y'
-);
-
 
 $system__options_general[]=array(
 'option_name'=>'include_sign_up_until_in_invitation',
@@ -420,95 +464,6 @@ $system__options_general[]=array(
 'type'=>'select_yesno_switchy',
 'default_value'=>'n'
 );
-
-
-$system__options_general[]=array('type'=>'line');
-
-$system__options_general[]=array('type'=>'comment',
-            'text'=>'Extra features');
-
-$system__options_general[]=array(
-'option_name'=>'enable_ethics_approval_module',
-'option_text'=>'Enable ethics approval module?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'n'
-);
-
-$system__options_general[]=array(
-'option_name'=>'enable_payment_module',
-'option_text'=>'Enable payment tracking module?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'n'
-);
-
-$system__options_general[]=array(
-'option_name'=>'payments_in_part_history',
-'option_text'=>'If payment module enabled: Include payments in participant\'s history?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'n'
-);
-
-$system__options_general[]=array(
-'option_name'=>'enable_rules_signed_tracking',
-'option_text'=>'Enable the "rules" checkbox in participant profiles and session participant lists?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'y'
-);
-
-$system__options_general[]=array(
-'option_name'=>'enable_event_participant_numbers',
-'option_text'=>'Allow to add participant numbers to non-ORSEE-experimental laboratory bookings?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'n'
-);
-
-$system__options_general[]=array('type'=>'line');
-
-
-$system__options_general[]=array('type'=>'comment',
-            'text'=>'Participant system registration settings');
-
-$system__options_general[]=array(
-'option_name'=>'subpool_default_registration_id',
-'option_text'=>'Default registration subject pool?',
-'type'=>'plain',
-'field'=>'func:subpools__select_field("options[subpool_default_registration_id]",$options["subpool_default_registration_id"])'
-);
-
-$system__options_general[]=array(
-'option_name'=>'registration__require_rules_acceptance',
-'option_text'=>'Do subjects have to accept the lab rules when enroling?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'y'
-);
-
-$system__options_general[]=array(
-'option_name'=>'registration__require_privacy_policy_acceptance',
-'option_text'=>'Do subjects have to accept the privacy policy when enroling?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'y'
-);
-
-$system__options_general[]=array('type'=>'line');
-
-$system__options_general[]=array('type'=>'comment',
-            'text'=>'Experiment enrolment settings');
-
-$system__options_general[]=array(
-'option_name'=>'enable_enrolment_only_on_invite',
-'option_text'=>'Eligible assigned subjects can only enrol after having received an invitation email?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'n'
-);
-
-
-$system__options_general[]=array(
-'option_name'=>'enable_mobile_pages',
-'option_text'=>'Enable special enrolment page for mobile devices?',
-'type'=>'select_yesno_switchy',
-'default_value'=>'n'
-);
-
 
 $system__options_general[]=array(
 'option_name'=>'allow_public_experiment_note',
@@ -567,6 +522,7 @@ $system__options_general[]=array(
 'default_value'=>'6',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 $system__options_general[]=array(
@@ -574,7 +530,7 @@ $system__options_general[]=array(
 'option_text'=>'If yes: Participation status to be assigned to subjects who canceled their session enrollment',
 'type'=>'plain',
 'field'=>'func:expregister__participation_status_select_field("options[subject_cancellation_participation_status]",
-            $options["subject_cancellation_participation_status"],array(),false)',
+            $options["subject_cancellation_participation_status"],array(),false,"select is-primary",true)',
 'default_value'=>'0'
 );
 
@@ -598,6 +554,7 @@ $system__options_general[]=array(
 'default_value'=>'2',
 'size'=>'2',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 $system__options_general[]=array(
@@ -613,7 +570,7 @@ $system__options_general[]=array(
 'option_text'=>'Participant status to be assigned to excluded subjects',
 'type'=>'plain',
 'field'=>'func:participant_status__select_field("options[automatic_exclusion_to_participant_status]",
-            $options["automatic_exclusion_to_participant_status"],array("0"))'
+            $options["automatic_exclusion_to_participant_status"],array("0"),"","select is-primary",true)'
 );
 
 
@@ -659,6 +616,20 @@ $system__options_general[]=array(
 );
 
 $system__options_general[]=array(
+'option_name'=>'force_ltr_admin_login_username',
+'option_text'=>'Force left-to-right input field for admin login username?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'force_ltr_admin_login_password',
+'option_text'=>'Force left-to-right input field for admin login password?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'y'
+);
+
+$system__options_general[]=array(
 'option_name'=>'admin_password_regexp',
 'option_text'=>'Regular expression for admin passwords (default: PW between 8 and 20 characters long,
                  at least one lower-case letter (a-z), one upper-case (A-Z), one digit (0-9)).
@@ -667,6 +638,7 @@ $system__options_general[]=array(
 'default_value'=>'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,20}$',
 'size'=>'50',
 'maxlength'=>'200',
+'force_ltr'=>'y',
 );
 
 $system__options_general[]=array(
@@ -683,6 +655,7 @@ $system__options_general[]=array(
 'default_value'=>'3',
 'size'=>'5',
 'maxlength'=>'5',
+'force_ltr'=>'y',
 );
 
 $system__options_general[]=array(
@@ -692,19 +665,13 @@ $system__options_general[]=array(
 'default_value'=>'30',
 'size'=>'5',
 'maxlength'=>'5',
-);
-
-$system__options_general[]=array(
-'option_name'=>'disable_admin_login_js',
-'option_text'=>'Disable auto-submit on admin login form? (May interfere with some browser autofill functions.)',
-'type'=>'select_yesno_switchy',
-'default_value'=>'n'
+'force_ltr'=>'y',
 );
 
 $system__options_general[]=array('type'=>'line');
 
 $system__options_general[]=array('type'=>'comment',
-            'text'=>'Subject security and privacy related settings');
+            'text'=>'Participant authentication related settings');
 
 
 $system__options_general[]=array(
@@ -718,6 +685,13 @@ $system__options_general[]=array(
 );
 
 $system__options_general[]=array(
+'option_name'=>'force_ltr_participant_login_password',
+'option_text'=>'Force left-to-right input field for participant login password?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'y'
+);
+
+$system__options_general[]=array(
 'option_name'=>'participant_password_regexp',
 'option_text'=>'Regular expression for participant passwords (default: PW between 8 and 20 characters long,
                  at least one lower-case letter (a-z), one upper-case (A-Z), one digit (0-9)).
@@ -726,6 +700,7 @@ $system__options_general[]=array(
 'default_value'=>'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,20}$',
 'size'=>'50',
 'maxlength'=>'200',
+'force_ltr'=>'y',
 );
 
 $system__options_general[]=array(
@@ -735,6 +710,7 @@ $system__options_general[]=array(
 'default_value'=>'3',
 'size'=>'5',
 'maxlength'=>'5',
+'force_ltr'=>'y',
 );
 
 $system__options_general[]=array(
@@ -744,6 +720,86 @@ $system__options_general[]=array(
 'default_value'=>'30',
 'size'=>'5',
 'maxlength'=>'5',
+'force_ltr'=>'y',
+);
+
+$system__options_general[]=array('type'=>'comment',
+            'text'=>'Calendar');
+
+$system__options_general[]=array(
+'option_name'=>'public_calendar_hide_exp_name',
+'option_text'=>'Participant calendar: Hide public experiment name?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'hide_planned_sessions_in_public_calendar',
+'option_text'=>'Participant calendar: Hide "planned" sessions?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'enable_event_participant_numbers',
+'option_text'=>'Allow to add participant numbers to non-ORSEE-experimental laboratory bookings?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'n'
+);
+
+$system__options_general[]=array('type'=>'line');
+
+$system__options_general[]=array('type'=>'comment',
+            'text'=>'Extra features');
+
+$system__options_general[]=array(
+'option_name'=>'enable_ethics_approval_module',
+'option_text'=>'Enable ethics approval module?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'enable_payment_module',
+'option_text'=>'Enable payment tracking module?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'payments_in_part_history',
+'option_text'=>'If payment module enabled: Include payments in participant\'s history?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'enable_email_module',
+'option_text'=>'Enable module to receive emails within ORSEE?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'n'
+);
+
+$system__options_general[]=array(
+'option_name'=>'email_module_delete_emails_from_server',
+'option_text'=>'Email module: Delete emails from server after retrieval (strong recommendation: yes)?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'y'
+);
+
+$system__options_general[]=array(
+'option_name'=>'email_module_allow_assign_emails',
+'option_text'=>'Email module: Allow to assign emails to experimenters?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'n'
+);
+
+
+$system__options_general[]=array(
+'option_name'=>'enable_rules_signed_tracking',
+'option_text'=>'Enable the "rules" checkbox in participant profiles and session participant lists?',
+'type'=>'select_yesno_switchy',
+'default_value'=>'y'
 );
 
 $system__options_general[]=array('type'=>'line');
@@ -753,12 +809,22 @@ $system__options_general[]=array('type'=>'comment',
             'text'=>'Diverse settings');
 
 $system__options_general[]=array(
+'option_name'=>'session_timeout_minutes',
+'option_text'=>'Session timeout for administrators and participants (minutes)?',
+'type'=>'textline',
+'default_value'=>'120',
+'size'=>'5',
+'maxlength'=>'5',
+);
+
+$system__options_general[]=array(
 'option_name'=>'http_log_file_location',
 'option_text'=>'Path to server log file (access.log)?',
 'type'=>'textline',
 'default_value'=>'/var/log/apache2/access_log',
 'size'=>'30',
 'maxlength'=>'200',
+'force_ltr'=>'y',
 );
 
 $system__options_general[]=array(
@@ -768,6 +834,7 @@ $system__options_general[]=array(
 'default_value'=>'500000',
 'size'=>'10',
 'maxlength'=>'20',
+'force_ltr'=>'y',
 );
 
 $system__options_general[]=array(
@@ -851,7 +918,8 @@ $system__options_defaults[]=array(
 'type'=>'textline',
 'default_value'=>'10',
 'size'=>'5',
-'maxlength'=>'5'
+'maxlength'=>'5',
+'force_ltr'=>'y'
 );
 
 $system__options_defaults[]=array('type'=>'line');
@@ -863,7 +931,7 @@ $system__options_defaults[]=array(
 'default_value'=>'12',
 'value_begin'=>'6',
 'value_end'=>'25',
-'value_step'=>'1',
+'value_step'=>'0.5',
 'values_reverse'=>'n',
 'include_none_option'=>'n'
 );
@@ -872,10 +940,10 @@ $system__options_defaults[]=array(
 'option_name'=>'calendar_pdf_table_fontsize',
 'option_text'=>'PDF Calendar: table entry font size?',
 'type'=>'select_numbers',
-'default_value'=>'8',
+'default_value'=>'7.5',
 'value_begin'=>'6',
 'value_end'=>'25',
-'value_step'=>'1',
+'value_step'=>'0.5',
 'values_reverse'=>'n',
 'include_none_option'=>'n'
 );
@@ -884,10 +952,10 @@ $system__options_defaults[]=array(
 'option_name'=>'participant_list_pdf_title_fontsize',
 'option_text'=>'PDF Participant list: title font size?',
 'type'=>'select_numbers',
-'default_value'=>'12',
+'default_value'=>'11',
 'value_begin'=>'6',
 'value_end'=>'25',
-'value_step'=>'1',
+'value_step'=>'0.5',
 'values_reverse'=>'n',
 'include_none_option'=>'n'
 );
@@ -896,62 +964,15 @@ $system__options_defaults[]=array(
 'option_name'=>'participant_list_pdf_table_fontsize',
 'option_text'=>'PDF Participant list: table entry font size?',
 'type'=>'select_numbers',
-'default_value'=>'10',
+'default_value'=>'9',
 'value_begin'=>'6',
 'value_end'=>'25',
-'value_step'=>'1',
+'value_step'=>'0.5',
 'values_reverse'=>'n',
 'include_none_option'=>'n'
 );
 
 $system__options_defaults[]=array('type'=>'line');
-
-$system__options_defaults[]=array(
-'option_name'=>'multipicker_left_or_right',
-'option_text'=>'Multipickers on left or ritgh side of multi-select fields?',
-'type'=>'select_list',
-'option_values'=>'left,right',
-'option_values_lang'=>'left,right',
-'default_value'=>'left',
-'include_none_option'=>'n'
-);
-
-$system__options_defaults[]=array(
-'option_name'=>'experimenter_list_nr_columns',
-'option_text'=>'Multipicker list of experimenters: max number of columns?',
-'type'=>'select_numbers',
-'default_value'=>'3',
-'value_begin'=>'1',
-'value_end'=>'6',
-'value_step'=>'1',
-'values_reverse'=>'n',
-'include_none_option'=>'n'
-);
-
-$system__options_defaults[]=array(
-'option_name'=>'query_experiment_classes_list_nr_columns',
-'option_text'=>'Participant query: Multipicker list of experiment classes: number of columns?',
-'type'=>'select_numbers',
-'default_value'=>'3',
-'value_begin'=>'1',
-'value_end'=>'6',
-'value_step'=>'1',
-'values_reverse'=>'n',
-'include_none_option'=>'n'
-);
-
-
-$system__options_defaults[]=array(
-'option_name'=>'query_experiment_list_nr_columns',
-'option_text'=>'Participant query: Multipicker list of other experiments: number of columns?',
-'type'=>'select_numbers',
-'default_value'=>'3',
-'value_begin'=>'1',
-'value_end'=>'6',
-'value_step'=>'1',
-'values_reverse'=>'n',
-'include_none_option'=>'n'
-);
 
 $system__options_defaults[]=array('type'=>'line');
 $system__options_defaults[]=array(
@@ -973,6 +994,7 @@ $system__options_defaults[]=array(
 'default_value'=>'5',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 $system__options_defaults[]=array(
@@ -982,6 +1004,7 @@ $system__options_defaults[]=array(
 'default_value'=>'5',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 $system__options_defaults[]=array(
@@ -991,6 +1014,7 @@ $system__options_defaults[]=array(
 'default_value'=>'5',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 $system__options_defaults[]=array(
@@ -1000,6 +1024,7 @@ $system__options_defaults[]=array(
 'default_value'=>'5',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 
@@ -1031,6 +1056,7 @@ $system__options_defaults[]=array(
 'default_value'=>'15',
 'size'=>'3',
 'maxlength'=>'4',
+'force_ltr'=>'y',
 );
 
 $system__options_defaults[]=array(
@@ -1052,6 +1078,7 @@ $system__options_defaults[]=array(
 'default_value'=>'15',
 'size'=>'3',
 'maxlength'=>'4',
+'force_ltr'=>'y',
 );
 
 $system__options_defaults[]=array(
@@ -1109,6 +1136,7 @@ $system__options_defaults[]=array(
 'default_value'=>'240',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 $system__options_defaults[]=array(
@@ -1118,6 +1146,7 @@ $system__options_defaults[]=array(
 'default_value'=>'12',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 
@@ -1152,6 +1181,7 @@ $system__options_defaults[]=array(
 'default_value'=>'120',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 $system__options_defaults[]=array(
@@ -1161,6 +1191,7 @@ $system__options_defaults[]=array(
 'default_value'=>'12',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 
@@ -1180,38 +1211,13 @@ $system__options_defaults[]=array(
 $system__options_defaults[]=array('type'=>'line');
 
 $system__options_defaults[]=array(
-'option_name'=>'session_start_years_backward',
-'option_text'=>'Experiment Session: "session start"-field: years backward?',
-'type'=>'select_numbers',
-'default_value'=>'10',
-'value_begin'=>'0',
-'value_end'=>'40',
-'value_step'=>'1',
-'values_reverse'=>'n',
-'include_none_option'=>'n'
-);
-
-$system__options_defaults[]=array(
-'option_name'=>'session_start_years_forward',
-'option_text'=>'Experiment Session: "session start"-field: years forward?',
-'type'=>'select_numbers',
-'default_value'=>'10',
-'value_begin'=>'0',
-'value_end'=>'20',
-'value_step'=>'1',
-'values_reverse'=>'n',
-'include_none_option'=>'n'
-);
-
-$system__options_defaults[]=array('type'=>'line');
-
-$system__options_defaults[]=array(
 'option_name'=>'mailqueue_number_of_entries_per_page',
 'option_text'=>'General mail queue display: number of entries per page',
 'type'=>'textline',
 'default_value'=>'100',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 $system__options_defaults[]=array(
@@ -1221,6 +1227,17 @@ $system__options_defaults[]=array(
 'default_value'=>'100',
 'size'=>'3',
 'maxlength'=>'3',
+'force_ltr'=>'y',
+);
+
+$system__options_defaults[]=array(
+'option_name'=>'emails_number_of_entries_per_page',
+'option_text'=>'Email module display: number of entries per page',
+'type'=>'textline',
+'default_value'=>'50',
+'size'=>'3',
+'maxlength'=>'3',
+'force_ltr'=>'y',
 );
 
 $system__options_defaults[]=array('type'=>'line');
@@ -1240,7 +1257,7 @@ $system__colors[]=array('type'=>'comment',
 
 $system__colors[]=array(
 'color_name'=>'html_header_top_bar_background',
-'default_value'=>'#6b7da5'
+'default_value'=>'#6285d0'
 );
 
 $system__colors[]=array(
@@ -1249,10 +1266,9 @@ $system__colors[]=array(
 );
 
 $system__colors[]=array(
-'color_name'=>'html_header_menu_background',
-'default_value'=>'#566383'
+'color_name'=>'html_header_logo_bar_text',
+'default_value'=>'#ffffff'
 );
-
 
 $system__colors[]=array('type'=>'line');
 
@@ -1261,34 +1277,75 @@ $system__colors[]=array('type'=>'comment',
 
 $system__colors[]=array(
 'color_name'=>'body_text',
-'default_value'=>'#000000'
+'default_value'=>'#0f172a'
 );
 
 $system__colors[]=array(
 'color_name'=>'body_link',
-'default_value'=>'#006dc7'
+'default_value'=>'#2f5fb0'
 );
 
 $system__colors[]=array(
 'color_name'=>'body_alink',
-'default_value'=>'#006dc7'
+'default_value'=>'#3c74d2'
 );
 
 $system__colors[]=array(
 'color_name'=>'body_vlink',
-'default_value'=>'#006dc7'
+'default_value'=>'#365fa6'
+);
+
+$system__colors[]=array(
+'color_name'=>'text_secondary',
+'default_value'=>'#616161'
+);
+
+$system__colors[]=array(
+'color_name'=>'text_placeholder',
+'default_value'=>'#9aa4b2'
 );
 
 $system__colors[]=array(
 'color_name'=>'shade_around_content',
-'default_value'=>'#dadada'
+'default_value'=>'#f3f6fb'
 );
 
 $system__colors[]=array(
 'color_name'=>'content_background_color',
-'default_value'=>'#fefefe'
+'default_value'=>'#ffffff'
 );
 
+$system__colors[]=array('type'=>'line');
+
+$system__colors[]=array('type'=>'comment',
+            'text'=>'ORSEE menu colors');
+
+$system__colors[]=array(
+'color_name'=>'html_header_menu_background',
+'default_value'=>'#405789'
+);
+
+$system__colors[]=array(
+'color_name'=>'menu_title',
+'default_value'=>'#f5f8fe'
+);
+
+
+$system__colors[]=array(
+'color_name'=>'menu_item',
+'default_value'=>'#f8fafe'
+);
+
+
+$system__colors[]=array(
+'color_name'=>'menu_item_highlighted_background',
+'default_value'=>'#457c9b'
+);
+
+$system__colors[]=array(
+'color_name'=>'menu_logout_text',
+'default_value'=>'#ff8f87'
+);
 
 $system__colors[]=array('type'=>'line');
 
@@ -1296,18 +1353,13 @@ $system__colors[]=array('type'=>'comment',
             'text'=>'Colors for lists, panels, etc.');
 
 $system__colors[]=array(
-'color_name'=>'page_subtitle_background',
-'default_value'=>'#EEEEEE'
-);
-
-$system__colors[]=array(
-'color_name'=>'page_subtitle_textcolor',
-'default_value'=>'#222222'
+'color_name'=>'page_title_text',
+'default_value'=>'#35548c'
 );
 
 $system__colors[]=array(
 'color_name'=>'panel_title_background',
-'default_value'=>'#6b7da5'
+'default_value'=>'#5676c3'
 );
 
 $system__colors[]=array(
@@ -1316,13 +1368,8 @@ $system__colors[]=array(
 );
 
 $system__colors[]=array(
-'color_name'=>'options_box_background',
-'default_value'=>'#d3d3d3'
-);
-
-$system__colors[]=array(
 'color_name'=>'list_header_background',
-'default_value'=>'#6b7da5'
+'default_value'=>'#5676c3'
 );
 
 $system__colors[]=array(
@@ -1332,7 +1379,7 @@ $system__colors[]=array(
 
 $system__colors[]=array(
 'color_name'=>'list_header_highlighted_background',
-'default_value'=>'#93712c'
+'default_value'=>'#6655c2'
 );
 
 $system__colors[]=array(
@@ -1341,40 +1388,111 @@ $system__colors[]=array(
 );
 
 $system__colors[]=array(
+'color_name'=>'dragdrop_selected_background',
+'default_value'=>'#4f79c8'
+);
+
+$system__colors[]=array(
+'color_name'=>'dragdrop_selected_text',
+'default_value'=>'#f8fbff'
+);
+
+$system__colors[]=array(
 'color_name'=>'list_shade1',
-'default_value'=>'#fefefe'
+'default_value'=>'#fcfdfd'
 );
 
 $system__colors[]=array(
 'color_name'=>'list_shade2',
-'default_value'=>'#e0e0e0'
+'default_value'=>'#f5f7fd'
+);
+
+$system__colors[]=array(
+'color_name'=>'list_row_hover_background',
+'default_value'=>'#dfe8f7'
 );
 
 $system__colors[]=array(
 'color_name'=>'list_shade_subtitle',
-'default_value'=>'#d3d3d3'
+'default_value'=>'#e2e2e4'
+);
+
+$system__colors[]=array(
+'color_name'=>'border',
+'default_value'=>'#b2bccc'
 );
 
 $system__colors[]=array('type'=>'line');
 
 $system__colors[]=array('type'=>'comment',
-            'text'=>'ORSEE menu colors');
+            'text'=>'Button colors');
 
 $system__colors[]=array(
-'color_name'=>'menu_title',
-'default_value'=>'#d7d7d7'
+'color_name'=>'button_action_background',
+'default_value'=>'#ffffff'
 );
 
-
 $system__colors[]=array(
-'color_name'=>'menu_item',
-'default_value'=>'#e2e2e2'
+'color_name'=>'button_action_border',
+'default_value'=>'#3d81d3'
 );
 
+$system__colors[]=array(
+'color_name'=>'button_action_text',
+'default_value'=>'#2f619b'
+);
 
 $system__colors[]=array(
-'color_name'=>'menu_item_highlighted_background',
-'default_value'=>'#93712c'
+'color_name'=>'button_action_hover_background',
+'default_value'=>'#e2e5eb'
+);
+
+$system__colors[]=array(
+'color_name'=>'button_delete_background',
+'default_value'=>'#ffffff'
+);
+
+$system__colors[]=array(
+'color_name'=>'button_delete_border',
+'default_value'=>'#c62828'
+);
+
+$system__colors[]=array(
+'color_name'=>'button_delete_text',
+'default_value'=>'#c62828'
+);
+
+$system__colors[]=array(
+'color_name'=>'button_mobile_action_background',
+'default_value'=>'#0033aa'
+);
+
+$system__colors[]=array(
+'color_name'=>'button_mobile_action_text',
+'default_value'=>'#ffffff'
+);
+
+$system__colors[]=array(
+'color_name'=>'button_mobile_delete_background',
+'default_value'=>'#c62828'
+);
+
+$system__colors[]=array(
+'color_name'=>'button_mobile_delete_text',
+'default_value'=>'#ffffff'
+);
+
+$system__colors[]=array('type'=>'comment',
+            'text'=>'Form element colors');
+
+$system__colors[]=array(
+'color_name'=>'form_element_background',
+'default_value'=>'#ffffff'
+);
+
+$system__colors[]=array(
+'color_name'=>'form_element_accent_color',
+'default_value'=>'#5676c3'
 );
 
 
@@ -1385,67 +1503,40 @@ $system__colors[]=array('type'=>'comment',
 
 $system__colors[]=array(
 'color_name'=>'message_background',
-'default_value'=>'#ff7f50'
+'default_value'=>'#f5f9ff'
 );
 
 $system__colors[]=array(
-'color_name'=>'message_border',
-'default_value'=>'#566383'
+'color_name'=>'message_border_note',
+'default_value'=>'#4f79c8'
+);
+
+$system__colors[]=array(
+'color_name'=>'message_border_warning',
+'default_value'=>'#c79028'
+);
+
+$system__colors[]=array(
+'color_name'=>'message_border_error',
+'default_value'=>'#c64040'
 );
 
 $system__colors[]=array(
 'color_name'=>'message_text',
-'default_value'=>'#000000'
+'default_value'=>'#1f2f3f'
 );
 
 $system__colors[]=array(
 'color_name'=>'important_note_textcolor',
-'default_value'=>'#FF0000'
+'default_value'=>'#c62828'
 );
 
 
 $system__colors[]=array('type'=>'line');
 
 $system__colors[]=array('type'=>'comment',
-            'text'=>'Colors to be used for participant profile / email popup');
-
-$system__colors[]=array(
-'color_name'=>'popup_bgcolor',
-'default_value'=>'#e8e8e8'
-);
-
-$system__colors[]=array(
-'color_name'=>'popup_text',
-'default_value'=>'#021d59'
-);
-
-$system__colors[]=array(
-'color_name'=>'popup_modal_color',
-'default_value'=>'#a3a3a3'
-);
-
-$system__colors[]=array('type'=>'line');
-
-$system__colors[]=array('type'=>'comment',
-            'text'=>'Experiment calendar colors');
-
-$system__colors[]=array(
-'color_name'=>'calendar_month_font',
-'default_value'=>'#ffffff'
-);
-
-$system__colors[]=array(
-'color_name'=>'calendar_month_background',
-'default_value'=>'#6b7da5'
-);
-
-$system__colors[]=array(
-'color_name'=>'calendar_day_background',
-'default_value'=>'#e6e6e6'
-);
-
-$system__colors[]=array('type'=>'comment',
-        'text'=>'The following three are color <B>lists</B>, seperated by ",".<BR>
+        'text'=>'Experiment calendar colors<br>
+                The following three are color <B>lists</B>, seperated by ",".<BR>
                 The calendar will rotate through these colors to depict different experiments.<BR>
                 If you want the same color for all experiments (e.g. in the public calendar,
                 just choose only one color.');
@@ -1466,6 +1557,11 @@ $system__colors[]=array(
 'color_name'=>'calendar_event_reservation',
 'default_value'=>'darksalmon,lightcoral,hotpink,lightpink,pink',
 'options'=>array('nopicker'=>true,'size'=>40,'maxlength'=>200)
+);
+
+$system__colors[]=array(
+'color_name'=>'calendar_today_frame',
+'default_value'=>'#5676c3'
 );
 
 
@@ -1496,7 +1592,7 @@ $system__colors[]=array(
 
 $system__colors[]=array(
 'color_name'=>'session_public_expired',
-'default_value'=>'#0000ff'
+'default_value'=>'#4b6fb8'
 );
 
 $system__colors[]=array(
@@ -1504,14 +1600,46 @@ $system__colors[]=array(
 'default_value'=>'#008000'
 );
 
+$system__colors[]=array(
+'color_name'=>'session_status_planned',
+'default_value'=>'#ffa500'
+);
+
+$system__colors[]=array(
+'color_name'=>'session_status_live',
+'default_value'=>'#008000'
+);
+
+$system__colors[]=array(
+'color_name'=>'session_status_completed',
+'default_value'=>'#808080'
+);
+
+$system__colors[]=array(
+'color_name'=>'session_status_balanced',
+'default_value'=>'#00008b'
+);
+
+$system__colors[]=array(
+'color_name'=>'session_status_canceled',
+'default_value'=>'#cc3300'
+);
+
+$system__colors[]=array(
+'color_name'=>'experiment_running',
+'default_value'=>'#2f6fd6'
+);
+
+$system__colors[]=array(
+'color_name'=>'experiment_completed',
+'default_value'=>'#7c8798'
+);
+
 
 $system__colors[]=array('type'=>'line');
 
 $system__colors[]=array('type'=>'comment',
-            'text'=>'Participation status colors');
-
-$system__colors[]=array('type'=>'comment',
-            'text'=>'Public area');
+            'text'=>'Participation status colors - Public area');
 
 $system__colors[]=array(
 'color_name'=>'shownup_no',
@@ -1524,7 +1652,7 @@ $system__colors[]=array(
 );
 
 $system__colors[]=array('type'=>'comment',
-            'text'=>'Admin pages');
+            'text'=>'Participation status colors - Admin pages');
 
 $system__colors[]=array(
 'color_name'=>'pstatus_noshow',
@@ -1625,17 +1753,7 @@ $system__colors[]=array('type'=>'comment',
 
 $system__colors[]=array(
 'color_name'=>'missing_field',
-'default_value'=>'#ffa500'
-);
-
-$system__colors[]=array('type'=>'line');
-
-$system__colors[]=array('type'=>'comment',
-            'text'=>'Public area, experiment registration');
-
-$system__colors[]=array(
-'color_name'=>'just_registered_session_background',
-'default_value'=>'#f4a460'
+'default_value'=>'#fff4db'
 );
 
 $system__colors[]=array('type'=>'line');
@@ -1645,24 +1763,7 @@ $system__colors[]=array('type'=>'comment',
 
 $system__colors[]=array(
 'color_name'=>'stats_graph_background',
-'default_value'=>'#fffafa'
-);
-
-
-
-$system__colors[]=array('type'=>'line');
-
-$system__colors[]=array('type'=>'comment',
-            'text'=>'Some colors in admin area');
-
-$system__colors[]=array(
-'color_name'=>'search__pseudo_query_background',
-'default_value'=>'#d8e1eb'
-);
-
-$system__colors[]=array(
-'color_name'=>'email__new_emails_textcolor',
-'default_value'=>'#0000FF'
+'default_value'=>'#ffffff'
 );
 
 $system__colors[]=array('type'=>'line');
@@ -1672,7 +1773,7 @@ $system__colors[]=array('type'=>'comment',
 
 $system__colors[]=array(
 'color_name'=>'tool_tip_background_color',
-'default_value'=>'#566383'
+'default_value'=>'#4b649f'
 );
 
 $system__colors[]=array(
@@ -1693,6 +1794,6 @@ $system__colors[]=array(
 
 // DATABASE UPGRADE DEFINITIONS //
 $system__database_upgrades=array();
-include ("dbupdates.php");
+include("dbupdates.php");
 
 ?>

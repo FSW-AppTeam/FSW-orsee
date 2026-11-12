@@ -49,10 +49,11 @@ $table_fields=array(
 // function to connect with different charsets
 function pdoconnect($charset='UTF8') {
     global $site__database_host, $site__database_admin_username,
-        $site__database_admin_password, $site__database_database, $site__database_port;
+    $site__database_admin_password, $site__database_database, $site__database_port;
 
     if (preg_match("/^([^:]+):([0-9]+)$/",trim($site__database_host),$matches)) {
-        $host='host='.$matches[1].';'; $port='port='.$matches[2].';';
+        $host='host='.$matches[1].';';
+        $port='port='.$matches[2].';';
     } else {
         $host='host='.$site__database_host.';';
         if (isset($site__database_port) && $site__database_port) {
@@ -78,7 +79,7 @@ function pdoconnect($charset='UTF8') {
         $db = new PDO($dsn, $site__database_admin_username, $site__database_admin_password,$construct_options);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
+        $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         return $db;
     } catch (PDOException $e) {
         die('Connection failed: ' . $e->getMessage());
@@ -92,7 +93,9 @@ function run_query($db,$query,$pars=array()) {
             // parametrized query
             $stmt = $db->prepare($query);
             if (isset($pars[0]) && is_array($pars[0])) {
-                foreach ($pars as $tpars) $stmt->execute($tpars);
+                foreach ($pars as $tpars) {
+                    $stmt->execute($tpars);
+                }
             } else {
                 $stmt->execute($pars);
             }
@@ -133,7 +136,7 @@ foreach ($table_fields as $table=>$tabdata) {
     while ($line = pdo_fetch_assoc($result)) {
         // check whether selected fields (read via latin1) contain any valid UTF8 code
         $has_utf8=false;
-        foreach($tabdata['fields'] as $f) {
+        foreach ($tabdata['fields'] as $f) {
             if (detectUTF8($line[$f])) {
                 $has_utf8=true;
             }
@@ -142,8 +145,9 @@ foreach ($table_fields as $table=>$tabdata) {
         if ($has_utf8) {
             $i++;
             // write data back through the utf8 connection, for selected fields
-            $pars=array(); $parstring=array();
-            foreach($tabdata['fields'] as $f) {
+            $pars=array();
+            $parstring=array();
+            foreach ($tabdata['fields'] as $f) {
                 $pars[':'.$f]=$line[$f];
                 $parstring[]=$f."=:".$f;
             }

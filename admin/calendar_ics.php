@@ -1,13 +1,14 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-include ("cronheader.php");
+include("cronheader.php");
 
-$continue=true; $all=false;
+$continue=true;
+$all=false;
 
-if(!isset($_REQUEST['cal'])) { 
-    $continue=false; 
-    $message="no token"; 
+if (!isset($_REQUEST['cal'])) {
+    $continue=false;
+    $message="no token";
 }
 
 if ($continue) {
@@ -17,9 +18,9 @@ if ($continue) {
         $all=true;
     } elseif ($caltype=='p') {
         $all=false;
-    } else { 
-        $continue=false; 
-        $message="cal type not allowed"; 
+    } else {
+        $continue=false;
+        $message="cal type not allowed";
     }
 }
 
@@ -33,13 +34,13 @@ if ($continue) {
             if ($all==true && !check_allow('calendar_export_all')) {
                 $all=false;
             }
-        } else { 
-            $continue=false; 
-            $message="no rights to export"; 
+        } else {
+            $continue=false;
+            $message="no rights to export";
         }
-    } else { 
-        $continue=false; 
-        $message="invalid token"; 
+    } else {
+        $continue=false;
+        $message="invalid token";
     }
 }
 
@@ -47,8 +48,8 @@ if ($continue) {
 if ($continue) {
     $labs=laboratories__get_laboratories();
     $laboratory_id=false;
-    if(isset($_REQUEST['lab_id']) && $_REQUEST['lab_id']) {
-        if(isset($labs[$_REQUEST['lab_id']])) {
+    if (isset($_REQUEST['lab_id']) && $_REQUEST['lab_id']) {
+        if (isset($labs[$_REQUEST['lab_id']])) {
             $laboratory_id=$_REQUEST['lab_id'];
         }
     }
@@ -57,7 +58,7 @@ if ($continue) {
     $displayfrom_upper = time()+60*60*24*31*$settings['calendar_export_months_ahead'];
 
     if ($all) {
-        $expadminid=false; 
+        $expadminid=false;
     } else {
         $expadminid=$expadmindata['admin_id'];
     }
@@ -87,15 +88,15 @@ if ($continue) {
     echo 'TZNAME:UTC' . "\r\n";
     echo 'END:STANDARD' . "\r\n";
     echo 'END:VTIMEZONE' . "\r\n";
-    foreach($results as $day) {
-        foreach($day as $item) {
+    foreach ($results as $day) {
+        foreach ($day as $item) {
             $description='';
             $description.=experiment__list_experimenters($item['experimenters'],false,true).'\n';
-            if($item['type'] == "location_reserved") {
+            if ($item['type'] == "location_reserved") {
                 if (check_allow('events_edit')) {
                     $item['title_link']=$item['edit_link'];
                 }
-            } elseif($item['type'] == "experiment_session") {
+            } elseif ($item['type'] == "experiment_session") {
                 $description.=$item['participants_registered'] . " (" . $item['participants_needed']. "," . $item['participants_reserve'] . ")".'\n';
             }
             $description=trim($description);
@@ -106,10 +107,11 @@ if ($continue) {
             echo 'DTSTART:' . calendar__unixtime_to_ical_date($item['start_time']) . "\r\n";
             echo 'LOCATION:' . calendar__escapestring($item['location']) . "\r\n";
             echo 'SUMMARY:' . calendar__escapestring($item['title']) . "\r\n";
-            if(isset($item['title_link'])){
+            if (isset($item['title_link'])) {
                 echo 'URL:' . $item['title_link'] . "\r\n";
             }
-            echo 'DESCRIPTION:' . calendar__escapestring($description). "\r\n";;
+            echo 'DESCRIPTION:' . calendar__escapestring($description). "\r\n";
+            ;
             echo 'END:VEVENT' . "\r\n";
         }
     }

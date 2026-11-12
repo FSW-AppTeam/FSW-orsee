@@ -1,21 +1,34 @@
 <?php
 // part of orsee. see orsee.org
 
-function subpools__select_field($postvarname,$selected,$hidden=array(),$class='') {
-
+function subpools__select_field($postvarname,$selected,$hidden=array(),$class='',$select_wrapper_class='select is-primary',$compact=false) {
     $subpools=subpools__get_subpools();
-    $out='<SELECT name="'.$postvarname.'"';
-    if ($class) $out.=' class="'.$class.'"';
+    if ($compact && stripos($select_wrapper_class,'select-compact')===false) {
+        $select_wrapper_class=trim($select_wrapper_class.' select-compact');
+    }
+    $out='';
+    if ($select_wrapper_class) {
+        $out.='<span class="'.$select_wrapper_class.'">';
+    }
+    $out.='<SELECT name="'.$postvarname.'"';
+    if ($class) {
+        $out.=' class="'.$class.'"';
+    }
     $out.='>';
     foreach ($subpools as $pool) {
         if (!in_array($pool['subpool_id'],$hidden)) {
             $out.='<OPTION value="'.$pool['subpool_id'].'"';
-            if ($pool['subpool_id']==$selected) $out.=" SELECTED";
+            if ($pool['subpool_id']==$selected) {
+                $out.=" SELECTED";
+            }
             $out.='>'.$pool['subpool_name'];
             $out.='</OPTION>';
-            }
         }
+    }
     $out.='</SELECT>';
+    if ($select_wrapper_class) {
+        $out.='</span>';
+    }
     return $out;
 }
 
@@ -28,13 +41,14 @@ function subpools__multi_select_field($postvarname,$selected,$mpoptions=array())
     $subpools=subpools__get_subpools();
 
     $mylist=array();
-    foreach($subpools as $pool) {
+    foreach ($subpools as $pool) {
         $mylist[$pool['subpool_id']]=$pool['subpool_name'];
     }
 
-    if (!is_array($mpoptions)) $mpoptions=array();
-    if (!isset($mpoptions['picker_icon'])) $mpoptions['picker_icon']='globe';
-    $out.= get_multi_picker($postvarname,$mylist,$selected,$mpoptions);
+    if (!is_array($mpoptions)) {
+        $mpoptions=array();
+    }
+    $out.= get_tag_picker($postvarname,$mylist,$selected,$mpoptions);
     return $out;
 }
 
@@ -62,8 +76,11 @@ function subpools__idlist_to_namelist($idlist) {
     $ids=explode(",",$idlist);
     $namearr=array();
     foreach ($ids as $id) {
-        if (isset($names[$id])) $namearr[]=$names[$id]['subpool_name'];
-        else $namearr[]=$id;
+        if (isset($names[$id])) {
+            $namearr[]=$names[$id]['subpool_name'];
+        } else {
+            $namearr[]=$id;
+        }
     }
     return implode(", ",$namearr);
 }

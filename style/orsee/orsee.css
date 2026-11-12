@@ -1,0 +1,1046 @@
+/* part of orsee. see orsee.org */
+/* =============================================================================
+   ORSEE THEME
+   1) Theme Tokens and Typography
+      - static + runtime tokens (lcolor/color), fonts, dark-mode derivation
+   2) Header and App Shell Branding
+      - masthead, logo bars, burger, menu frame, main frame, page title icons
+   3) Menu Typography and Interaction Skin
+      - nav item typography, hover/active, horizontal/dynamic/static menu visuals
+   ============================================================================= */
+/* ==================== GLOBAL TOKENS: STATIC BASE ==================== */
+/* Applies everywhere (admin + public, all viewports). */
+/* Static design tokens that do not come from DB options. */
+:root {
+    --orsee-radius: 20px;
+    --orsee-gap: 12px;
+}
+
+/* ==================== GLOBAL TOKENS: RUNTIME + TYPOGRAPHY ==================== */
+/* Applies everywhere (admin + public, all viewports). */
+/* Includes DB-mapped CSS vars (--color-* from --orsee-*), typography, and root shell defaults. */
+.orsee {
+    margin: 0;
+    padding: 0;
+    /* Font families */
+    --font-header-bar: "Avenir Medium", Helvetica, Arial, sans-serif;
+    --font-title: "Avenir Medium", Helvetica, Arial, sans-serif;
+    --font-menu: "Inter", Helvetica, Arial, sans-serif;
+    --font-ui: "Inter", Helvetica, Arial, sans-serif;
+    --font-sql-query: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    /* Font sizes */
+    --font-size-ui-base: 12pt;
+    --font-size-header-bar: 9pt;
+    --font-size-title: 20pt;
+    --font-size-menu-head: 1.02rem;
+    --font-size-menu-item: 1.02rem;
+    --font-size-button: 0.95rem;
+    --font-size-compact: 0.8rem;
+    --font-size-tiny: 0.65rem;
+    /* Font weights */
+    --font-weight-ui: 400;
+    --font-weight-header-bar: 600;
+    --font-weight-title: 600;
+    --font-weight-menu-head: 700;
+    --font-weight-menu-item: 400;
+    --font-weight-button: 400;
+
+    /* LIGHT COLOR TOKENS: default colors, mainly set from DB */
+
+    /* Light Color Tokens: Global Text / Links / Surfaces */
+    --lcolor-shade-around-content: var(--orsee-shade_around_content, #f3f6fb);
+    --lcolor-content-background-color: var(--orsee-content_background_color, #ffffff);
+    --lcolor-body-text: var(--orsee-body_text, #0f172a);
+    --lcolor-body-link: var(--orsee-body_link, #2f5fb0);
+    --lcolor-body-vlink: var(--orsee-body_vlink, #365fa6);
+    --lcolor-body-alink: var(--orsee-body_alink, #3c74d2);
+    --lcolor-text-secondary: var(--orsee-text_secondary, #616161);
+    --lcolor-text-placeholder: var(--orsee-text_placeholder, #9aa4b2);
+    --lcolor-page-title-text: var(--orsee-page_title_text, #35548c);
+
+    /* Light Color Tokens: Header / Navigation */
+    --lcolor-html-header-top-bar-background: var(--orsee-html_header_top_bar_background, #6285d0);
+    --lcolor-html-header-logo-bar-background: var(--orsee-html_header_logo_bar_background, #566383);
+    --lcolor-html-header-logo-bar-text: var(--orsee-html_header_logo_bar_text, #ffffff);
+    --lcolor-html-header-menu-background: var(--orsee-html_header_menu_background, #405789);
+    --lcolor-menu-title: var(--orsee-menu_title, #f5f8fe);
+    --lcolor-menu-item: var(--orsee-menu_item, #f8fafe);
+    --lcolor-menu-item-highlighted-background: var(--orsee-menu_item_highlighted_background, #457c9b);
+    --lcolor-menu-logout-text: var(--orsee-menu_logout_text, #ff8f87);
+    --lcolor-tabbar-desktop-background-active: var(--orsee-tabbar-desktop-background-active, #edf2fb);
+    --lcolor-tabbar-mobile-font: var(--orsee-tabbar-mobile-font, #838996);
+
+    /* Light Color Tokens: List / Row Surfaces */
+    --lcolor-list-shade1: var(--orsee-list_shade1, #fcfdfd);
+    --lcolor-list-shade2: var(--orsee-list_shade2, #f5f7fd);
+    --lcolor-list-shade-subtitle: var(--orsee-list_shade_subtitle, #e2e2e4);
+    --lcolor-list-row-hover-background: var(--orsee-list_row_hover_background, #dfe8f7);
+    --lcolor-dragdrop-selected-background: var(--orsee-dragdrop_selected_background, #4f79c8);
+    --lcolor-dragdrop-selected-text: var(--orsee-dragdrop_selected_text, #f8fbff);
+    --lcolor-list-header-background: var(--orsee-list_header_background, #5676c3);
+    --lcolor-list-header-text: var(--orsee-list_header_textcolor, #ffffff);
+    --lcolor-list-header-highlighted-background: var(--orsee-list_header_highlighted_background, #6655c2);
+    --lcolor-list-header-highlighted-text: var(--orsee-list_header_highlighted_textcolor, #ffffff);
+
+    /* Light Color Tokens: Panels / Buttons / Controls */
+    --lcolor-panel-title-background: var(--orsee-panel_title_background, #5676c3);
+    --lcolor-panel-title-text: var(--orsee-panel_title_textcolor, #ffffff);
+    --lcolor-button-action-background: var(--orsee-button_action_background, #ffffff);
+    --lcolor-button-action-hover-background: var(--orsee-button_action_hover_background, #e2e5eb);
+    --lcolor-button-action-border: var(--orsee-button_action_border, #3d81d3);
+    --lcolor-button-action-text: var(--orsee-button_action_text, #2f619b);
+    --lcolor-button-delete-background: var(--orsee-button_delete_background, #ffffff);
+    --lcolor-button-delete-border: var(--orsee-button_delete_border, #c62828);
+    --lcolor-button-delete-text: var(--orsee-button_delete_text, #c62828);
+    --lcolor-button-mobile-action-background: var(--orsee-button_mobile_action_background, #0033aa);
+    --lcolor-button-mobile-action-text: var(--orsee-button_mobile_action_text, #ffffff);
+    --lcolor-button-mobile-delete-background: var(--orsee-button_mobile_delete_background, #c62828);
+    --lcolor-button-mobile-delete-text: var(--orsee-button_mobile_delete_text, #ffffff);
+    --lcolor-form-element-background: var(--orsee-form_element_background, #ffffff);
+    --lcolor-form-element-accent-color: var(--orsee-form_element_accent_color, #5676c3);
+    --lcolor-form-element-focus-border: var(--lcolor-form-element-accent-color);
+    --lcolor-shadow-focus-ring: 0 0 0 0.18rem color-mix(in srgb, var(--lcolor-form-element-focus-border) 32%, transparent);
+    --lcolor-shadow-1: rgba(21, 35, 57, 0.1);
+    --lcolor-shadow-2: rgba(21, 35, 57, 0.18);
+    --lcolor-shadow-3: rgba(20, 32, 52, 0.34);
+    --lcolor-inset-highlight-soft: rgba(255, 255, 255, 0.26);
+    --lcolor-inset-highlight-strong: rgba(255, 255, 255, 0.42);
+    --lcolor-modal-overlay-scrim: rgba(0, 0, 0, 0.22);
+
+    /* Light Color Tokens: Message / Callout / Tooltip */
+    --lcolor-message-background: var(--orsee-message_background, #f5f9ff);
+    --lcolor-message-text: var(--orsee-message_text, #1f2f3f);
+    --lcolor-message-border-note: var(--orsee-message_border_note, #4f79c8);
+    --lcolor-message-border-warning: var(--orsee-message_border_warning, #c79028);
+    --lcolor-message-border-error: var(--orsee-message_border_error, #c64040);
+    --lcolor-important-note-text: var(--orsee-important_note_textcolor, #c62828);
+    --lcolor-missing-field: var(--orsee-missing_field, #fff4db);
+    --lcolor-tooltip-background: var(--orsee-tool_tip_background_color, #4b649f);
+    --lcolor-tooltip-text: var(--orsee-tool_tip_text_color, #ffffff);
+
+    /* Light Color Tokens: Participant / Session / Experiment State */
+    --lcolor-shownup-no: var(--orsee-shownup_no, #ff0000);
+    --lcolor-shownup-yes: var(--orsee-shownup_yes, #008000);
+    --lcolor-participant-status-eligible: var(--orsee-participant_status_eligible_for_experiments, #b9e6a8);
+    --lcolor-participant-status-noneligible: var(--orsee-participant_status_noneligible_for_experiments, #c2bcac);
+    --lcolor-participation-status-participated: var(--orsee-pstatus_participated, #99ff99);
+    --lcolor-participation-status-noshow: var(--orsee-pstatus_noshow, #ff9999);
+    --lcolor-participation-status-other: var(--orsee-pstatus_other, #e1e1e6);
+    --lcolor-session-not-enough-participants: var(--orsee-session_not_enough_participants, #ff0000);
+    --lcolor-session-not-enough-reserve: var(--orsee-session_not_enough_reserve, #ffa500);
+    --lcolor-session-complete: var(--orsee-session_complete, #008000);
+    --lcolor-session-public-free-places: var(--orsee-session_public_free_places, #008000);
+    --lcolor-session-public-complete: var(--orsee-session_public_complete, #ff0000);
+    --lcolor-session-public-expired: var(--orsee-session_public_expired, #4b6fb8);
+    --lcolor-session-reminder-state-sent: var(--orsee-session_reminder_state_sent_text, #008000);
+    --lcolor-session-reminder-state-checked: var(--orsee-session_reminder_state_checked_text, #ff0000);
+    --lcolor-session-reminder-state-waiting: var(--orsee-session_reminder_state_waiting_text, #0000ff);
+    --lcolor-session-status-planned: var(--orsee-session_status_planned, #ffa500);
+    --lcolor-session-status-live: var(--orsee-session_status_live, #008000);
+    --lcolor-session-status-completed: var(--orsee-session_status_completed, #808080);
+    --lcolor-session-status-balanced: var(--orsee-session_status_balanced, #00008b);
+    --lcolor-session-status-canceled: var(--orsee-session_status_canceled, #cc3300);
+    --lcolor-experiment-running: var(--orsee-experiment_running, #2f6fd6);
+    --lcolor-experiment-completed: var(--orsee-experiment_completed, #7c8798);
+
+    /* Light Color Tokens: Email Icons */
+    --lcolor-email-icon-read: var(--lcolor-text-secondary);
+    --lcolor-email-icon-unread: var(--lcolor-session-status-live);
+    --lcolor-email-icon-assigned-unread: var(--lcolor-session-status-balanced);
+    --lcolor-email-icon-processed: var(--lcolor-session-complete);
+
+    /* Light Color Tokens: Yes/No Switch */
+    --lcolor-yesnoswitch-yes: #008000;
+    --lcolor-yesnoswitch-no: #dc143c;
+
+    /* Light Color Tokens: Calendar */
+    --lcolor-calendar-entry-default-background: #e7e7e7;
+    --lcolor-calendar-today-frame: var(--orsee-calendar_today_frame, #5676c3);
+
+    /* Light Color Tokens: Ethics / Admin Validation */
+    --lcolor-ethics-approval-not-entered: var(--orsee-ethics_approval_not_entered, #e0e0eb);
+    --lcolor-ethics-approval-valid: var(--orsee-ethics_approval_valid, #c2f0c2);
+    --lcolor-ethics-approval-expired: var(--orsee-ethics_approval_expired, #ffd985);
+    --lcolor-admin-type-required-by-error: var(--orsee-admin_type_required_by_error, #90ee90);
+    --lcolor-admin-type-error-missing-required: var(--orsee-admin_type_error_missing_required, #f08080);
+
+    /* Light Color Tokens: Borders / Mixing Anchors */
+    --lcolor-border: var(--orsee-border, #b2bccc);
+    --lcolor-border-soft: #b8c2d1;
+    --lcolor-border-strong: #9da7ba;
+    --lcolor-mix-anchor-light: #ffffff;
+    --lcolor-mix-anchor-dark: #1a2233;
+
+    /* Light Color Tokens: Selector Tags (Legacy Picker Colors) */
+    --lcolor-selector-tag-bg-class: #e2e6f0;
+    --lcolor-selector-tag-bg-experimenters: #f1c06f;
+    --lcolor-selector-tag-bg-emails: #c4e79d;
+    --lcolor-selector-tag-bg-profilefields: #bbbbbb;
+    --lcolor-selector-tag-bg-paymenttypes: #33cc33;
+
+    /* EFFECTIVE COLOR TOKENS: used in all css classes, overwritten in dark mode*/
+
+    /* Effective Color Tokens: Global Text / Links / Surfaces */
+    --color-shade-around-content: var(--lcolor-shade-around-content);
+    --color-content-background-color: var(--lcolor-content-background-color);
+    --color-body-text: var(--lcolor-body-text);
+    --color-body-link: var(--lcolor-body-link);
+    --color-body-vlink: var(--lcolor-body-vlink);
+    --color-body-alink: var(--lcolor-body-alink);
+    --color-text-secondary: var(--lcolor-text-secondary);
+    --color-text-placeholder: var(--lcolor-text-placeholder);
+    --color-page-title-text: var(--lcolor-page-title-text);
+
+    /* Effective Color Tokens: Header / Navigation */
+    --color-html-header-top-bar-background: var(--lcolor-html-header-top-bar-background);
+    --color-html-header-logo-bar-background: var(--lcolor-html-header-logo-bar-background);
+    --color-html-header-logo-bar-text: var(--lcolor-html-header-logo-bar-text);
+    --color-html-header-menu-background: var(--lcolor-html-header-menu-background);
+    --color-menu-title: var(--lcolor-menu-title);
+    --color-menu-item: var(--lcolor-menu-item);
+    --color-menu-item-highlighted-background: var(--lcolor-menu-item-highlighted-background);
+    --color-menu-logout-text: var(--lcolor-menu-logout-text);
+    --color-tabbar-desktop-background-active: var(--lcolor-tabbar-desktop-background-active);
+    --color-tabbar-mobile-font: var(--lcolor-tabbar-mobile-font);
+
+    /* Effective Color Tokens: List / Row Surfaces */
+    --color-list-shade1: var(--lcolor-list-shade1);
+    --color-list-shade2: var(--lcolor-list-shade2);
+    --color-list-shade-subtitle: var(--lcolor-list-shade-subtitle);
+    --color-list-row-hover-background: var(--lcolor-list-row-hover-background);
+    --color-dragdrop-selected-background: var(--lcolor-dragdrop-selected-background);
+    --color-dragdrop-selected-text: var(--lcolor-dragdrop-selected-text);
+    --color-list-header-background: var(--lcolor-list-header-background);
+    --color-list-header-text: var(--lcolor-list-header-text);
+    --color-list-header-highlighted-background: var(--lcolor-list-header-highlighted-background);
+    --color-list-header-highlighted-text: var(--lcolor-list-header-highlighted-text);
+
+    /* Effective Color Tokens: Panels / Buttons / Controls */
+    --color-panel-title-background: var(--lcolor-panel-title-background);
+    --color-panel-title-text: var(--lcolor-panel-title-text);
+    --color-button-action-background: var(--lcolor-button-action-background);
+    --color-button-action-hover-background: var(--lcolor-button-action-hover-background);
+    --color-button-action-border: var(--lcolor-button-action-border);
+    --color-button-action-text: var(--lcolor-button-action-text);
+    --color-button-delete-background: var(--lcolor-button-delete-background);
+    --color-button-delete-border: var(--lcolor-button-delete-border);
+    --color-button-delete-text: var(--lcolor-button-delete-text);
+    --color-button-mobile-action-background: var(--lcolor-button-mobile-action-background);
+    --color-button-mobile-action-text: var(--lcolor-button-mobile-action-text);
+    --color-button-mobile-delete-background: var(--lcolor-button-mobile-delete-background);
+    --color-button-mobile-delete-text: var(--lcolor-button-mobile-delete-text);
+    --color-form-element-background: var(--lcolor-form-element-background);
+    --color-form-element-focus-border: var(--lcolor-form-element-focus-border);
+    --color-form-element-accent-color: var(--lcolor-form-element-accent-color);
+    --color-shadow-focus-ring: var(--lcolor-shadow-focus-ring);
+    --color-shadow-1: var(--lcolor-shadow-1);
+    --color-shadow-2: var(--lcolor-shadow-2);
+    --color-shadow-3: var(--lcolor-shadow-3);
+    --color-inset-highlight-soft: var(--lcolor-inset-highlight-soft);
+    --color-inset-highlight-strong: var(--lcolor-inset-highlight-strong);
+    --color-modal-overlay-scrim: var(--lcolor-modal-overlay-scrim);
+
+    /* Effective Color Tokens: Message / Callout / Tooltip */
+    --color-message-background: var(--lcolor-message-background);
+    --color-message-text: var(--lcolor-message-text);
+    --color-message-border-note: var(--lcolor-message-border-note);
+    --color-message-border-warning: var(--lcolor-message-border-warning);
+    --color-message-border-error: var(--lcolor-message-border-error);
+    --color-important-note-text: var(--lcolor-important-note-text);
+    --color-missing-field: var(--lcolor-missing-field);
+    --color-tooltip-background: var(--lcolor-tooltip-background);
+    --color-tooltip-text: var(--lcolor-tooltip-text);
+
+    /* Effective Color Tokens: Participant / Session State */
+    --color-shownup-no: var(--lcolor-shownup-no);
+    --color-shownup-yes: var(--lcolor-shownup-yes);
+    --color-participant-status-eligible: var(--lcolor-participant-status-eligible);
+    --color-participant-status-noneligible: var(--lcolor-participant-status-noneligible);
+    --color-participation-status-participated: var(--lcolor-participation-status-participated);
+    --color-participation-status-noshow: var(--lcolor-participation-status-noshow);
+    --color-participation-status-other: var(--lcolor-participation-status-other);
+    --color-session-not-enough-participants: var(--lcolor-session-not-enough-participants);
+    --color-session-not-enough-reserve: var(--lcolor-session-not-enough-reserve);
+    --color-session-complete: var(--lcolor-session-complete);
+    --color-session-public-free-places: var(--lcolor-session-public-free-places);
+    --color-session-public-complete: var(--lcolor-session-public-complete);
+    --color-session-public-expired: var(--lcolor-session-public-expired);
+    --color-session-reminder-state-sent: var(--lcolor-session-reminder-state-sent);
+    --color-session-reminder-state-checked: var(--lcolor-session-reminder-state-checked);
+    --color-session-reminder-state-waiting: var(--lcolor-session-reminder-state-waiting);
+    --color-session-status-planned: var(--lcolor-session-status-planned);
+    --color-session-status-live: var(--lcolor-session-status-live);
+    --color-session-status-completed: var(--lcolor-session-status-completed);
+    --color-session-status-balanced: var(--lcolor-session-status-balanced);
+    --color-session-status-canceled: var(--lcolor-session-status-canceled);
+    --color-email-icon-read: var(--lcolor-email-icon-read);
+    --color-email-icon-unread: var(--lcolor-email-icon-unread);
+    --color-email-icon-assigned-unread: var(--lcolor-email-icon-assigned-unread);
+    --color-email-icon-processed: var(--lcolor-email-icon-processed);
+    --color-yesnoswitch-yes: var(--lcolor-yesnoswitch-yes);
+    --color-yesnoswitch-no: var(--lcolor-yesnoswitch-no);
+    --color-experiment-running: var(--lcolor-experiment-running);
+    --color-experiment-completed: var(--lcolor-experiment-completed);
+    --color-calendar-entry-default-background: var(--lcolor-calendar-entry-default-background);
+    --color-calendar-today-frame: var(--lcolor-calendar-today-frame);
+    --color-calendar-entry-source-strength: 100%;
+
+    /* Effective Color Tokens: Ethics / Admin Validation */
+    --color-ethics-approval-not-entered: var(--lcolor-ethics-approval-not-entered);
+    --color-ethics-approval-valid: var(--lcolor-ethics-approval-valid);
+    --color-ethics-approval-expired: var(--lcolor-ethics-approval-expired);
+    --color-admin-type-required-by-error: var(--lcolor-admin-type-required-by-error);
+    --color-admin-type-error-missing-required: var(--lcolor-admin-type-error-missing-required);
+
+    /* Effective Color Tokens: Borders / Mixing Anchors */
+    --color-border: var(--lcolor-border);
+    --color-border-soft: var(--lcolor-border-soft);
+    --color-border-strong: var(--lcolor-border-strong);
+    --color-mix-anchor-light: var(--lcolor-mix-anchor-light);
+    --color-mix-anchor-dark: var(--lcolor-mix-anchor-dark);
+
+    /* Effective Color Tokens: Selector Tags (Legacy Picker Colors) */
+    --color-selector-tag-bg-class: var(--lcolor-selector-tag-bg-class);
+    --color-selector-tag-bg-experimenters: var(--lcolor-selector-tag-bg-experimenters);
+    --color-selector-tag-bg-emails: var(--lcolor-selector-tag-bg-emails);
+    --color-selector-tag-bg-profilefields: var(--lcolor-selector-tag-bg-profilefields);
+    --color-selector-tag-bg-paymenttypes: var(--lcolor-selector-tag-bg-paymenttypes);
+    min-height: 100vh;
+    font-family: var(--font-ui);
+    font-size: var(--font-size-ui-base);
+    font-weight: var(--font-weight-ui);
+    color: var(--color-body-text);
+    background: var(--color-shade-around-content);
+}
+
+@media (prefers-color-scheme: dark) {
+    .orsee {
+        color-scheme: dark;
+
+        /* Global text / surfaces */
+        --color-mix-anchor-dark: color-mix(in srgb, var(--lcolor-body-text) 30%, #000000);
+        --color-mix-anchor-light: color-mix(in srgb, var(--lcolor-content-background-color) 72%, #ffffff);
+        --color-content-background-color: color-mix(in srgb, var(--lcolor-content-background-color) 6%, var(--color-mix-anchor-dark));
+        --color-shade-around-content: color-mix(in srgb, var(--lcolor-shade-around-content) 8%, var(--color-mix-anchor-dark));
+        --color-body-text: color-mix(in srgb, var(--lcolor-body-text) 18%, #ffffff);
+        --color-text-secondary: color-mix(in srgb, var(--color-body-text) 66%, var(--color-content-background-color));
+        --color-text-placeholder: color-mix(in srgb, var(--color-body-text) 40%, var(--color-content-background-color));
+        --color-page-title-text: color-mix(in srgb, var(--lcolor-page-title-text) 20%, var(--color-body-text));
+        --color-body-link: color-mix(in srgb, var(--lcolor-body-link) 30%, var(--color-body-text));
+        --color-body-vlink: color-mix(in srgb, var(--lcolor-body-vlink) 30%, var(--color-body-text));
+        --color-body-alink: color-mix(in srgb, var(--lcolor-body-alink) 30%, var(--color-body-text));
+
+        /* Header / menu */
+        --color-html-header-top-bar-background: color-mix(in srgb, var(--lcolor-html-header-top-bar-background) 24%, var(--color-mix-anchor-dark));
+        --color-html-header-logo-bar-background: color-mix(in srgb, var(--lcolor-html-header-logo-bar-background) 24%, var(--color-mix-anchor-dark));
+        --color-html-header-menu-background: color-mix(in srgb, var(--lcolor-html-header-menu-background) 20%, var(--color-mix-anchor-dark));
+        --color-html-header-logo-bar-text: color-mix(in srgb, var(--lcolor-html-header-logo-bar-text) 62%, var(--color-text-secondary));
+        --color-menu-title: color-mix(in srgb, var(--lcolor-menu-title) 30%, var(--color-text-secondary));
+        --color-menu-item: var(--color-menu-title);
+        --color-menu-item-highlighted-background: color-mix(in srgb, var(--lcolor-menu-item-highlighted-background) 60%, var(--color-mix-anchor-dark));
+        --color-menu-logout-text: color-mix(in srgb, var(--lcolor-menu-logout-text) 80%, var(--color-body-text));
+        --color-tabbar-desktop-background-active: color-mix(in srgb, var(--lcolor-tabbar-desktop-background-active) 28%, var(--color-content-background-color));
+        --color-tabbar-mobile-font: var(--lcolor-tabbar-mobile-font);
+
+        /* Lists / tables */
+        --color-list-shade1: color-mix(in srgb, var(--lcolor-list-shade1) 2%, var(--color-content-background-color));
+        --color-list-shade2: color-mix(in srgb, var(--lcolor-list-shade2) 5%, var(--color-content-background-color));
+        --color-list-shade-subtitle: color-mix(in srgb, var(--lcolor-list-shade-subtitle) 8%, var(--color-content-background-color));
+        --color-list-row-hover-background: color-mix(in srgb, var(--lcolor-list-row-hover-background) 14%, var(--color-content-background-color));
+        --color-list-header-background: color-mix(in srgb, var(--lcolor-list-header-background) 44%, var(--color-mix-anchor-dark));
+        --color-list-header-text: color-mix(in srgb, var(--lcolor-list-header-text) 24%, var(--color-text-secondary));
+        --color-list-header-highlighted-background: color-mix(in srgb, var(--lcolor-list-header-highlighted-background) 56%, var(--color-mix-anchor-dark));
+        --color-list-header-highlighted-text: color-mix(in srgb, var(--lcolor-list-header-highlighted-text) 90%, var(--color-body-text));
+        --color-dragdrop-selected-background: color-mix(in srgb, var(--lcolor-dragdrop-selected-background) 52%, var(--color-mix-anchor-dark));
+        --color-dragdrop-selected-text: color-mix(in srgb, var(--lcolor-dragdrop-selected-text) 90%, var(--color-body-text));
+
+        /* Borders */
+        --color-border: color-mix(in srgb, var(--lcolor-border) 48%, var(--color-body-text));
+        --color-border-soft: color-mix(in srgb, var(--lcolor-border-soft) 42%, var(--color-content-background-color));
+        --color-border-strong: color-mix(in srgb, var(--lcolor-border-strong) 54%, var(--color-body-text));
+
+        /* Panels / controls */
+        --color-panel-title-background: color-mix(in srgb, var(--lcolor-panel-title-background) 42%, var(--color-mix-anchor-dark));
+        --color-panel-title-text: color-mix(in srgb, var(--lcolor-panel-title-text) 22%, var(--color-text-secondary));
+        --color-button-action-background: color-mix(in srgb, var(--lcolor-button-action-background) 20%, var(--color-mix-anchor-dark));
+        --color-button-action-border: color-mix(in srgb, var(--lcolor-button-action-border) 62%, var(--color-mix-anchor-dark));
+        --color-button-action-hover-background: color-mix(in srgb, var(--lcolor-button-action-hover-background) 24%, var(--color-content-background-color));
+        --color-button-action-text: color-mix(in srgb, var(--lcolor-button-action-text) 40%, var(--color-body-text));
+        --color-button-delete-background: color-mix(in srgb, var(--lcolor-button-delete-background) 14%, var(--color-content-background-color));
+        --color-button-delete-border: color-mix(in srgb, var(--lcolor-button-delete-border) 72%, var(--color-body-text));
+        --color-button-delete-text: color-mix(in srgb, var(--lcolor-button-delete-text) 82%, var(--color-body-text));
+        --color-button-mobile-action-background: color-mix(in srgb, var(--lcolor-button-mobile-action-background) 44%, var(--color-mix-anchor-dark));
+        --color-button-mobile-action-text: color-mix(in srgb, var(--lcolor-button-mobile-action-text) 40%, var(--color-body-text));
+        --color-button-mobile-delete-background: color-mix(in srgb, var(--lcolor-button-mobile-delete-background) 72%, var(--color-mix-anchor-dark));
+        --color-button-mobile-delete-text: color-mix(in srgb, var(--lcolor-button-mobile-delete-text) 92%, var(--color-body-text));
+        --color-form-element-background: color-mix(in srgb, var(--lcolor-form-element-background) 9%, var(--color-content-background-color));
+        --color-form-element-accent-color: color-mix(in srgb, var(--lcolor-form-element-accent-color) 66%, var(--color-body-text));
+        --color-form-element-focus-border: var(--color-form-element-accent-color);
+        --color-shadow-1: color-mix(in srgb, var(--color-body-text) 18%, transparent);
+        --color-shadow-2: color-mix(in srgb, var(--color-body-text) 24%, transparent);
+        --color-shadow-3: color-mix(in srgb, var(--color-body-text) 34%, transparent);
+        --color-shadow-focus-ring: 0 0 0 0.18rem color-mix(in srgb, var(--color-form-element-focus-border) 40%, transparent);
+        --color-inset-highlight-soft: color-mix(in srgb, var(--lcolor-inset-highlight-soft) 26%, transparent);
+        --color-inset-highlight-strong: color-mix(in srgb, var(--lcolor-inset-highlight-strong) 26%, transparent);
+        --color-modal-overlay-scrim: color-mix(in srgb, var(--lcolor-modal-overlay-scrim) 80%, #000000);
+
+        /* Message / tooltips */
+        --color-message-background: color-mix(in srgb, var(--lcolor-message-background) 6%, var(--color-content-background-color));
+        --color-message-text: color-mix(in srgb, var(--lcolor-message-text) 44%, var(--color-body-text));
+        --color-message-border-note: color-mix(in srgb, var(--lcolor-message-border-note) 70%, var(--color-body-text));
+        --color-message-border-warning: color-mix(in srgb, var(--lcolor-message-border-warning) 74%, var(--color-body-text));
+        --color-message-border-error: color-mix(in srgb, var(--lcolor-message-border-error) 74%, var(--color-body-text));
+        --color-important-note-text: color-mix(in srgb, var(--lcolor-important-note-text) 80%, var(--color-body-text));
+        --color-missing-field: color-mix(in srgb, var(--lcolor-missing-field) 26%, var(--color-content-background-color));
+        --color-tooltip-background: color-mix(in srgb, var(--lcolor-tooltip-background) 34%, var(--color-mix-anchor-dark));
+        --color-tooltip-text: color-mix(in srgb, var(--lcolor-tooltip-text) 90%, var(--color-body-text));
+
+        /* Status / semantic colors */
+        --color-shownup-no: color-mix(in srgb, var(--lcolor-shownup-no) 78%, var(--color-body-text));
+        --color-shownup-yes: color-mix(in srgb, var(--lcolor-shownup-yes) 78%, var(--color-body-text));
+        --color-participant-status-eligible: color-mix(in srgb, var(--lcolor-participant-status-eligible) 56%, var(--color-content-background-color));
+        --color-participant-status-noneligible: color-mix(in srgb, var(--lcolor-participant-status-noneligible) 56%, var(--color-content-background-color));
+        --color-participation-status-participated: color-mix(
+            in srgb,
+            var(--lcolor-participation-status-participated) 54%,
+            var(--color-content-background-color)
+        );
+        --color-participation-status-noshow: color-mix(in srgb, var(--lcolor-participation-status-noshow) 56%, var(--color-content-background-color));
+        --color-participation-status-other: color-mix(in srgb, var(--lcolor-participation-status-other) 46%, var(--color-content-background-color));
+        --color-session-not-enough-participants: color-mix(in srgb, var(--lcolor-session-not-enough-participants) 76%, var(--color-body-text));
+        --color-session-not-enough-reserve: color-mix(in srgb, var(--lcolor-session-not-enough-reserve) 76%, var(--color-body-text));
+        --color-session-complete: color-mix(in srgb, var(--lcolor-session-complete) 76%, var(--color-body-text));
+        --color-session-public-free-places: color-mix(in srgb, var(--lcolor-session-public-free-places) 76%, var(--color-body-text));
+        --color-session-public-complete: color-mix(in srgb, var(--lcolor-session-public-complete) 76%, var(--color-body-text));
+        --color-session-public-expired: color-mix(in srgb, var(--lcolor-session-public-expired) 76%, var(--color-body-text));
+        --color-session-reminder-state-sent: color-mix(in srgb, var(--lcolor-session-reminder-state-sent) 78%, var(--color-body-text));
+        --color-session-reminder-state-checked: color-mix(in srgb, var(--lcolor-session-reminder-state-checked) 78%, var(--color-body-text));
+        --color-session-reminder-state-waiting: color-mix(in srgb, var(--lcolor-session-reminder-state-waiting) 78%, var(--color-body-text));
+        --color-session-status-planned: color-mix(in srgb, var(--lcolor-session-status-planned) 78%, var(--color-body-text));
+        --color-session-status-live: color-mix(in srgb, var(--lcolor-session-status-live) 78%, var(--color-body-text));
+        --color-session-status-completed: color-mix(in srgb, var(--lcolor-session-status-completed) 78%, var(--color-body-text));
+        --color-session-status-balanced: color-mix(in srgb, var(--lcolor-session-status-balanced) 78%, var(--color-body-text));
+        --color-session-status-canceled: color-mix(in srgb, var(--lcolor-session-status-canceled) 78%, var(--color-body-text));
+        --color-email-icon-read: color-mix(in srgb, var(--lcolor-email-icon-read) 70%, var(--color-body-text));
+        --color-email-icon-unread: color-mix(in srgb, var(--lcolor-email-icon-unread) 80%, var(--color-body-text));
+        --color-email-icon-assigned-unread: color-mix(in srgb, var(--lcolor-email-icon-assigned-unread) 80%, var(--color-body-text));
+        --color-email-icon-processed: color-mix(in srgb, var(--lcolor-email-icon-processed) 80%, var(--color-body-text));
+        --color-yesnoswitch-yes: color-mix(in srgb, var(--lcolor-yesnoswitch-yes) 82%, var(--color-body-text));
+        --color-yesnoswitch-no: color-mix(in srgb, var(--lcolor-yesnoswitch-no) 82%, var(--color-body-text));
+        --color-experiment-running: color-mix(in srgb, var(--lcolor-experiment-running) 62%, var(--color-mix-anchor-dark));
+        --color-experiment-completed: color-mix(in srgb, var(--lcolor-experiment-completed) 78%, var(--color-body-text));
+        --color-calendar-entry-default-background: color-mix(
+            in srgb,
+            var(--lcolor-calendar-entry-default-background) 30%,
+            var(--color-content-background-color)
+        );
+        --color-calendar-entry-source-strength: 50%;
+        --color-ethics-approval-not-entered: color-mix(in srgb, var(--lcolor-ethics-approval-not-entered) 18%, var(--color-content-background-color));
+        --color-ethics-approval-valid: color-mix(in srgb, var(--lcolor-ethics-approval-valid) 18%, var(--color-content-background-color));
+        --color-ethics-approval-expired: color-mix(in srgb, var(--lcolor-ethics-approval-expired) 18%, var(--color-content-background-color));
+        --color-admin-type-required-by-error: color-mix(in srgb, var(--lcolor-admin-type-required-by-error) 36%, var(--color-content-background-color));
+        --color-admin-type-error-missing-required: color-mix(
+            in srgb,
+            var(--lcolor-admin-type-error-missing-required) 44%,
+            var(--color-content-background-color)
+        );
+
+        /* Tag selector chips */
+        --color-selector-tag-bg-class: color-mix(in srgb, var(--lcolor-selector-tag-bg-class) 32%, var(--color-content-background-color));
+        --color-selector-tag-bg-experimenters: color-mix(in srgb, var(--lcolor-selector-tag-bg-experimenters) 40%, var(--color-content-background-color));
+        --color-selector-tag-bg-emails: color-mix(in srgb, var(--lcolor-selector-tag-bg-emails) 40%, var(--color-content-background-color));
+        --color-selector-tag-bg-profilefields: color-mix(in srgb, var(--lcolor-selector-tag-bg-profilefields) 32%, var(--color-content-background-color));
+        --color-selector-tag-bg-paymenttypes: color-mix(in srgb, var(--lcolor-selector-tag-bg-paymenttypes) 40%, var(--color-content-background-color));
+    }
+
+    .orsee .iti {
+        --iti-hover-color: color-mix(in srgb, var(--color-list-row-hover-background) 70%, transparent);
+        --iti-border-color: var(--color-border-strong);
+        --iti-dialcode-color: var(--color-text-secondary);
+        --iti-dropdown-bg: var(--color-form-element-background);
+        --iti-search-icon-color: var(--color-text-secondary);
+        --iti-arrow-color: var(--color-text-secondary);
+    }
+
+    .orsee .iti__country-list,
+    .orsee .iti__country,
+    .orsee .iti__search-input,
+    .orsee .iti__no-results,
+    .orsee .iti .iti__selected-dial-code {
+        color: var(--color-body-text);
+    }
+
+    .orsee .iti__search-input {
+        background: var(--color-form-element-background);
+    }
+}
+
+.orsee strong {
+    color: var(--color-body-text);
+}
+
+.orsee .orsee-font-compact {
+    font-family: var(--font-ui);
+    font-size: var(--font-size-compact);
+    font-weight: var(--font-weight-ui);
+}
+
+.orsee a:link {
+    color: var(--color-body-link);
+}
+
+.orsee a:visited {
+    color: var(--color-body-vlink);
+}
+
+.orsee a:active {
+    color: var(--color-body-alink);
+}
+
+.orsee .orsee-link-hover-underline,
+.orsee .orsee-link-hover-underline:link,
+.orsee .orsee-link-hover-underline:visited,
+.orsee .orsee-link-hover-underline:active {
+    text-decoration: none;
+}
+
+.orsee .orsee-link-hover-underline:hover,
+.orsee .orsee-link-hover-underline:focus-visible {
+    text-decoration: underline;
+}
+
+/* ==================== CUSTOMIZATION SURFACE: BRAND HEADER SHELL ==================== */
+/* Used by style/orsee/html_header.php (admin + public, all viewports). */
+.orsee-masthead {
+    display: flex;
+    align-items: stretch;
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-html-header-top-bar-background) 88%, var(--color-mix-anchor-light) 12%),
+        color-mix(in srgb, var(--color-html-header-top-bar-background) 74%, var(--color-mix-anchor-dark) 26%)
+    );
+    box-shadow: 0 6px 14px var(--color-shadow-2);
+    position: relative;
+    overflow: hidden;
+}
+
+.orsee-brand {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    width: 100%;
+}
+
+.orsee-brand-left {
+    display: flex;
+    align-items: center;
+    flex: 0 0 34%;
+    max-width: 34%;
+    padding: 8px var(--orsee-gap);
+    box-sizing: border-box;
+}
+
+@media (min-width: 741px) {
+    .orsee .orsee-brand-left > img {
+        padding-inline-start: 25px;
+        padding-inline-end: 25px;
+        box-sizing: content-box;
+    }
+}
+
+.orsee-brand-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex: 0 0 66%;
+    max-width: 66%;
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+    border-end-start-radius: var(--orsee-radius);
+    overflow: hidden;
+}
+
+.orsee-brand-bar {
+    width: 100%;
+    text-align: end;
+    color: var(--color-html-header-logo-bar-text);
+    font-family: var(--font-header-bar);
+    font-size: var(--font-size-header-bar);
+    font-weight: var(--font-weight-header-bar);
+    padding: 3px var(--orsee-gap);
+    box-sizing: border-box;
+}
+
+.orsee-brand-logo {
+    width: 100%;
+    text-align: end;
+    padding: 6px var(--orsee-gap);
+    box-sizing: border-box;
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+    border-end-start-radius: var(--orsee-radius);
+}
+
+.orsee-brand-logo,
+.orsee-brand-bar:first-child {
+    background: var(--color-html-header-logo-bar-background);
+}
+
+.orsee-burger {
+    display: none;
+    width: 66px;
+    height: 66px;
+    margin: 0 0.3rem 0 0.35rem;
+    border: 0;
+    border-radius: 0.9rem;
+    background: var(--color-html-header-logo-bar-background);
+    position: relative;
+    cursor: pointer;
+}
+
+.orsee-burger::before {
+    content: "";
+    width: 42px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--color-html-header-logo-bar-text);
+    position: absolute;
+    top: 50%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow:
+        0 -14px 0 var(--color-html-header-logo-bar-text),
+        0 14px 0 var(--color-html-header-logo-bar-text);
+}
+
+.orsee.orsee-area-public {
+    --orsee-public-panel-min-height: 30rem;
+}
+
+/* ==================== CUSTOMIZATION SURFACE: APP SHELL + LEFT MENU FRAME ==================== */
+/* Used by style/orsee/html_header.php (admin + public, all viewports). */
+.orsee-shell {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--orsee-gap);
+    padding: var(--orsee-gap);
+}
+
+.orsee.orsee-orientation-vertical .orsee-shell {
+    padding-inline-start: 0;
+}
+
+.orsee-menu {
+    flex: 0 0 150px;
+    position: relative;
+    overflow: hidden;
+    background: var(--color-html-header-menu-background);
+    color: var(--color-menu-item);
+    border: 1px solid var(--color-border-strong);
+    border-inline-start-color: var(--color-border);
+    border-top-color: var(--color-border);
+    box-shadow: 0 10px 26px var(--color-shadow-2);
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+    border-start-end-radius: var(--orsee-radius);
+    border-end-end-radius: var(--orsee-radius);
+    margin-top: 0.55rem;
+    padding: 0.6rem 0 0.8rem;
+    z-index: 2;
+}
+
+.orsee.orsee-orientation-vertical .orsee-menu {
+    flex-basis: 205px;
+    position: sticky;
+    top: 0.3rem;
+}
+
+.orsee .orsee-menu .orsee-menu-vertical {
+    display: block;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal {
+    display: none;
+}
+
+.orsee.orsee-orientation-horizontal .orsee-menu .orsee-menu-vertical {
+    display: none;
+}
+
+.orsee.orsee-orientation-horizontal .orsee-menu .orsee-menu-horizontal {
+    display: block;
+}
+
+.orsee .orsee-menu .orsee-menu-vertical .orsee-nav {
+    gap: 2px;
+    padding: 0.6rem 0;
+}
+
+.orsee .orsee-menu .orsee-menu-vertical .orsee-nav__section,
+.orsee .orsee-menu .orsee-menu-vertical .orsee-nav__item {
+    line-height: normal;
+}
+
+.orsee .orsee-menu .orsee-menu-vertical .orsee-nav__section {
+    padding: 0.32rem 0.95rem 0.32rem;
+    margin-top: 0.2rem;
+}
+
+.orsee .orsee-menu .orsee-menu-vertical .orsee-nav__item {
+    padding-block-start: 0.18rem;
+    padding-block-end: 0.18rem;
+    padding-inline-start: 3rem;
+    padding-inline-end: 0.95rem;
+}
+
+.orsee-menu::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    top: 0;
+    height: 18%;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--color-mix-anchor-light) 16%, transparent), transparent);
+    pointer-events: none;
+}
+
+.orsee-menu::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow:
+        0 0 0 1px var(--color-inset-highlight-soft) inset,
+        0 0 0 2px var(--color-inset-highlight-soft) inset;
+    pointer-events: none;
+}
+
+/* ==================== CUSTOMIZATION SURFACE: MAIN CONTENT FRAME + PAGE TITLE ==================== */
+/* Used by style/orsee/html_header.php (admin + public, all viewports). */
+.orsee-main {
+    flex: 1;
+    min-width: 0;
+    border-start-start-radius: var(--orsee-radius);
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+    border-end-start-radius: 0;
+    padding: 0 var(--orsee-gap) var(--orsee-gap) var(--orsee-gap);
+    background: var(--color-shade-around-content);
+}
+
+.orsee-title {
+    margin: 0 0 8px;
+    padding: 0;
+    font-family: var(--font-title);
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-title);
+    text-transform: uppercase;
+    color: var(--color-page-title-text);
+}
+
+/* ==================== PAGE TITLE ICONS (ALL AREAS, ALL VIEWPORTS) ==================== */
+/* Used on admin and public pages where a title icon is rendered. */
+.orsee .orsee-page-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.45em;
+    height: 1.45em;
+    border-radius: 0.32em;
+    margin-inline-end: 0.34em;
+    font-size: 0.72em;
+    line-height: 1;
+    vertical-align: baseline;
+    color: var(--color-content-background-color);
+}
+
+.orsee .orsee-page-title-icon-participant {
+    background: var(--color-html-header-logo-bar-background);
+}
+
+.orsee .orsee-page-title-icon-admin {
+    background: var(--color-menu-logout-text);
+}
+
+/* ==================== CUSTOMIZATION SURFACE: MENU TYPOGRAPHY + INTERACTIONS ==================== */
+/* Primary nav item styling used by header/menu shell in vertical and horizontal modes. */
+.orsee-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 0.08rem 0.3rem;
+}
+
+.orsee-nav__section,
+.orsee-nav__item {
+    display: block;
+    text-decoration: none;
+    border-radius: 0.35rem;
+    line-height: 1.08;
+}
+
+.orsee-nav__section {
+    font-family: var(--font-menu);
+    color: var(--color-menu-title);
+    font-weight: var(--font-weight-menu-head);
+    font-size: var(--font-size-menu-head);
+    text-shadow: 0 1px 0 var(--color-shadow-2);
+    padding: 0.26rem 0.85rem 0.06rem;
+    margin-top: 0.2rem;
+}
+
+.orsee-nav__item {
+    font-family: var(--font-menu);
+    color: var(--color-menu-item);
+    text-shadow: 0 1px 0 var(--color-shadow-2);
+    padding-block-start: 0.07rem;
+    padding-block-end: 0.08rem;
+    padding-inline-start: 2.8rem;
+    padding-inline-end: 0.85rem;
+    font-size: var(--font-size-menu-item);
+    font-weight: var(--font-weight-menu-item);
+}
+
+.orsee a.orsee-nav__section:link,
+.orsee a.orsee-nav__section:visited,
+.orsee a.orsee-nav__section:active,
+.orsee a.orsee-nav__item:link,
+.orsee a.orsee-nav__item:visited,
+.orsee a.orsee-nav__item:active {
+    color: inherit;
+}
+
+.orsee-nav__section:hover,
+.orsee-nav__item:hover,
+.orsee-nav__section.is-active,
+.orsee-nav__item.is-active {
+    background: var(--color-menu-item-highlighted-background);
+    box-shadow: 0 0 0 1px var(--color-inset-highlight-soft) inset;
+}
+
+.orsee.orsee-orientation-vertical div.orsee-nav__section:hover {
+    background: transparent;
+    box-shadow: none;
+}
+
+.orsee-nav__section.is-logout,
+.orsee-nav__item.is-logout {
+    color: var(--color-menu-logout-text);
+}
+
+.orsee-nav .menuicon {
+    margin-inline-end: 0.35rem;
+    color: var(--color-menu-title) !important;
+    font-size: inherit;
+}
+
+.orsee.orsee-orientation-horizontal .orsee-shell {
+    display: block;
+    padding: 0;
+}
+
+.orsee.orsee-orientation-horizontal .orsee-main {
+    padding-top: var(--orsee-gap);
+}
+
+.orsee.orsee-orientation-horizontal .orsee-menu {
+    margin-top: 0;
+    border-radius: 0;
+    padding: 0.2rem var(--orsee-gap);
+}
+
+.orsee.orsee-orientation-horizontal .orsee-menu::before,
+.orsee.orsee-orientation-horizontal .orsee-menu::after {
+    display: none;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-userbox {
+    font-family: var(--font-menu);
+    color: var(--color-menu-title);
+    font-size: 0.92rem;
+    font-weight: var(--font-weight-menu-item);
+    line-height: 1.22;
+    padding: 0.2rem 0.35rem 0 0.25rem;
+    margin-inline-start: auto;
+    white-space: nowrap;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack .orsee-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    padding: 0;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack .orsee-nav-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-menu-item) transparent;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack .orsee-nav-tabs .orsee-nav__section {
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-subs {
+    position: relative;
+    min-height: 1.5rem;
+    padding-top: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-menu-item) transparent;
+    --orsee-sub-offset: 0px;
+    --orsee-sub-width: 0px;
+    --orsee-sub-items-width: 0px;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack .orsee-nav-tabs::-webkit-scrollbar,
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-subs::-webkit-scrollbar,
+.orsee[data-menu-mode="horizontal_static_submenu"] .orsee-menu .orsee-menu-horizontal .orsee-nav-static::-webkit-scrollbar {
+    height: 8px;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack .orsee-nav-tabs::-webkit-scrollbar-thumb,
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-subs::-webkit-scrollbar-thumb,
+.orsee[data-menu-mode="horizontal_static_submenu"] .orsee-menu .orsee-menu-horizontal .orsee-nav-static::-webkit-scrollbar-thumb {
+    background: var(--color-menu-item);
+    border-radius: 999px;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack .orsee-nav-tabs::-webkit-scrollbar-track,
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-subs::-webkit-scrollbar-track,
+.orsee[data-menu-mode="horizontal_static_submenu"] .orsee-menu .orsee-menu-horizontal .orsee-nav-static::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-subs::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: var(--orsee-sub-offset);
+    width: var(--orsee-sub-items-width);
+    top: 0;
+    height: 1px;
+    background: var(--color-menu-item);
+    display: none;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-subs::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    inset-inline-start: var(--orsee-sub-offset);
+    width: var(--orsee-sub-width);
+    height: 3px;
+    background: var(--color-menu-item);
+    border-radius: 2px;
+    display: none;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-subs.has-subs::before,
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-subs.has-subs::after {
+    display: block;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-subgroup {
+    display: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 4px;
+    min-width: max-content;
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-subgroup.is-active {
+    display: flex;
+    margin-inline-start: var(--orsee-sub-offset);
+}
+
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack .orsee-nav__section,
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack .orsee-nav__item,
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack-static .orsee-nav__section,
+.orsee .orsee-menu .orsee-menu-horizontal .orsee-nav-stack-static .orsee-nav__item {
+    font-family: var(--font-menu);
+    color: var(--color-menu-item);
+    text-shadow: none;
+    font-size: var(--font-size-menu-item);
+    box-shadow: none;
+    margin-top: 0;
+    padding: 0.24rem 0.6rem;
+}
+
+.orsee[data-menu-mode="horizontal_static_submenu"] .orsee-menu .orsee-menu-horizontal .orsee-nav-row-static {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.orsee[data-menu-mode="horizontal_static_submenu"] .orsee-menu .orsee-menu-horizontal .orsee-nav-userbox {
+    margin-top: 0.2rem;
+}
+
+.orsee[data-menu-mode="horizontal_static_submenu"] .orsee-menu .orsee-menu-horizontal .orsee-nav-stack-static {
+    min-width: 0;
+}
+
+.orsee[data-menu-mode="horizontal_static_submenu"] .orsee-menu .orsee-menu-horizontal .orsee-nav-static {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-menu-item) transparent;
+}
+
+.orsee[data-menu-mode="horizontal_static_submenu"] .orsee-menu .orsee-menu-horizontal .orsee-nav-static-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    flex: 0 0 auto;
+}
+
+.orsee[data-menu-mode="horizontal_static_submenu"] .orsee-menu .orsee-menu-horizontal .orsee-nav-static-subs {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.orsee[data-menu-mode="horizontal_static_submenu"] .orsee-menu .orsee-menu-horizontal .orsee-nav-static-subs .orsee-nav__item {
+    margin-top: 0;
+}
+
+.orsee .orsee-menu a.is-logout,
+.orsee .orsee-menu a.is-logout:link,
+.orsee .orsee-menu a.is-logout:visited,
+.orsee .orsee-menu a.is-logout:active,
+.orsee .orsee-menu a.is-logout:hover {
+    color: var(--color-menu-logout-text) !important;
+}
+
+.orsee .orsee-menu a.is-logout .menuicon {
+    color: var(--color-menu-logout-text) !important;
+}

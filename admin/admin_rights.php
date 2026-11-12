@@ -1,43 +1,57 @@
 <?php
 // part of orsee. see orsee.org
 ob_start();
-
 $menu__area="options";
 $title="my_rights";
-include ("header.php");
-if ($proceed) {
-    echo '<center>';
-    $rights=$expadmindata['rights'];
-    echo '<TABLE class="or_listtable"><thead>
-        <TR style="background: '.$color['list_header_background'].'; color: '.$color['list_header_textcolor'].';">
-            <TD>'.lang('authorization').'</TD>
-            <TD>'.lang('description').'</TD>
-        </TR></thead>
-        <tbody>';
+include("header.php");
 
-    $shade=true; $lastclass="";
+if ($proceed) {
+    echo '<div class="orsee-options-list-panel">';
+    echo '<div class="orsee-panel">';
+    $rights=$expadmindata['rights'];
+    echo '<div class="orsee-table orsee-table-tablet-2cols orsee-table-mobile orsee-table-body-cells-compact">';
+    echo '<div class="orsee-table-row orsee-table-head">';
+    echo '<div class="orsee-table-cell">'.lang('authorization').'</div>';
+    echo '<div class="orsee-table-cell">'.lang('description').'</div>';
+    echo '</div>';
+
+    $shade=true;
+    $lastclass="";
     foreach ($system__admin_rights as $right) {
         $line=explode(":",$right);
         if (isset($rights[$line[0]]) && $rights[$line[0]]) {
             $tclass=str_replace(strstr($line[0],"_"),"",$line[0]);
             if ($tclass!=$lastclass) {
-                echo '<TR><TD colspan=4>&nbsp;</TD></TR>';
-                $lastclass=$tclass; //$shade=true;
+                if ($lastclass!=="") {
+                    echo '<div class="orsee-table-row orsee-table-row-spacer">';
+                    echo '<div class="orsee-table-cell"></div>';
+                    echo '<div class="orsee-table-cell"></div>';
+                    echo '</div>';
+                }
+                $lastclass=$tclass;
             }
-            echo '  <TR bgcolor="';
-            if ($shade) echo $color['list_shade1']; else echo $color['list_shade2'];
-            echo '">
-                    <TD class="small" align=left>'.$line[0].'</TD>
-                    <TD class="small">'.$line[1].'</TD>
-              </TR>';
-            if ($shade) $shade=false; else $shade=true;
+            $row_class='orsee-table-row';
+            if ($shade) {
+                $row_class.=' is-alt';
+            }
+            echo '<div class="'.$row_class.'">';
+            echo '<div class="orsee-table-cell" data-label="'.lang('authorization').'">'.$line[0].'</div>';
+            echo '<div class="orsee-table-cell" data-label="'.lang('description').'">'.$line[1].'</div>';
+            echo '</div>';
+            if ($shade) {
+                $shade=false;
+            } else {
+                $shade=true;
+            }
         }
     }
-    echo '  </tbody></TABLE>
-        </center>
-        <BR><BR>';
-
+    echo '</div>';
+    echo '<div class="orsee-stat-actions">';
+    echo button_back('options_main.php');
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
 }
-include ("footer.php");
+include("footer.php");
 
 ?>

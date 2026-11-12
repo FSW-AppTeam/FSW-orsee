@@ -1,23 +1,20 @@
-These are short installation notes for ORSEE 3.3.x
+*Installation instructions*
 
-The ORSEE Wiki contains more details on ORSEE installation.
-
-When you upgrade from an older version of ORSEE, please read the UPGRADE.howto
+These are short installation notes for ORSEE 3.4.x. The ORSEE Wiki contains more details on ORSEE installation. When you upgrade from an older version of ORSEE, please read the UPGRADE.howto
 
 PREREQUISITES
-
 - a webserver (Apache preferred)
-- PHP >=8 both as apache module (apache2-mod_php8) and on commandline (php8-cli) with modules: gd, mysql, mbstring.
+- PHP >=8 both as apache module (apache2-mod_php8) and on commandline (php8-cli) with extentions: pdo_mysql, mbstring, gd, json, filter, session, openssl, curl.
 - MySQL/MariaDB >=8
 - cronjob access
-- webalizer for web traffic analysis, of required.
+- webalizer for web traffic analysis, if required.
 
 BASIC INSTALLATION
 
 1. Unpack ORSEE's tgz file in your webservers path. (Oh, you already did?)
 
 2. Rename the directory if needed
-   % mv orsee-3.3.x yourdirname
+   % mv orsee-3.4.x yourdirname
 
 3. Cd to the 'install' directory.
    % cd yourdirname/install
@@ -42,7 +39,6 @@ BASIC INSTALLATION
 
 7. Copy settings-dist.php to 'config' directory and rename to 'settings.php'.
    % cp settings-dist.php ../config/settings.php
-   % cd ../config/
 
 8. Edit the few settings in 'settings.php'.
 
@@ -63,22 +59,22 @@ Just some notes:
 
 - Also change the email address of the user orsee_install in Options/Edit administrators.
 
-- Edit the settings in Options/General Settings and Options/Default Values. Don't forget to change the "System support email address", otherwise your system emails appear to come from orsee.org, and *I* will receive replies to *your* emails.
+- Edit the settings in Options/General Settings and Options/Default Values. Don't forget to change the "System support email address", otherwise your system emails appear to come from orsee.org (or not sent at all).
 
-- Check whether all characters are correctly displayed on the site. To do so, just use the pre-installed German language with all its umlauts (click on Switch to Deutsch when on public/index.php).
+- Create and edit profile participant fields (see documentation wiki).
 
-- If you want to add your own fields in the participant profile from, then please read the instructions in the wiki.
+- Edit the public and admin menu, edit richtext pages (see documentation wiki).
 
-- Create your own style
+- Create your own style.
   ->Copy the 'orsee' directory from the 'style' dir.
   % cp -r orsee mystyle
-  -> Edit the files in the directory.
-  -> Edit the colors in Options/Colors
-  -> Select the style in Options/General Settings
+  -> Edit the files in the directory (orsee.css, orsee_header.php, orsee_footer.php).
+  -> Edit the colors in Options/Colors or in colors.json.
+  -> Select the style in Options/General Settings.
 
-- Enable the Options/Regular Tasks (the cronjobs)
+- Enable the Options/Regular Tasks (the cronjobs).
 
-- Edit the Options/Administrator Types and their rights
+- Edit the Options/Administrator Types and their rights.
 
 - Create Administrators.
 
@@ -90,7 +86,7 @@ Just some notes:
 
 - Select your Languages/Public Languages.
 
-- Edit Public Content, FAQs, E-mail templates.
+- Edit Public menu and pages, FAQs, E-mail templates.
 
 - You might want to edit the file 'webalizer.template' in the 'usage' dir.
 
@@ -98,5 +94,4 @@ Just some notes:
 Ready to start.
 
 ORSEE. The ease of recruitment. ;-)
-
 
